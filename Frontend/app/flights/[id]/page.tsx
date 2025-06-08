@@ -10,9 +10,10 @@ import { Separator } from "@/components/ui/separator"
 import { MainNav } from "@/components/main-nav"
 import { UserNav } from "@/components/user-nav"
 import { FlightDetailsHeader } from "@/components/flight-details-header"
-import { FlightDetailsCard } from "@/components/flight-details-card"
+import { EnhancedFlightCard } from "@/components/enhanced-flight-card"
 import { BookingForm } from "@/components/booking-form"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import type { FlightOffer } from "@/types/flight-api"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -21,10 +22,14 @@ export default function FlightDetailsPage() {
   const params = useParams()
   const flightId = params.id as string
   
+  // Get trip type from search parameters
+  const tripType = searchParams.get('tripType') || 'one-way'
+  
   // State management
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [flightOffer, setFlightOffer] = useState<any>(null)
+  const [returnFlightOffer, setReturnFlightOffer] = useState<any>(null)
   const [pricedOffer, setPricedOffer] = useState<any>(null)
   const [airShoppingResponse, setAirShoppingResponse] = useState<any>(null)
 
@@ -56,6 +61,18 @@ export default function FlightDetailsPage() {
         }
 
         setFlightOffer(selectedOffer)
+
+        // Handle return flight for round-trip
+        if (tripType === 'round-trip' && airShoppingResponseData.data.offers.length > 1) {
+          // Find return flight (assuming it's the second offer or has return segments)
+          const returnOffer = airShoppingResponseData.data.offers.find(
+            (offer: any) => offer.id !== flightId && offer.segments?.some((seg: any) => seg.direction === 'return')
+          ) || airShoppingResponseData.data.offers[1] // Fallback to second offer
+          
+          if (returnOffer) {
+            setReturnFlightOffer(returnOffer)
+          }
+        }
 
         // Call the flight-price API endpoint
         const response = await api.getFlightPrice(
@@ -170,110 +187,81 @@ export default function FlightDetailsPage() {
 
   // If we have flight data, render the flight details
   if (flightOffer && pricedOffer) {
-    // Extract data from API response
-    const outboundSegment = flightOffer.segments[0]
-    const returnSegment = flightOffer.segments.length > 1 ? flightOffer.segments[1] : null
+    // Price data from priced offer or fallback to flight offer
+    const totalPrice = pricedOffer.data.priced_offer?.total_amount || flightOffer.price || 0
+    const currency = pricedOffer.data.priced_offer?.currency || flightOffer.currency || "USD"
+    const taxes = pricedOffer.data.priced_offer?.breakdown?.[0]?.taxes || flightOffer.priceBreakdown?.taxes || 0
+    const baseFare = pricedOffer.data.priced_offer?.breakdown?.[0]?.base || flightOffer.priceBreakdown?.baseFare || (totalPrice - taxes)
     
-    // Price data
-    const totalPrice = pricedOffer.data.priced_offer?.total_amount || flightOffer.price?.amount
-    const currency = pricedOffer.data.priced_offer?.currency || flightOffer.price?.currency || "USD"
-    const taxes = pricedOffer.data.priced_offer?.breakdown?.[0]?.taxes || 0
-    const baseFare = pricedOffer.data.priced_offer?.breakdown?.[0]?.base || (totalPrice - taxes)
-    
-    // Format flight data for the components
-    const formattedFlight = {
+    // Format flight data for the components using the actual API response structure
+    const formattedFlight: FlightOffer = {
       id: flightOffer.id,
       airline: {
-        name: outboundSegment?.marketingCarrier?.name || "Airline",
-        logo: "/placeholder.svg?height=40&width=40", // Default logo
-        code: outboundSegment?.marketingCarrier?.iataCode || "",
-        flightNumber: outboundSegment?.marketingFlightNumber || "",
+        name: flightOffer.airline?.name || "Unknown Airline",
+        logo: flightOffer.airline?.logo || "/placeholder.svg?height=40&width=40",
+        code: flightOffer.airline?.code || "",
+        flightNumber: flightOffer.airline?.flightNumber || "",
       },
       departure: {
-        airport: outboundSegment?.departure?.airport || "",
-        terminal: outboundSegment?.departure?.terminal || "",
-        city: outboundSegment?.departure?.cityName || "",
-        time: new Date(outboundSegment?.departure?.time || "").toLocaleTimeString('en-US', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        }),
-        date: new Date(outboundSegment?.departure?.time || "").toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric', 
-          year: 'numeric' 
-        }),
-        fullDate: formatDate(outboundSegment?.departure?.time),
+        airport: flightOffer.departure?.airport || "",
+        datetime: flightOffer.departure?.datetime || "",
+        terminal: flightOffer.departure?.terminal || "",
+        airportName: flightOffer.departure?.airportName || "",
       },
       arrival: {
-        airport: outboundSegment?.arrival?.airport || "",
-        terminal: outboundSegment?.arrival?.terminal || "",
-        city: outboundSegment?.arrival?.cityName || "",
-        time: new Date(outboundSegment?.arrival?.time || "").toLocaleTimeString('en-US', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        }),
-        date: new Date(outboundSegment?.arrival?.time || "").toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric', 
-          year: 'numeric' 
-        }),
-        fullDate: formatDate(outboundSegment?.arrival?.time),
+        airport: flightOffer.arrival?.airport || "",
+        datetime: flightOffer.arrival?.datetime || "",
+        terminal: flightOffer.arrival?.terminal || "",
+        airportName: flightOffer.arrival?.airportName || "",
       },
-      returnFlight: returnSegment ? {
-        airline: {
-          name: returnSegment?.marketingCarrier?.name || "Airline",
-          logo: "/placeholder.svg?height=40&width=40", // Default logo
-          code: returnSegment?.marketingCarrier?.iataCode || "",
-          flightNumber: returnSegment?.marketingFlightNumber || "",
-        },
-        departure: {
-          airport: returnSegment?.departure?.airport || "",
-          terminal: returnSegment?.departure?.terminal || "",
-          city: returnSegment?.departure?.cityName || "",
-          time: new Date(returnSegment?.departure?.time || "").toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          }),
-          date: new Date(returnSegment?.departure?.time || "").toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric' 
-          }),
-          fullDate: formatDate(returnSegment?.departure?.time),
-        },
-        arrival: {
-          airport: returnSegment?.arrival?.airport || "",
-          terminal: returnSegment?.arrival?.terminal || "",
-          city: returnSegment?.arrival?.cityName || "",
-          time: new Date(returnSegment?.arrival?.time || "").toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          }),
-          date: new Date(returnSegment?.arrival?.time || "").toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric' 
-          }),
-          fullDate: formatDate(returnSegment?.arrival?.time),
-        },
-        duration: returnSegment?.duration || "",
-        stops: 0, // Default value, adjust based on API response
-        aircraft: returnSegment?.equipment || "Aircraft",
-        amenities: [], // Default value, adjust based on API response
-      } : null,
-      duration: outboundSegment?.duration || flightOffer.duration || "",
-      stops: (outboundSegment?.stops?.length || 0),
-      aircraft: outboundSegment?.equipment || "Aircraft",
-      amenities: [], // Default value, adjust based on API response
-      baggageAllowance: {
-        carryOn: "1 bag (8 kg)", // Default value, adjust based on API response
-        checked: "1 bag (23 kg)", // Default value, adjust based on API response
-      },
+      duration: flightOffer.duration && flightOffer.duration !== "0h 0m" 
+        ? flightOffer.duration 
+        : flightOffer.segments?.reduce((total: number, segment: any) => {
+            if (segment.duration && segment.duration.startsWith('PT')) {
+              // Parse ISO 8601 duration format (PT1H15M)
+              const hours = segment.duration.match(/PT(\d+)H/) ? parseInt(segment.duration.match(/PT(\d+)H/)![1]) : 0;
+              const minutes = segment.duration.match(/(\d+)M/) ? parseInt(segment.duration.match(/(\d+)M/)![1]) : 0;
+              return total + (hours * 60) + minutes;
+            }
+            return total;
+          }, 0) ? (() => {
+            const totalMinutes = flightOffer.segments?.reduce((total: number, segment: any) => {
+              if (segment.duration && segment.duration.startsWith('PT')) {
+                const hours = segment.duration.match(/PT(\d+)H/) ? parseInt(segment.duration.match(/PT(\d+)H/)![1]) : 0;
+                const minutes = segment.duration.match(/(\d+)M/) ? parseInt(segment.duration.match(/(\d+)M/)![1]) : 0;
+                return total + (hours * 60) + minutes;
+              }
+              return total;
+            }, 0) || 0;
+            const hours = Math.floor(totalMinutes / 60);
+            const mins = totalMinutes % 60;
+            return `${hours}h ${mins}m`;
+          })() : "0h 0m",
+      stops: flightOffer.segments?.length > 1 ? flightOffer.segments.length - 1 : 0,
+      stopDetails: flightOffer.stopDetails || [],
       price: totalPrice,
       currency: currency,
-      seatsAvailable: flightOffer.seatsAvailable || 9,
-      refundable: flightOffer.refundable || false,
-      fareClass: flightOffer.cabinType || "Economy",
+      seatsAvailable: flightOffer.seatsAvailable || "Available",
+      baggage: flightOffer.baggage ? {
+        carryOn: { 
+          description: typeof flightOffer.baggage.carryOn === 'string' ? flightOffer.baggage.carryOn : flightOffer.baggage.carryOn?.description || "Not specified" 
+        },
+        checkedBaggage: { 
+          description: typeof flightOffer.baggage.checked === 'string' ? flightOffer.baggage.checked : flightOffer.baggage.checkedBaggage?.description || "Not specified",
+          policyType: 'WEIGHT_BASED' as const
+        }
+      } : {
+        carryOn: { description: "Not specified" },
+        checkedBaggage: { description: "Not specified", policyType: 'WEIGHT_BASED' as const }
+      },
+      fare: flightOffer.fare,
+      aircraft: flightOffer.aircraft,
+      segments: flightOffer.segments?.map((segment: any) => ({
+        ...segment,
+        airlineName: flightOffer.airline?.name || segment.airlineName || "Unknown Airline"
+      })) || [],
+      priceBreakdown: flightOffer.priceBreakdown,
+      additionalServices: flightOffer.additionalServices,
     }
 
     return (
@@ -301,12 +289,12 @@ export default function FlightDetailsPage() {
               </Link>
 
               <FlightDetailsHeader
-                origin={formattedFlight.departure.city}
-                originCode={formattedFlight.departure.airport}
-                destination={formattedFlight.arrival.city}
-                destinationCode={formattedFlight.arrival.airport}
-                departDate={formattedFlight.departure.fullDate}
-                returnDate={formattedFlight.returnFlight?.departure.fullDate}
+                origin={formattedFlight.departure.airportName || ''}
+                originCode={formattedFlight.departure.airport || ''}
+                destination={formattedFlight.arrival.airportName || ''}
+                destinationCode={formattedFlight.arrival.airport || ''}
+                departDate={formatDate(formattedFlight.departure.datetime)}
+                returnDate={returnFlightOffer ? formatDate(returnFlightOffer.departure?.datetime) : undefined}
                 passengers={1} // Update with actual passenger count from search
                 price={formattedFlight.price}
                 currency={formattedFlight.currency}
@@ -316,34 +304,62 @@ export default function FlightDetailsPage() {
             <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
               {/* Flight Details and Booking Form */}
               <div className="space-y-6">
-                <div className="rounded-lg border">
-                  <div className="p-4 sm:p-6">
-                    <h2 className="text-xl font-semibold">Outbound Flight</h2>
-                    <p className="text-sm text-muted-foreground">{formattedFlight.departure.fullDate}</p>
-                  </div>
-                  <Separator />
-                  <FlightDetailsCard flight={formattedFlight} />
-                </div>
-
-                {formattedFlight.returnFlight && (
+                {/* Dynamic flight display based on trip type */}
+                {tripType === 'one-way' && (
                   <div className="rounded-lg border">
                     <div className="p-4 sm:p-6">
-                      <h2 className="text-xl font-semibold">Return Flight</h2>
-                      <p className="text-sm text-muted-foreground">{formattedFlight.returnFlight.departure.fullDate}</p>
+                      <h2 className="text-xl font-semibold">Flight Details</h2>
+                      <p className="text-sm text-muted-foreground">{formatDate(formattedFlight.departure.datetime)}</p>
                     </div>
                     <Separator />
-                    <FlightDetailsCard
-                      flight={{
-                        ...formattedFlight.returnFlight,
-                        id: formattedFlight.id,
-                        price: formattedFlight.price,
-                        currency: formattedFlight.currency,
-                        seatsAvailable: formattedFlight.seatsAvailable,
-                        baggageAllowance: formattedFlight.baggageAllowance,
-                        refundable: formattedFlight.refundable,
-                        fareClass: formattedFlight.fareClass,
-                      }}
-                    />
+                    <EnhancedFlightCard flight={formattedFlight} />
+                  </div>
+                )}
+
+                {tripType === 'round-trip' && (
+                  <>
+                    <div className="rounded-lg border">
+                      <div className="p-4 sm:p-6">
+                        <h2 className="text-xl font-semibold">Outbound Flight</h2>
+                        <p className="text-sm text-muted-foreground">{formatDate(formattedFlight.departure.datetime)}</p>
+                      </div>
+                      <Separator />
+                      <EnhancedFlightCard flight={formattedFlight} />
+                    </div>
+
+                    {returnFlightOffer && (
+                      <div className="rounded-lg border">
+                        <div className="p-4 sm:p-6">
+                          <h2 className="text-xl font-semibold">Return Flight</h2>
+                          <p className="text-sm text-muted-foreground">{formatDate(returnFlightOffer.departure?.datetime)}</p>
+                        </div>
+                        <Separator />
+                        <EnhancedFlightCard
+                          flight={{
+                            ...returnFlightOffer,
+                            stopDetails: returnFlightOffer.stopDetails || [],
+                            baggage: returnFlightOffer.baggage || {
+                              carryOn: { description: "Not specified" },
+                              checkedBaggage: { description: "Not specified" }
+                            },
+                          } as FlightOffer}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {tripType === 'multi-city' && (
+                  <div className="space-y-4">
+                    <div className="rounded-lg border">
+                      <div className="p-4 sm:p-6">
+                        <h2 className="text-xl font-semibold">Flight Segment 1</h2>
+                        <p className="text-sm text-muted-foreground">{formatDate(formattedFlight.departure.datetime)}</p>
+                      </div>
+                      <Separator />
+                      <EnhancedFlightCard flight={formattedFlight} />
+                    </div>
+                    {/* Additional segments would be rendered here based on the flight data */}
                   </div>
                 )}
 
@@ -378,9 +394,9 @@ export default function FlightDetailsPage() {
                     <div className="text-xs text-muted-foreground">
                       <p>Fare rules:</p>
                       <ul className="mt-1 list-inside list-disc">
-                        <li>{formattedFlight.refundable ? "Refundable" : "Non-refundable"}</li>
+                        <li>{flightOffer?.fareRules?.refundable ? "Refundable" : "Non-refundable"}</li>
                         <li>Changes allowed (fee may apply)</li>
-                        <li>Fare class: {formattedFlight.fareClass}</li>
+                        <li>Fare class: {flightOffer?.cabinType || "Economy"}</li>
                       </ul>
                     </div>
                   </div>
