@@ -52,13 +52,15 @@ def filter_price_metadata(price_metadatas_container, all_offer_refs_set):
     return {"PriceMetadatas": {"PriceMetadata": filtered_items}}
 
 
-def build_flight_price_request(airshopping_response, selected_offer_index=0):
+def build_flight_price_request(airshopping_response, selected_offer_index=0, selected_airline_owner=None):
     """
     Generate a complete FlightPrice request from the AirShopping response.
     
     Args:
         airshopping_response (dict): The AirShopping response
         selected_offer_index (int): Index of the selected offer in AirlineOffers
+        selected_airline_owner (str, optional): The airline owner code (e.g., 'KQ', 'BA'). 
+                                               If not provided, will use the first airline.
         
     Returns:
         dict: FlightPrice request payload
@@ -74,13 +76,31 @@ def build_flight_price_request(airshopping_response, selected_offer_index=0):
         if not airline_offers_list_container or not isinstance(airline_offers_list_container, list):
             raise ValueError("No AirlineOffers found or invalid format in AirShoppingRS")
         
-        selected_airline_offers_node = airline_offers_list_container[0] # Assuming primary offers are in the first AirlineOffers entry
+        # Find the correct AirlineOffers entry based on selected_airline_owner
+        selected_airline_offers_node = None
+        if selected_airline_owner:
+            for airline_offers_entry in airline_offers_list_container:
+                if isinstance(airline_offers_entry, dict):
+                    owner_info = airline_offers_entry.get("Owner", {})
+                    if isinstance(owner_info, dict) and owner_info.get("value") == selected_airline_owner:
+                        selected_airline_offers_node = airline_offers_entry
+                        break
+            if not selected_airline_offers_node:
+                raise ValueError(f"No AirlineOffers found for airline owner: {selected_airline_owner}")
+        else:
+            # Default to first entry if no specific airline owner is provided
+            selected_airline_offers_node = airline_offers_list_container[0]
+        
         actual_airline_offers = selected_airline_offers_node.get("AirlineOffer", [])
         
         if not actual_airline_offers or not isinstance(actual_airline_offers, list) or selected_offer_index >= len(actual_airline_offers):
             raise ValueError(f"AirlineOffer list is empty or selected_offer_index {selected_offer_index} is out of bounds.")
             
         selected_offer = actual_airline_offers[selected_offer_index]
+        
+        # Extract the airline owner from the selected airline offers node
+        airline_owner = selected_airline_offers_node.get("Owner", {}).get("value", "")
+        
     except (IndexError, KeyError, TypeError) as e:
         raise ValueError(f"Error accessing selected AirlineOffer in AirShoppingRS: {str(e)}")
 
@@ -249,12 +269,53 @@ def build_flight_price_request(airshopping_response, selected_offer_index=0):
 
     shopping_response_id_node = airshopping_response.get("ShoppingResponseID", {}) # From top level of AirShoppingRS
     try:
-        sr_id_val = airshopping_response["Metadata"]["Other"]["OtherMetadata"][0]["DescriptionMetadatas"]["DescriptionMetadata"][0]["AugmentationPoint"]["AugPoint"][0]["Key"]
-        sr_owner_val = airshopping_response["Metadata"]["Other"]["OtherMetadata"][0]["DescriptionMetadatas"]["DescriptionMetadata"][0]["AugmentationPoint"]["AugPoint"][0]["Owner"]            
-        shopping_response_id_node = {"Owner": sr_owner_val, "ResponseID": {"value": sr_id_val}}
-    except (KeyError, IndexError, TypeError):
-        print("Critical Warning: ShoppingResponseID could not be determined for FlightPriceRQ from any source.")
-        # Depending on requirements, either raise error or set to None/empty and let Verteil handle it
+        # Find the shopping response ID for the specific airline owner
+        metadata_section = airshopping_response.get("Metadata", {})
+        other_metadata_list = metadata_section.get("Other", {}).get("OtherMetadata", [])
+        
+        sr_id_val = None
+        sr_owner_val = None
+        
+        if isinstance(other_metadata_list, list):
+            for other_metadata in other_metadata_list:
+                if isinstance(other_metadata, dict):
+                    desc_metadatas = other_metadata.get("DescriptionMetadatas", {})
+                    desc_metadata_list = desc_metadatas.get("DescriptionMetadata", [])
+                    
+                    if isinstance(desc_metadata_list, list):
+                        for desc_metadata in desc_metadata_list:
+                            if isinstance(desc_metadata, dict) and desc_metadata.get("MetadataKey") == "SHOPPING_RESPONSE_IDS":
+                                aug_points = desc_metadata.get("AugmentationPoint", {}).get("AugPoint", [])
+                                if isinstance(aug_points, list):
+                                    for aug_point in aug_points:
+                                        if isinstance(aug_point, dict) and aug_point.get("Owner") == airline_owner:
+                                            sr_id_val = aug_point.get("Key")
+                                            sr_owner_val = aug_point.get("Owner")
+                                            break
+                                    if sr_id_val and sr_owner_val:
+                                        break
+                            if sr_id_val and sr_owner_val:
+                                break
+                if sr_id_val and sr_owner_val:
+                    break
+        
+        if sr_id_val and sr_owner_val:
+            shopping_response_id_node = {"Owner": sr_owner_val, "ResponseID": {"value": sr_id_val}}
+            print(f"Found ShoppingResponseID for airline {sr_owner_val}: {sr_id_val}")
+        else:
+            print(f"Critical Warning: ShoppingResponseID could not be found for airline owner: {airline_owner}")
+            # Fallback to the original logic for backward compatibility
+            try:
+                sr_id_val = airshopping_response["Metadata"]["Other"]["OtherMetadata"][0]["DescriptionMetadatas"]["DescriptionMetadata"][0]["AugmentationPoint"]["AugPoint"][0]["Key"]
+                sr_owner_val = airshopping_response["Metadata"]["Other"]["OtherMetadata"][0]["DescriptionMetadatas"]["DescriptionMetadata"][0]["AugmentationPoint"]["AugPoint"][0]["Owner"]            
+                shopping_response_id_node = {"Owner": sr_owner_val, "ResponseID": {"value": sr_id_val}}
+                print(f"Fallback: Using first available ShoppingResponseID for owner: {sr_owner_val}")
+            except (KeyError, IndexError, TypeError):
+                print("Critical Warning: ShoppingResponseID could not be determined for FlightPriceRQ from any source.")
+                shopping_response_id_node = None
+                
+    except (KeyError, IndexError, TypeError) as e:
+        print(f"Error extracting ShoppingResponseID: {str(e)}")
         shopping_response_id_node = None
 
 
@@ -344,4 +405,34 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# --- USAGE EXAMPLES ---
+"""
+Usage Examples for Multi-Airline Support:
+
+1. Default behavior (uses first airline):
+   result = build_flight_price_request(airshopping_response, selected_offer_index=0)
+
+2. Specify a particular airline (e.g., Kenya Airways):
+   result = build_flight_price_request(
+       airshopping_response, 
+       selected_offer_index=0, 
+       selected_airline_owner='KQ'
+   )
+
+3. Specify another airline (e.g., British Airways):
+   result = build_flight_price_request(
+       airshopping_response, 
+       selected_offer_index=0, 
+       selected_airline_owner='BA'
+   )
+
+The function will automatically:
+- Find the correct AirlineOffers entry for the specified airline
+- Extract the appropriate ShoppingResponseID for that airline from the metadata
+- Build the FlightPriceRQ with the correct airline-specific information
+
+Note: If the specified airline_owner is not found, the function will raise a ValueError.
+"""
+
 # --- END OF FILE build_flightpriceRQ.py ---

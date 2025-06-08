@@ -1,4 +1,4 @@
-import { CalendarIcon, MapPin, Users } from "lucide-react"
+import { Calendar as CalendarIcon, MapPin, Users } from "lucide-react"
 
 interface FlightDetailsHeaderProps {
   origin: string
@@ -9,6 +9,7 @@ interface FlightDetailsHeaderProps {
   returnDate?: string
   passengers: number
   price: number
+  currency: string
 }
 
 export function FlightDetailsHeader({
@@ -20,6 +21,7 @@ export function FlightDetailsHeader({
   returnDate,
   passengers,
   price,
+  currency,
 }: FlightDetailsHeaderProps) {
   return (
     <div className="mt-4">
@@ -44,7 +46,7 @@ export function FlightDetailsHeader({
             {passengers} {passengers === 1 ? "passenger" : "passengers"}
           </span>
         </div>
-        <div className="ml-auto font-medium text-foreground">Total: ${(price + 45.6).toFixed(2)}</div>
+        <div className="ml-auto font-medium text-foreground">Total: {price.toFixed(2)} {currency}</div>
       </div>
     </div>
   )

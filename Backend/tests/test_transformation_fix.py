@@ -13,7 +13,7 @@ def test_transformation():
     """Test the transformation with the saved API response"""
     
     # Load the saved API response
-    response_file = 'debug/api_response_live_20250607_115324.json'
+    response_file = 'debug/api_response_20250607_132944.json'
     
     try:
         with open(response_file, 'r') as f:

@@ -347,11 +347,7 @@ export default function FlightDetailsPage() {
                   </div>
                 )}
 
-                <BookingForm 
-                  flightOffer={flightOffer} 
-                  pricedOffer={pricedOffer} 
-                  airShoppingResponse={airShoppingResponse} 
-                />
+                <BookingForm />
               </div>
 
               {/* Price Summary */}
@@ -377,7 +373,7 @@ export default function FlightDetailsPage() {
                     <Separator />
                     <div className="flex justify-between font-bold">
                       <span>Total</span>
-                      <span>{totalPrice.toFixed(2)} {currency}</span>
+                      <span>{formattedFlight.price.toFixed(2)} {formattedFlight.currency}</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
                       <p>Fare rules:</p>
