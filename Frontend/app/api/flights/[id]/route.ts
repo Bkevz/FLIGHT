@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { getFlightDetails } from '@/lib/flight-api';
 import { logger } from '@/lib/logger';
 
 interface FlightDetailsParams {
@@ -30,8 +29,17 @@ export async function GET(
       );
     }
 
-    const flightDetails = await getFlightDetails(id);
-    return NextResponse.json(flightDetails);
+    // TODO: Implement proper flight details retrieval from backend
+    // This endpoint needs to be connected to the actual backend service
+    return NextResponse.json({
+      id,
+      message: 'Flight details endpoint needs implementation',
+      // Placeholder response structure
+      flightDetails: {
+        id,
+        status: 'not_implemented'
+      }
+    });
   } catch (error) {
     logger.error('Error fetching flight details', { error });
     return NextResponse.json(

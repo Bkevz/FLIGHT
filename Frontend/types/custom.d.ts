@@ -3,24 +3,18 @@ declare module '@/lib/flight-api' {
   export interface FlightSearchRequest {
     tripType: string;
     odSegments: Array<{
-      Origin: string;
-      Destination: string;
-      DepartureDate: string;
+      origin: string;
+      destination: string;
+      departureDate: string;
     }>;
     numAdults: number;
     numChildren: number;
     numInfants: number;
     cabinPreference: string;
+    directOnly: boolean;
   }
 
-  export interface FlightOffer {
-    // Define the FlightOffer interface based on your backend response
-    id: string;
-    // Add other flight offer properties
-  }
-
-  export function callVerteilAirShopping(params: FlightSearchRequest): Promise<FlightOffer[]>;
-  export function getFlightDetails(offerId: string): Promise<FlightOffer>;
+  export function callVerteilAirShopping(params: FlightSearchRequest): Promise<any>;
 }
 
 declare module '@/lib/logger' {

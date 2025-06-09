@@ -12,6 +12,27 @@
 
 ## Lessons Learned
 
+### [2025-01-07] ThirdPartyId Configuration Analysis Completed
+- **Issue Identified**: Configuration shows `VERTEIL_THIRD_PARTY_ID=EK` but API responses contain data from multiple airlines (KQ, WY, etc.)
+- **Root Cause Analysis**: 
+  - ThirdPartyId is sent in HTTP headers (`X-Third-Party-ID` and `ThirdpartyId`) but NOT in request payload body
+  - AirShopping endpoint: ThirdPartyId is optional - API returns offers from multiple airlines regardless of header value
+  - FlightPrice endpoint: ThirdPartyId is mandatory - must match the airline of the selected offer
+  - OrderCreate endpoint: ThirdPartyId is mandatory - must match the airline for booking creation
+- **Current Implementation**: 
+  - Headers correctly include `ThirdpartyId: EK` from config
+  - Request payloads (AirShopping, FlightPrice, OrderCreate) do NOT include thirdPartyId field
+  - API responses contain airline-specific data (e.g., "Owner": {"value": "KQ"}) independent of header
+- **Evidence Found**:
+  - Debug response shows offers from KQ airline despite EK thirdPartyId header
+  - WY references found in encoded offer IDs within API responses
+  - Test files use `VERTEIL_THIRD_PARTY_ID='KQ'` while production uses `EK`
+- **Detailed Analysis and Recommendations**:
+  1. **Current Implementation Status**: ThirdPartyId is correctly included in headers but not in request payloads (which is correct per API specification)
+  2. **Dynamic ThirdPartyId Implementation**: For FlightPrice and OrderCreate operations, implement dynamic thirdPartyId header setting based on the selected offer's airline (extract from offer.Owner.value)
+  3. **Service Layer Enhancement**: Update FlightPricingService and FlightBookingService to accept airline parameter and dynamically set thirdPartyId header
+- **Recommendation**: ThirdPartyId header should match the airline being processed for FlightPrice/OrderCreate operations
+
 ### [2024-12-19] Frontend-Backend Integration Successfully Tested
 - **Issue Fixed**: Configuration error "Configuration not available for FlightSearchService in process_air_shopping"
 - **Root Cause**: Flight service was trying to import Flask's `current_app` instead of Quart's `current_app`

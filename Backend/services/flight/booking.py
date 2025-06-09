@@ -65,6 +65,10 @@ class FlightBookingService(FlightService):
             # Generate a request ID if not provided
             request_id = request_id or str(uuid.uuid4())
             
+            # Extract airline code from the flight price response for dynamic thirdPartyId
+            airline_code = self._extract_airline_code_from_price_response(flight_price_response)
+            logger.info(f"Extracted airline code '{airline_code}' for booking (ReqID: {request_id})")
+            
             # Build the request payload
             payload = self._build_booking_payload(
                 flight_price_response=flight_price_response,
@@ -74,11 +78,12 @@ class FlightBookingService(FlightService):
                 request_id=request_id
             )
             
-            # Make the API request
+            # Make the API request with dynamic airline code
             response = await self._make_request(
                 endpoint='ordercreate',
                 payload=payload,
                 service_name='OrderCreate',
+                airline_code=airline_code,
                 request_id=request_id
             )
             
@@ -103,6 +108,53 @@ class FlightBookingService(FlightService):
                 'error': f"Failed to create booking: {str(e)}",
                 'request_id': request_id
             }
+    
+    def _extract_airline_code_from_price_response(self, flight_price_response: Dict[str, Any]) -> Optional[str]:
+        """
+        Extract the airline code from the flight price response for dynamic thirdPartyId.
+        
+        Args:
+            flight_price_response: The FlightPrice response containing offer details
+            
+        Returns:
+            The airline code (e.g., 'KQ', 'WY') or None if not found
+        """
+        try:
+            # Navigate to the priced offers in the response
+            flight_price_rs = flight_price_response.get('FlightPriceRS', {})
+            priced_offer = flight_price_rs.get('PricedOffer', {})
+            
+            # Extract airline code from Owner field
+            owner = priced_offer.get('Owner', {})
+            if isinstance(owner, dict):
+                airline_code = owner.get('value')
+                if airline_code:
+                    logger.info(f"Found airline code '{airline_code}' in FlightPrice response")
+                    return airline_code
+            
+            # Alternative: try to extract from OfferItem if Owner not found at top level
+            offer_items = priced_offer.get('OfferItem', [])
+            if not isinstance(offer_items, list):
+                offer_items = [offer_items]
+            
+            for offer_item in offer_items:
+                # Look for airline code in service associations or flight segments
+                service = offer_item.get('Service', {})
+                if isinstance(service, list) and service:
+                    service = service[0]
+                
+                # Try to extract from service details
+                service_definition = service.get('ServiceDefinition', {})
+                if service_definition:
+                    # Look for airline code in service definition
+                    pass  # This would require more specific API response analysis
+            
+            logger.warning(f"Could not extract airline code from FlightPrice response")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error extracting airline code from FlightPrice response: {str(e)}", exc_info=True)
+            return None
     
     async def get_booking_details(
         self,

@@ -130,8 +130,23 @@ def create_app(test_config=None):
 app = create_app()
 
 if __name__ == '__main__':
+    # Configure logging to reduce verbosity
+    import logging
+    import os
+    
+    # Set environment variable to disable asyncio debug mode
+    os.environ['PYTHONASYNCIODEBUG'] = '0'
+    
+    # Configure root logger to reduce noise
+    # logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    # Suppress specific loggers that cause repetitive output
+    logging.getLogger('asyncio').setLevel(logging.ERROR)
+    logging.getLogger('quart.serving').setLevel(logging.INFO)
+    logging.getLogger('quart.utils').setLevel(logging.ERROR)
+    
     # Run with Hypercorn server for async support
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
 
 # Import routes at the bottom to avoid circular imports
 # from . import routes

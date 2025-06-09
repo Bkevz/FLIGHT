@@ -293,18 +293,6 @@ def _transform_single_offer(
         price_breakdown = _build_price_breakdown(price_detail, priced_offer, airline_offer)
         
         # Build baggage information (simplified)
-        baggage = {
-            'carryOn': {
-                'included': True,
-                'weight': {'value': 7, 'unit': 'kg'},
-                'dimensions': {'length': 56, 'width': 45, 'height': 25, 'unit': 'cm'}
-            },
-            'checked': {
-                'included': True,
-                'weight': {'value': 23, 'unit': 'kg'},
-                'pieces': 1
-            }
-        }
         
         # Build airline details
         airline_details = {
@@ -391,8 +379,20 @@ def _transform_segment(segment_data: Dict[str, Any], reference_data: Dict[str, A
     dep_datetime = extract_datetime(dep_date_raw, dep_time_raw)
     arr_datetime = extract_datetime(arr_date_raw, arr_time_raw)
     
-    # Extract time portion from datetime for display
-    def extract_time_from_datetime(datetime_str):
+    # Extract time portion - prioritize separate Time field, fallback to datetime extraction
+    def extract_time_with_priority(time_field, datetime_str):
+        # First priority: use separate Time field if available
+        if time_field and time_field.strip():
+            # Handle both "HH:MM" and "HH:MM:SS" formats
+            time_parts = time_field.split(':')
+            if len(time_parts) == 2:
+                return f"{time_field}:00"  # Add seconds if missing
+            elif len(time_parts) == 3:
+                return time_field  # Already has seconds
+            else:
+                return time_field  # Return as-is if unexpected format
+        
+        # Fallback: extract from datetime string
         if 'T' in datetime_str:
             time_part = datetime_str.split('T')[1]
             # Remove milliseconds if present
@@ -401,8 +401,8 @@ def _transform_segment(segment_data: Dict[str, Any], reference_data: Dict[str, A
             return time_part
         return None
     
-    dep_time = extract_time_from_datetime(dep_datetime)
-    arr_time = extract_time_from_datetime(arr_datetime)
+    dep_time = extract_time_with_priority(dep_time_raw, dep_datetime)
+    arr_time = extract_time_with_priority(arr_time_raw, arr_datetime)
     
     # Extract airline name using correct path: OperatingCarrier.Name
     airline_name = segment_data.get('OperatingCarrier', {}).get('Name', 'Unknown Airline')

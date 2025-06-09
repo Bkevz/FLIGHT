@@ -97,14 +97,19 @@ class FlightService:
             logger.error(f"Failed to get access token from TokenManager: {str(e)}", exc_info=True)
             raise AuthenticationError(f"Failed to get access token: {str(e)}") from e
 
-    async def _get_headers(self, service_name: str) -> Dict[str, str]:
+    async def _get_headers(self, service_name: str, airline_code: Optional[str] = None) -> Dict[str, str]:
         access_token = await self._get_access_token()
+        
+        # Use dynamic airline code for FlightPrice and OrderCreate operations
+        # For AirShopping, use the default from config
+        third_party_id = airline_code if airline_code else self.config.get('VERTEIL_THIRD_PARTY_ID', '')
+        
         return {
             'Content-Type': 'application/json',
             'Accept': '*/*',
             'Authorization': f'Bearer {access_token}', # Optional: Keep if Verteil uses/recommends it
             'OfficeId': self.config.get('VERTEIL_OFFICE_ID', ''),
-            'ThirdpartyId': self.config.get('VERTEIL_THIRD_PARTY_ID', ''),
+            'ThirdpartyId': third_party_id,
             'service': service_name,
             'User-Agent': 'FlightBookingPortal/1.0'
         }
@@ -117,10 +122,11 @@ class FlightService:
         payload: Dict[str, Any],
         service_name: str,
         method: str = 'POST',
+        airline_code: Optional[str] = None,
         **kwargs # Used to pass request_id from route context
     ) -> Dict[str, Any]:
         url = urljoin(str(self.config['VERTEIL_API_BASE_URL']).rstrip('/') + '/', endpoint.lstrip('/'))
-        headers = await self._get_headers(service_name) # _get_headers is now async
+        headers = await self._get_headers(service_name, airline_code) # _get_headers is now async
 
         # Propagate request_id from calling context (e.g., route handler) if available
         # Otherwise, use the one generated in _get_headers or generate a new one for the payload
@@ -160,9 +166,8 @@ class FlightService:
                         logger.error(f"API request for {service_name} (ReqID: {log_request_id}) failed with status {response.status}. Response was not JSON: {response_text[:500]}")
                         # If it's a 401, still try to invalidate token
                         if response.status == 401 and attempt < max_retries -1:
-                             logger.warning(f"Received 401 (Unauthorized) with non-JSON response for {service_name} (ReqID: {log_request_id}). Invalidating local token.")
-                             self._access_token = None
-                             self._token_expiry_time = 0
+                             logger.warning(f"Received 401 (Unauthorized) with non-JSON response for {service_name} (ReqID: {log_request_id}). Clearing TokenManager token.")
+                             self._token_manager.clear_token()
                              # Fall through to retry logic
                         else:
                              raise APIError(f"API request for {service_name} (ReqID: {log_request_id}) failed with status {response.status}. Response was not JSON: {response_text[:200]}", status_code=response.status)
@@ -171,9 +176,8 @@ class FlightService:
                     if response.status >= 400:
                         error_msg = f"API request for {service_name} (ReqID: {log_request_id}) failed with status {response.status}. Response: {json.dumps(response_data)}"
                         if response.status == 401: # Unauthorized
-                            logger.warning(f"Received 401 (Unauthorized) for {service_name} (ReqID: {log_request_id}). Invalidating local token.")
-                            self._access_token = None # Invalidate token
-                            self._token_expiry_time = 0
+                            logger.warning(f"Received 401 (Unauthorized) for {service_name} (ReqID: {log_request_id}). Clearing TokenManager token.")
+                            self._token_manager.clear_token()
                             if attempt == max_retries - 1: # Last attempt
                                 raise AuthenticationError(error_msg)
                             # Fall through to retry logic, will attempt to get new token on next _get_headers call

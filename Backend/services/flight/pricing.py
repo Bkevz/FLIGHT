@@ -58,6 +58,10 @@ class FlightPricingService(FlightService):
             # Generate a request ID if not provided
             request_id = request_id or str(uuid.uuid4())
             
+            # Extract airline code from the offer for dynamic thirdPartyId
+            airline_code = self._extract_airline_code_from_offer(airshopping_response, offer_id)
+            logger.info(f"Extracted airline code '{airline_code}' for offer {offer_id} (ReqID: {request_id})")
+            
             # Build the request payload
             payload = self._build_pricing_payload(
                 airshopping_response=airshopping_response,
@@ -67,11 +71,12 @@ class FlightPricingService(FlightService):
                 request_id=request_id
             )
             
-            # Make the API request
+            # Make the API request with dynamic airline code
             response = await self._make_request(
                 endpoint='flightprice',
                 payload=payload,
                 service_name='FlightPrice',
+                airline_code=airline_code,
                 request_id=request_id
             )
             
@@ -97,13 +102,61 @@ class FlightPricingService(FlightService):
                 'request_id': request_id
             }
     
+    def _extract_airline_code_from_offer(self, airshopping_response: Dict[str, Any], offer_id: str) -> Optional[str]:
+        """
+        Extract the airline code from the offer data for dynamic thirdPartyId.
+        
+        Args:
+            airshopping_response: The AirShopping response containing offers
+            offer_id: The ID of the offer to extract airline code from
+            
+        Returns:
+            The airline code (e.g., 'KQ', 'WY') or None if not found
+        """
+        try:
+            # Navigate to the offers in the response
+            offers_group = airshopping_response.get('AirShoppingRS', {}).get('OffersGroup', {})
+            
+            # Look for the specific offer
+            air_line_offers = offers_group.get('AirlineOffers', [])
+            if not isinstance(air_line_offers, list):
+                air_line_offers = [air_line_offers]
+            
+            for airline_offer in air_line_offers:
+                offers = airline_offer.get('Offer', [])
+                if not isinstance(offers, list):
+                    offers = [offers]
+                
+                for offer in offers:
+                    if offer.get('OfferID', {}).get('value') == offer_id:
+                        # Extract airline code from Owner field
+                        owner = offer.get('Owner', {})
+                        if isinstance(owner, dict):
+                            airline_code = owner.get('value')
+                            if airline_code:
+                                logger.info(f"Found airline code '{airline_code}' for offer {offer_id}")
+                                return airline_code
+            
+            # If not found in offers, try to extract from OfferGroup level
+            for airline_offer in air_line_offers:
+                owner = airline_offer.get('Owner', {})
+                if isinstance(owner, dict):
+                    airline_code = owner.get('value')
+                    if airline_code:
+                        logger.info(f"Using airline code '{airline_code}' from OfferGroup for offer {offer_id}")
+                        return airline_code
+            
+            logger.warning(f"Could not extract airline code for offer {offer_id}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error extracting airline code for offer {offer_id}: {str(e)}", exc_info=True)
+            return None
+    
     def _build_pricing_payload(
         self,
         airshopping_response: Dict[str, Any],
-        offer_id: str,
-        shopping_response_id: str,
-        currency: str,
-        request_id: str
+        offer_id: str
     ) -> Dict[str, Any]:
         """
         Build the FlightPrice request payload using the request builder.
