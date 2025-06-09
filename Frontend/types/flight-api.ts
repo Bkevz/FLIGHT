@@ -394,7 +394,6 @@ export interface FlightOffer {
   stopDetails: string[]; // Array of airport codes for stops
   price: number;
   currency: string;
-  seatsAvailable: number | string; // Can be number or 'N/A'
   baggage: BaggageAllowance; // Added baggage allowance information
   fare?: FareDetails; // Added fare details information
   aircraft?: AircraftDetails; // Added aircraft information

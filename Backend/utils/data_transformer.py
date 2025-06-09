@@ -6,17 +6,23 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def transform_verteil_to_frontend(verteil_response: Dict[str, Any]) -> List[Dict[str, Any]]:
+def transform_verteil_to_frontend(verteil_response: Dict[str, Any], enable_roundtrip: bool = False) -> List[Dict[str, Any]]:
     """
     Transform Verteil API air shopping response to frontend-compatible FlightOffer objects.
     
     Args:
         verteil_response: Raw response from Verteil API
+        enable_roundtrip: Whether to enable round trip transformation logic
         
     Returns:
         List of FlightOffer objects compatible with frontend interface
     """
     try:
+        # If roundtrip transformation is enabled, use the enhanced roundtrip logic
+        if enable_roundtrip:
+            from utils.data_transformer_roundtrip import transform_verteil_to_frontend_with_roundtrip
+            return transform_verteil_to_frontend_with_roundtrip(verteil_response)
+        
         flight_offers = []
         
         # Debug logging to understand the response structure
@@ -265,8 +271,20 @@ def _transform_single_offer(
                 stop_airport = segments[i]['departure']['airport']
                 stop_details.append(stop_airport)
         
-        # Calculate total duration (simplified)
-        duration = _calculate_duration(first_segment, last_segment)
+        # Calculate total duration by summing individual segment durations
+        total_duration_minutes = 0
+        for segment in segments:
+            segment_duration = segment.get('duration', 'PT0M')
+            total_duration_minutes += _parse_iso_duration(segment_duration)
+        
+        # Convert total minutes back to "Xh Ym" format
+        if total_duration_minutes > 0:
+            hours = total_duration_minutes // 60
+            minutes = total_duration_minutes % 60
+            duration = f"{hours}h {minutes}m"
+        else:
+            # Fallback to datetime calculation
+            duration = _calculate_duration(first_segment, last_segment)
         
         # Generate unique offer ID
         offer_id = f"{airline_code}-{'-'.join(all_segment_refs)}-{price}"
@@ -373,6 +391,19 @@ def _transform_segment(segment_data: Dict[str, Any], reference_data: Dict[str, A
     dep_datetime = extract_datetime(dep_date_raw, dep_time_raw)
     arr_datetime = extract_datetime(arr_date_raw, arr_time_raw)
     
+    # Extract time portion from datetime for display
+    def extract_time_from_datetime(datetime_str):
+        if 'T' in datetime_str:
+            time_part = datetime_str.split('T')[1]
+            # Remove milliseconds if present
+            if '.' in time_part:
+                time_part = time_part.split('.')[0]
+            return time_part
+        return None
+    
+    dep_time = extract_time_from_datetime(dep_datetime)
+    arr_time = extract_time_from_datetime(arr_datetime)
+    
     # Extract airline name using correct path: OperatingCarrier.Name
     airline_name = segment_data.get('OperatingCarrier', {}).get('Name', 'Unknown Airline')
     
@@ -383,12 +414,14 @@ def _transform_segment(segment_data: Dict[str, Any], reference_data: Dict[str, A
         'departure': {
             'airport': dep_airport,
             'datetime': dep_datetime,
+            'time': dep_time,
             'terminal': dep_airport_info.get('terminal'),
             'airportName': dep_airport_info.get('name')
         },
         'arrival': {
             'airport': arr_airport,
             'datetime': arr_datetime,
+            'time': arr_time,
             'terminal': arr_airport_info.get('terminal'),
             'airportName': arr_airport_info.get('name')
         },
@@ -609,7 +642,8 @@ def _get_airline_name(airline_code: str) -> str:
         'AF': 'Air France',
         'KL': 'KLM',
         'EK': 'Emirates',
-        'QR': 'Qatar Airways'
+        'QR': 'Qatar Airways',
+        'WY': 'Oman Air'
     }
     return airline_names.get(airline_code, f"Airline {airline_code}")
 
@@ -714,3 +748,30 @@ def _transform_penalties_to_fare_rules(penalties: List[Dict[str, Any]]) -> Dict[
     fare_rules['additionalRestrictions'] = list(set(fare_rules['additionalRestrictions']))
     
     return fare_rules
+
+def _parse_iso_duration(duration_str):
+    """
+    Parse ISO 8601 duration string (e.g., "PT2H45M") to total minutes.
+    
+    Args:
+        duration_str (str): ISO 8601 duration string
+        
+    Returns:
+        int: Total duration in minutes
+    """
+    if not duration_str or not duration_str.startswith('PT'):
+        return 0
+    
+    import re
+    
+    # Remove 'PT' prefix
+    duration_str = duration_str[2:]
+    
+    # Extract hours and minutes using regex
+    hours_match = re.search(r'(\d+)H', duration_str)
+    minutes_match = re.search(r'(\d+)M', duration_str)
+    
+    hours = int(hours_match.group(1)) if hours_match else 0
+    minutes = int(minutes_match.group(1)) if minutes_match else 0
+    
+    return hours * 60 + minutes

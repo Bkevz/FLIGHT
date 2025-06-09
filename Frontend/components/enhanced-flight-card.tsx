@@ -183,9 +183,7 @@ export function EnhancedFlightCard({ flight, showExtendedDetails = false }: Enha
                 <Clock className="mr-1 h-3 w-3" />
                 <span>On-time performance: 92%</span>
               </div>
-              <div className="ml-auto">
-                <span className="font-medium text-foreground">{flight.seatsAvailable} seats left</span>
-              </div>
+
             </div>
             
             {/* Additional Services Icons */}

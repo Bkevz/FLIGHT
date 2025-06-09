@@ -241,18 +241,14 @@ export default function FlightDetailsPage() {
       stopDetails: flightOffer.stopDetails || [],
       price: totalPrice,
       currency: currency,
-      seatsAvailable: flightOffer.seatsAvailable || "Available",
-      baggage: flightOffer.baggage ? {
+      baggage: {
         carryOn: { 
-          description: typeof flightOffer.baggage.carryOn === 'string' ? flightOffer.baggage.carryOn : flightOffer.baggage.carryOn?.description || "Not specified" 
+          description: flightOffer.baggage?.carryOn || "Not specified"
         },
         checkedBaggage: { 
-          description: typeof flightOffer.baggage.checked === 'string' ? flightOffer.baggage.checked : flightOffer.baggage.checkedBaggage?.description || "Not specified",
+          description: flightOffer.baggage?.checked || "Not specified",
           policyType: 'WEIGHT_BASED' as const
         }
-      } : {
-        carryOn: { description: "Not specified" },
-        checkedBaggage: { description: "Not specified", policyType: 'WEIGHT_BASED' as const }
       },
       fare: flightOffer.fare,
       aircraft: flightOffer.aircraft,

@@ -74,7 +74,6 @@ interface Flight {
   stops: number
   stopDetails?: StopDetail[]
   price: number
-  seatsAvailable: number
 }
 
 // This interface matches the API response format
@@ -102,7 +101,6 @@ interface ApiFlightResponse {
   stops: number
   stopDetails?: string[]
   price: number
-  seatsAvailable: number
 }
 
 interface FlightFiltersState {
@@ -261,33 +259,50 @@ export default function FlightsPage() {
         
         console.log('API Response:', apiResponse);
         console.log('Extracted flights:', apiFlights.length, 'offers');
-        const mappedFlights = apiFlights.map((offer: any) => ({
-          id: offer.id,
-          airline: {
-            name: offer.segments[0]?.marketingCarrier?.name || 'Unknown Airline',
-            logo: '', // You might want to add airline logos
-            code: offer.segments[0]?.marketingCarrier?.iataCode || '',
-            flightNumber: offer.segments[0]?.marketingFlightNumber?.toString() || ''
-          },
-          departure: {
-            airport: offer.segments[0]?.departure.airport || '',
-            city: getAirportCity(offer.segments[0]?.departure.airport || ''),
-            time: new Date(offer.segments[0]?.departure.time || '').toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-            date: formatDate(offer.segments[0]?.departure.time || '')
-          },
-          arrival: {
-            airport: offer.segments[offer.segments.length - 1]?.arrival.airport || '',
-            city: getAirportCity(offer.segments[offer.segments.length - 1]?.arrival.airport || ''),
-            time: new Date(offer.segments[offer.segments.length - 1]?.arrival.time || '').toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-            date: formatDate(offer.segments[offer.segments.length - 1]?.arrival.time || '')
-          },
-          duration: offer.duration || '',
-          stops: (offer.segments?.length || 1) - 1,
-          price: offer.price?.amount || 0,
-          seatsAvailable: 9 // Default value, adjust based on API response if available
-        }));
         
-        setAllFlights(mappedFlights);
+        // Use backend-transformed data directly - minimal transformation for UI compatibility
+        const directFlights = apiFlights.map((offer: any) => {
+          // Convert backend stopDetails (array of airport codes) to frontend format
+          const stopDetails = offer.stopDetails ? offer.stopDetails.map((stop: string) => ({
+            airport: stop,
+            city: getAirportCity(stop),
+            duration: '2h 30m' // Default layover time - could be enhanced later
+          })) : [];
+          
+          return {
+            id: offer.id,
+            airline: {
+              name: offer.airline?.name || 'Unknown Airline',
+              logo: offer.airline?.logo || '',
+              code: offer.airline?.code || '',
+              flightNumber: offer.airline?.flightNumber || ''
+            },
+            departure: {
+              airport: offer.departure?.airport || '',
+              city: getAirportCity(offer.departure?.airport || ''),
+              time: offer.departure?.time || '', // Use backend-provided time field
+              date: formatDate(offer.departure?.datetime || '')
+            },
+            arrival: {
+              airport: offer.arrival?.airport || '',
+              city: getAirportCity(offer.arrival?.airport || ''),
+              time: offer.arrival?.time || '', // Use backend-provided time field
+              date: formatDate(offer.arrival?.datetime || '')
+            },
+            duration: offer.duration || '',
+             stops: offer.stops || 0,
+             stopDetails: stopDetails,
+             price: offer.price || 0,
+             currency: offer.currency || 'USD',
+             baggage: offer.baggage || {
+               carryOn: 'Not specified',
+               checked: 'Not specified'
+             },
+             penalties: offer.penalties || []
+           };
+        });
+        
+        setAllFlights(directFlights);
       } catch (error) {
         console.error('Error fetching flights:', error);
         // You might want to show an error message to the user
@@ -311,76 +326,7 @@ export default function FlightsPage() {
 
   }, [searchParams]);
 
-  // Convert API response to Flight interface
-  function convertApiResponseToFlights(apiFlights: any[], origin: string, destination: string): Flight[] {
-    return apiFlights.map(flight => {
-      // Fix the time extraction logic to handle the unusual datetime format
-      const extractTime = (dateStr: string) => {
-        if (!dateStr) return '00:00';
-        
-        // Handle the specific format "2025-04-23T00:00:00.000T13:30"
-        if (dateStr.includes('.000T')) {
-          const timePart = dateStr.split('.000T')[1];
-          return timePart || '00:00';
-        }
-        
-        // Handle standard format with one T separator
-        if (dateStr.includes('T')) {
-          const timePart = dateStr.split('T')[1].substring(0, 5);
-          return timePart || '00:00';
-        }
-        
-        // Direct time format
-        return dateStr;
-      };
-      
-      // Extract required fields or provide defaults
-      const departureTime = extractTime(flight.departure.datetime);
-      const arrivalTime = extractTime(flight.arrival.datetime);
-      
-      // Extract date parts
-      const departureDate = flight.departure.datetime.split('T')[0] || '';
-      const arrivalDate = flight.arrival.datetime.split('T')[0] || '';
-      
-      // Create stopDetails in the format expected by Flight interface
-      const stopDetails = flight.stops > 0 && flight.stopDetails ? flight.stopDetails.map((stop: string) => {
-        return {
-          airport: stop,
-          city: getAirportCity(stop),
-          duration: "2h 0m" // Default duration as it's not in the API response
-        };
-      }) : [];
-      
-      return {
-        id: flight.id,
-        airline: {
-          name: flight.airline.name,
-          logo: flight.airline.logo || `/airlines/${flight.airline.code.toLowerCase()}.png`,
-          code: flight.airline.code,
-          flightNumber: flight.airline.flightNumber
-        },
-        departure: {
-          airport: flight.departure.airport,
-          city: (flight.departure.airportName ? flight.departure.airportName.split(',')[0] : getAirportCity(flight.departure.airport)),
-          time: departureTime,
-          date: departureDate
-        },
-        arrival: {
-          airport: flight.arrival.airport,
-          city: (flight.arrival.airportName ? flight.arrival.airportName.split(',')[0] : getAirportCity(flight.arrival.airport)),
-          time: arrivalTime,
-          date: arrivalDate
-        },
-        duration: flight.duration,
-        stops: flight.stops,
-        stopDetails: stopDetails,
-        price: flight.price,
-        seatsAvailable: typeof flight.seatsAvailable === 'string' ? 
-          parseInt(flight.seatsAvailable.replace(/\D/g, '')) || 5 : 
-          flight.seatsAvailable
-      };
-    });
-  }
+  // Note: Removed convertApiResponseToFlights function as we now use backend-transformed data directly
 
   // Helper function to convert Flight data to FlightOffer format
   function convertToFlightOffer(flight: Flight): any {
@@ -417,7 +363,6 @@ export default function FlightsPage() {
       stopDetails: flight.stopDetails ? flight.stopDetails.map(stop => stop.airport) : [],
       price: flight.price,
       currency: "USD",
-      seatsAvailable: flight.seatsAvailable,
       
       // Enhanced fare information
       fare: {

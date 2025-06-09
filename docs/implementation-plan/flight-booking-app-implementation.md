@@ -95,7 +95,21 @@ Based on the comprehensive analysis of the existing codebase and the user's clar
 - **Files to Modify**: `Backend/routes/verteil_flights.py`
 - **Dependencies**: Task 2.0 must be completed first
 
-#### Task 2.2: Enhance Flight Pricing Endpoint
+#### Task 2.2: Remove seatsAvailable and Implement Data Flow Improvements
+- **Success Criteria**: 
+  - Remove seatsAvailable field from both frontend and backend code
+  - Consolidate frontend flight data transformation to use single function
+  - Fix data type mismatches between frontend and backend
+  - Implement proper stop duration calculation
+  - Remove hardcoded default values
+  - All tests pass after changes
+- **Files to Modify**: 
+  - `Backend/utils/data_transformer.py`
+  - `Frontend/app/flights/page.tsx`
+  - `Frontend/types/flight-api.ts`
+  - Related test files
+
+#### Task 2.3: Enhance Flight Pricing Endpoint
 - **Success Criteria**:
   - `/flight-price` endpoint accepts offer selection and returns detailed pricing
   - Response includes fare breakdown, taxes, and total cost
@@ -103,7 +117,7 @@ Based on the comprehensive analysis of the existing codebase and the user's clar
   - Error handling for invalid offers
 - **Files to Modify**: `Backend/routes/verteil_flights.py`
 
-#### Task 2.3: Create Flight Booking Endpoint
+#### Task 2.4: Create Flight Booking Endpoint
 - **Success Criteria**:
   - New `/flight-booking` endpoint created
   - Accepts passenger details, payment information, and selected flight
@@ -225,10 +239,9 @@ Based on the comprehensive analysis of the existing codebase and the user's clar
 ## Project Status Board
 
 ### To Do
-- [ ] **URGENT: Create data transformation layer (Task 2.0)**
-- [ ] Enhance flight search endpoint (Task 2.1) - BLOCKED by Task 2.0
-- [ ] Enhance flight pricing endpoint
-- [ ] Create flight booking endpoint
+- [ ] Enhance flight search endpoint (Task 2.1)
+- [ ] Enhance flight pricing endpoint (Task 2.3)
+- [ ] Create flight booking endpoint (Task 2.4)
 - [ ] Implement flight search interface
 - [ ] Implement flight selection interface
 - [ ] Implement booking interface
@@ -240,7 +253,7 @@ Based on the comprehensive analysis of the existing codebase and the user's clar
 - [ ] Prepare for deployment
 
 ### In Progress
-- [ ] **CRITICAL ANALYSIS COMPLETE**: Frontend-Backend data structure mismatch identified
+- [ ] **Task 2.2: Remove seatsAvailable and implement data flow improvements** - seatsAvailable field removed from frontend and backend, working on data flow improvements
 
 ### Done
 - [x] Analyze existing codebase
@@ -251,12 +264,13 @@ Based on the comprehensive analysis of the existing codebase and the user's clar
 - [x] **Integrate AirShopping request builder** - FlightSearchService now properly uses build_airshopping_request for payload construction
 - [x] **Integrate FlightPrice request builder** - FlightPricingService now properly uses build_flight_price_request for payload construction
 - [x] **Integrate OrderCreate request builder** - FlightBookingService now properly uses generate_order_create_rq for payload construction
+- [x] **Task 2.0: Create Data Transformation Layer** - COMPLETED with comprehensive test suite
 
 ## Current Status / Progress Tracking
 
 **Current Phase**: Phase 2 - Backend API Endpoints Enhancement
 **Last Updated**: 2025-01-07
-**Next Milestone**: Task 2.1 - Enhance flight search endpoint with advanced filtering
+**Next Milestone**: Task 2.2 - Remove seatsAvailable and implement data flow improvements
 
 ### Recent Progress
 - ✅ Completed comprehensive codebase analysis

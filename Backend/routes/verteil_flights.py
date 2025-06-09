@@ -102,6 +102,7 @@ async def air_shopping():
     - [maxStops]: Maximum number of stops (0, 1, 2+) (optional)
     - [departTimeMin]: Minimum departure time in HH:MM format (optional)
     - [departTimeMax]: Maximum departure time in HH:MM format (optional)
+    - [enableRoundtrip]: Boolean to enable round trip transformation (default: false)
     
     POST JSON Body:
     - tripType: Type of trip (ONE_WAY, ROUND_TRIP, MULTI_CITY)
@@ -125,6 +126,7 @@ async def air_shopping():
         - [aircraft]: string[] - Preferred aircraft types
     - [sortBy]: Sorting preference ('price', 'duration', 'departure', 'arrival', 'stops') (default: 'price')
     - [sortOrder]: Sort order ('asc' or 'desc') (default: 'asc')
+    - [enableRoundtrip]: Boolean to enable round trip transformation (default: false)
     """
     # if request.method == 'OPTIONS':
     #     response = await make_response()
@@ -223,6 +225,7 @@ async def air_shopping():
                 'numInfants': int(args.get('infants', 0)),
                 'cabinPreference': cabin_preference,
                 'directOnly': False,
+                'enableRoundtrip': args.get('enableRoundtrip', '').lower() == 'true',
                 'request_id': request_id
             }
             
@@ -261,6 +264,7 @@ async def air_shopping():
                 'numInfants': int(data.get('numInfants', 0)),
                 'cabinPreference': data.get('cabinPreference', 'ECONOMY'),
                 'directOnly': bool(data.get('directOnly', False)),
+                'enableRoundtrip': bool(data.get('enableRoundtrip', False)),
                 'request_id': request_id
             }
             

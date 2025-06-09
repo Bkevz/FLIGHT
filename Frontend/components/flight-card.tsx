@@ -36,7 +36,6 @@ interface FlightCardProps {
       duration: string
     }[]
     price: number
-    seatsAvailable: number
   }
 }
 
@@ -140,9 +139,6 @@ export function FlightCard({ flight }: FlightCardProps) {
               <div className="ml-4 flex items-center">
                 <Clock className="mr-1 h-3 w-3" />
                 <span>On-time performance: 92%</span>
-              </div>
-              <div className="ml-auto">
-                <span className="font-medium text-foreground">{flight.seatsAvailable} seats left at this price</span>
               </div>
             </div>
           </div>

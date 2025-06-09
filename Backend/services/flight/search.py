@@ -727,7 +727,9 @@ async def process_air_shopping(search_criteria: Dict[str, Any]) -> Dict[str, Any
             raw_response = result['data'].get('raw_response', {})
             if raw_response:
                 logger.info("Transforming Verteil API response to frontend format")
-                transformed_offers = transform_verteil_to_frontend(raw_response)
+                # Check if round trip transformation is enabled
+                enable_roundtrip = search_criteria.get('enableRoundtrip', False)
+                transformed_offers = transform_verteil_to_frontend(raw_response, enable_roundtrip=enable_roundtrip)
                 
                 # Apply filtering and sorting if specified
                 filtered_offers = _apply_filters_and_sorting(transformed_offers, search_criteria)
