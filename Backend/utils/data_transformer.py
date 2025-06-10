@@ -194,28 +194,28 @@ def _transform_single_offer(
         
         # Extract price information using the correct path from actual JSON structure
         price = 0
-        currency = 'USD'
+        currency = ''
         
         # Primary path: OfferPrice[0].RequestedDate.PriceDetail.TotalAmount.SimpleCurrencyPrice (as seen in actual JSON)
         price_detail = offer_price.get('RequestedDate', {}).get('PriceDetail', {})
         if price_detail:
             total_amount = price_detail.get('TotalAmount', {}).get('SimpleCurrencyPrice', {})
             price = total_amount.get('value', 0)
-            currency = total_amount.get('Code', 'USD')
+            currency = total_amount.get('Code', '')
             logger.info(f"Using OfferPrice PriceDetail: {price} {currency}")
         
         # Fallback to AirlineOffer level if OfferPrice price not found
         if price == 0 and airline_offer and 'TotalPrice' in airline_offer:
             total_price_obj = airline_offer.get('TotalPrice', {}).get('SimpleCurrencyPrice', {})
             price = total_price_obj.get('value', 0)
-            currency = total_price_obj.get('Code', 'USD')
+            currency = total_price_obj.get('Code', '')
             logger.info(f"Using AirlineOffer TotalPrice: {price} {currency}")
         
         # Final fallback to PricedOffer level
         if price == 0:
             priced_offer_total = priced_offer.get('TotalPrice', {}).get('SimpleCurrencyPrice', {})
             price = priced_offer_total.get('value', 0)
-            currency = priced_offer_total.get('Code', 'USD')
+            currency = priced_offer_total.get('Code', '')
             logger.info(f"Using PricedOffer level price: {price} {currency}")
         
         # Extract flight associations - check both OfferPrice and PricedOffer level
@@ -297,7 +297,7 @@ def _transform_single_offer(
         # Build airline details
         airline_details = {
             'code': airline_code,
-            'name': _get_airline_name(airline_code),
+            'name': _get_airline_name(airline_code, reference_data),
             'logo': f'/airlines/{airline_code.lower()}.png',
             'flightNumber': f"{airline_code}{segments[0].get('flightNumber', '001')}"
         }
@@ -630,22 +630,94 @@ def _extract_penalty_info(priced_offer: Dict[str, Any], reference_data: Dict[str
     return penalties
 
 
-def _get_airline_name(airline_code: str) -> str:
+def _get_airline_name(airline_code: str, reference_data: Dict[str, Any] = None) -> str:
     """
-    Get airline name from code. This could be expanded with a proper lookup table.
+    Get airline name from code by searching through flight segments in reference data.
+    First checks MarketingCarrier, then falls back to OperatingCarrier if not found.
+    
+    Args:
+        airline_code: 2-letter IATA airline code
+        reference_data: Dictionary containing flight segments and other reference data
+        
+    Returns:
+        Airline name if found, or formatted code if not found
     """
-    airline_names = {
-        'KQ': 'Kenya Airways',
-        'AA': 'American Airlines',
-        'BA': 'British Airways',
-        'LH': 'Lufthansa',
-        'AF': 'Air France',
-        'KL': 'KLM',
-        'EK': 'Emirates',
-        'QR': 'Qatar Airways',
-        'WY': 'Oman Air'
-    }
-    return airline_names.get(airline_code, f"Airline {airline_code}")
+    if not reference_data or not airline_code:
+        logger.warning(f"Missing reference_data or airline_code: {airline_code}")
+        return f"Airline {airline_code}"
+    
+    logger.info(f"Looking up airline name for code: {airline_code}")
+    
+    # First try to find in MarketingCarrier
+    for segment_key, segment in reference_data.get('segments', {}).items():
+        # Check MarketingCarrier first
+        marketing_carrier = segment.get('MarketingCarrier', {})
+        marketing_airline_id = marketing_carrier.get('AirlineID', {})
+        marketing_airline_code = marketing_airline_id.get('value') if isinstance(marketing_airline_id, dict) else marketing_airline_id
+        
+        if marketing_airline_code == airline_code:
+            name = marketing_carrier.get('Name')
+            if name:
+                logger.info(f"Found airline name in MarketingCarrier: {name}")
+                return name
+        
+        # If not found in MarketingCarrier, try OperatingCarrier
+        operating_carrier = segment.get('OperatingCarrier', {})
+        operating_airline_id = operating_carrier.get('AirlineID', {})
+        operating_airline_code = operating_airline_id.get('value') if isinstance(operating_airline_id, dict) else operating_airline_id
+        
+        if operating_airline_code == airline_code:
+            name = operating_carrier.get('Name')
+            if name:
+                logger.info(f"Found airline name in OperatingCarrier: {name}")
+                return name
+    
+    # If not found in segments, try a broader search in reference_data
+    def search_in_nested_dict(data, code):
+        if isinstance(data, dict):
+            # Check both MarketingCarrier and OperatingCarrier at this level
+            for carrier_type in ['MarketingCarrier', 'OperatingCarrier']:
+                carrier = data.get(carrier_type, {})
+                if not isinstance(carrier, dict):
+                    continue
+                    
+                # Check both direct AirlineID and nested AirlineID.value
+                airline_id = carrier.get('AirlineID', {})
+                if isinstance(airline_id, dict):
+                    if airline_id.get('value') == code:
+                        return carrier.get('Name')
+                elif airline_id == code:
+                    return carrier.get('Name')
+                    
+                # Also check for direct AirlineCode field
+                if carrier.get('AirlineCode') == code:
+                    return carrier.get('Name')
+            
+            # Recursively search in nested dictionaries
+            for key, value in data.items():
+                # Skip some large structures to avoid excessive recursion
+                if key in ['segments', 'flights', 'airports']:
+                    continue
+                result = search_in_nested_dict(value, code)
+                if result:
+                    return result
+                    
+        elif isinstance(data, (list, tuple)):
+            for item in data:
+                result = search_in_nested_dict(item, code)
+                if result:
+                    return result
+        return None
+    
+    # Perform the search in the entire reference_data
+    logger.info(f"Performing deep search for airline code: {airline_code}")
+    name = search_in_nested_dict(reference_data, airline_code)
+    if name:
+        logger.info(f"Found airline name in deep search: {name}")
+        return name
+    
+    logger.warning(f"Could not find airline name for code: {airline_code}")
+    return f"Airline {airline_code}"
 
 
 def _transform_penalties_to_fare_rules(penalties: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -664,7 +736,7 @@ def _transform_penalties_to_fare_rules(penalties: List[Dict[str, Any]]) -> Dict[
         penalty_type = penalty.get('type', '').lower()
         application = penalty.get('application', '')
         amount = penalty.get('amount', 0)
-        currency = penalty.get('currency', 'USD')
+        currency = penalty.get('currency', '')
         remarks = penalty.get('remarks', [])
         refundable = penalty.get('refundable', False)
         

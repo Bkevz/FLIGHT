@@ -216,10 +216,59 @@ class TestDataTransformer:
         assert result['currency'] == 'USD'
         
     def test_get_airline_name(self):
-        """Test airline name lookup."""
-        assert _get_airline_name('KQ') == 'Kenya Airways'
-        assert _get_airline_name('AA') == 'American Airlines'
-        assert _get_airline_name('UNKNOWN') == 'Airline UNKNOWN'
+        """Test airline name lookup with reference data."""
+        # Create mock reference data
+        reference_data = {
+            'segments': {
+                'SEG1': {
+                    'SegmentKey': 'SEG1',
+                    'MarketingCarrier': {
+                        'AirlineID': {'value': 'KQ'},
+                        'Name': 'Kenya Airways',
+                        'FlightNumber': {'value': '505'}
+                    },
+                    'OperatingCarrier': {
+                        'AirlineID': {'value': 'KQ'},
+                        'Name': 'Kenya Airways',
+                        'FlightNumber': {'value': '505'}
+                    }
+                },
+                'SEG2': {
+                    'SegmentKey': 'SEG2',
+                    'MarketingCarrier': {
+                        'AirlineID': {'value': 'EK'},
+                        'Name': 'Emirates',
+                        'FlightNumber': {'value': '722'}
+                    },
+                    'OperatingCarrier': {
+                        'AirlineID': {'value': 'QF'},
+                        'Name': 'Qantas',
+                        'FlightNumber': {'value': '8415'}
+                    }
+                }
+            },
+            'airports': {},
+            'flights': {},
+            'aircraft': {}
+        }
+        
+        # Test with marketing carrier
+        assert _get_airline_name('KQ', reference_data) == 'Kenya Airways'
+        
+        # Test with operating carrier
+        assert _get_airline_name('QF', reference_data) == 'Qantas'
+        
+        # Test with marketing carrier that has a different operating carrier
+        assert _get_airline_name('EK', reference_data) == 'Emirates'
+        
+        # Test with unknown airline code
+        assert _get_airline_name('UNKNOWN', reference_data) == 'Airline UNKNOWN'
+        
+        # Test with empty reference data
+        assert _get_airline_name('KQ', {}) == 'Airline KQ'
+        
+        # Test with None reference data
+        assert _get_airline_name('KQ', None) == 'Airline KQ'
         
     def test_transform_single_offer_success_real_data(self):
         """Test transformation of a single priced offer using real API data."""

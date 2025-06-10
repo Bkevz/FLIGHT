@@ -139,7 +139,7 @@ class FlightService:
 
         logger.info(f"Making {method} request to {url} for service {service_name} (ReqID: {log_request_id}).")       
         # Log final headers and payload for debugging
-        logger.info(f"Final headers for {service_name} (ReqID: {log_request_id}): {json.dumps(headers, indent=2)}")
+        # logger.info(f"Final headers for {service_name} (ReqID: {log_request_id}): {json.dumps(headers, indent=2)}")
         logger.info(f"Final payload for {service_name} (ReqID: {log_request_id}): {json.dumps(payload, indent=2)}")
         logger.info(f"Request URL: {url}")
         logger.info(f"Request method: {method}")

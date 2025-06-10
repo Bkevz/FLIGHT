@@ -257,7 +257,7 @@ export default function FlightsPage() {
           apiFlights = apiResponse.data.offers;
         }
         
-        console.log('API Response:', apiResponse);
+        // console.log('API Response:', apiResponse);
         console.log('Extracted flights:', apiFlights.length, 'offers');
         
         // Use backend-transformed data directly - minimal transformation for UI compatibility
@@ -266,39 +266,36 @@ export default function FlightsPage() {
           const stopDetails = offer.stopDetails ? offer.stopDetails.map((stop: string) => ({
             airport: stop,
             city: getAirportCity(stop),
-            duration: '2h 30m' // Default layover time - could be enhanced later
+            duration: ''
           })) : [];
           
           return {
             id: offer.id,
             airline: {
-              name: offer.airline?.name || 'Unknown Airline',
-              logo: offer.airline?.logo || '',
-              code: offer.airline?.code || '',
-              flightNumber: offer.airline?.flightNumber || ''
+              name: offer.airline.name,
+              logo: offer.airline?.logo,
+              code: offer.airline?.code,
+              flightNumber: offer.airline?.flightNumber
             },
             departure: {
-              airport: offer.departure?.airport || '',
-              city: getAirportCity(offer.departure?.airport || ''),
-              time: offer.departure?.time || '', // Use backend-provided time field
-              date: formatDate(offer.departure?.datetime || '')
+              airport: offer.departure?.airport,
+              city: getAirportCity(offer.departure?.airport),
+              time: offer.departure?.time,
+              date: formatDate(offer.departure?.datetime)
             },
             arrival: {
-              airport: offer.arrival?.airport || '',
-              city: getAirportCity(offer.arrival?.airport || ''),
-              time: offer.arrival?.time || '', // Use backend-provided time field
-              date: formatDate(offer.arrival?.datetime || '')
+              airport: offer.arrival?.airport,
+              city: getAirportCity(offer.arrival?.airport),
+              time: offer.arrival?.time,
+              date: formatDate(offer.arrival?.datetime)
             },
-            duration: offer.duration || '',
-             stops: offer.stops || 0,
+            duration: offer.duration,
+             stops: offer.stops,
              stopDetails: stopDetails,
-             price: offer.price || 0,
-             currency: offer.currency || 'USD',
-             baggage: offer.baggage || {
-               carryOn: 'Not specified',
-               checked: 'Not specified'
-             },
-             penalties: offer.penalties || []
+             price: offer.price,
+             currency: offer.currency,
+             baggage: offer.baggage,
+             penalties: offer.penalties
            };
         });
         

@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from utils.data_transformer import transform_verteil_to_frontend, _extract_reference_data
+from Backend.utils.data_transformer import transform_verteil_to_frontend, _extract_reference_data
 from tests.test_data_transformer import SAMPLE_VERTEIL_RESPONSE
 
 # Extract reference data first
