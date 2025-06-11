@@ -132,20 +132,6 @@ def _create_flight_offer_from_segments(segments: List[Dict], airline_code: str,
     # Build price breakdown
     price_breakdown = _build_price_breakdown(price_detail, priced_offer, airline_offer)
     
-    # Build baggage information
-    baggage = {
-        'carryOn': {
-            'included': True,
-            'weight': {'value': 7, 'unit': 'kg'},
-            'dimensions': {'length': 56, 'width': 45, 'height': 25, 'unit': 'cm'}
-        },
-        'checked': {
-            'included': True,
-            'weight': {'value': 23, 'unit': 'kg'},
-            'pieces': 1
-        }
-    }
-    
     # Build airline details
     airline_details = {
         'code': airline_code,

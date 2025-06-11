@@ -115,14 +115,9 @@ class FlightSearchService(FlightService):
             
             trip_type = trip_type_mapping.get(trip_type, 'ONE_WAY')
             
-            # Prepare OD segments for the request builder
+            # Build segments for the request and extract cabin preferences
             od_segments = []
-            for seg in criteria['odSegments']:
-                od_segments.append({
-                    'Origin': seg['origin'],
-                    'Destination': seg['destination'],
-                    'DepartureDate': seg['departureDate']
-                })
+            cabin_preferences_per_segment = []
             
             # Map cabin preference to the expected codes
             cabin_mapping = {
@@ -132,8 +127,26 @@ class FlightSearchService(FlightService):
                 'PREMIUM_ECONOMY': 'W'
             }
             
+            for seg in criteria['odSegments']:
+                od_segments.append({
+                    'Origin': seg['origin'],
+                    'Destination': seg['destination'],
+                    'DepartureDate': seg['departureDate']
+                })
+                
+                # Extract cabin preference for this segment
+                if 'cabinPreference' in seg:
+                    segment_cabin_code = cabin_mapping.get(seg['cabinPreference'].upper(), 'Y')
+                    cabin_preferences_per_segment.append(segment_cabin_code)
+                else:
+                    # Fallback to global cabin preference
+                    global_cabin_preference = criteria.get('cabinPreference', 'ECONOMY')
+                    segment_cabin_code = cabin_mapping.get(global_cabin_preference.upper(), 'Y')
+                    cabin_preferences_per_segment.append(segment_cabin_code)
+            
+            # Use per-segment cabin preferences if available, otherwise fallback to single cabin code
             cabin_preference = criteria.get('cabinPreference', 'ECONOMY')
-            cabin_code = cabin_mapping.get(cabin_preference.upper(), 'Y')
+            fallback_cabin_code = cabin_mapping.get(cabin_preference.upper(), 'Y')
             
             # Get passenger counts (handle both camelCase and snake_case)
             num_adults = criteria.get('numAdults', criteria.get('num_adults', 1))
@@ -147,7 +160,8 @@ class FlightSearchService(FlightService):
                 num_adults=num_adults,
                 num_children=num_children,
                 num_infants=num_infants,
-                cabin_preference_code=cabin_code,
+                cabin_preference_code=fallback_cabin_code,
+                cabin_preferences=cabin_preferences_per_segment,
                 fare_type_code="PUBL"
             )
             
@@ -698,6 +712,9 @@ async def process_air_shopping(search_criteria: Dict[str, Any]) -> Dict[str, Any
     
     effective_config: Optional[Dict[str, Any]] = None
     logger.info("Processing air shopping request with enhanced features")
+    
+    # Add debug logging for search criteria
+    logger.info(f"[DEBUG] Search criteria received in process_air_shopping: {search_criteria}")
     
     try:
         from quart import current_app

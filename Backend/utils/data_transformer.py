@@ -117,53 +117,52 @@ def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
                 if segment_key and isinstance(segment_key, str):
                     reference_data['segments'][segment_key] = segment
                     logger.info(f"Added segment {segment_key} to reference data")
-                elif segment_key:
-                    logger.warning(f"Invalid SegmentKey type: {type(segment_key)} - {segment_key}")
-                    continue
                     
                     # Extract airline information from the segment
                     for carrier_type in ['MarketingCarrier', 'OperatingCarrier']:
-                        carrier = segment.get(carrier_type, {})
-                        if not carrier:
-                            logger.debug(f"No {carrier_type} in segment {segment_key}")
-                            continue
+                            carrier = segment.get(carrier_type, {})
+                            if not carrier:
+                                logger.debug(f"No {carrier_type} in segment {segment_key}")
+                                continue
+                                
+                            logger.info(f"Processing {carrier_type} for segment {segment_key}")
+                            logger.info(f"Carrier data: {carrier}")
                             
-                        logger.info(f"Processing {carrier_type} for segment {segment_key}")
-                        logger.info(f"Carrier data: {carrier}")
-                        
-                        airline_id = carrier.get('AirlineID', {})
-                        logger.info(f"AirlineID: {airline_id}")
-                        
-                        # Extract airline code safely, ensuring it's always a string
-                        if isinstance(airline_id, dict):
-                            airline_code = airline_id.get('value')
-                        else:
-                            airline_code = airline_id
-                        
-                        # Ensure airline_code is a string and not None or empty
-                        if not airline_code or not isinstance(airline_code, str):
-                            logger.warning(f"Invalid airline_code extracted: {airline_code} (type: {type(airline_code)})")
-                            continue
+                            airline_id = carrier.get('AirlineID', {})
+                            logger.info(f"AirlineID: {airline_id}")
                             
-                        airline_name = carrier.get('Name')
-                        
-                        logger.info(f"Extracted - Code: {airline_code}, Name: {airline_name}")
-                        
-                        if airline_code and airline_name:
-                            if 'airlines' not in reference_data:
-                                reference_data['airlines'] = {}
+                            # Extract airline code safely, ensuring it's always a string
+                            if isinstance(airline_id, dict):
+                                airline_code = airline_id.get('value')
+                            else:
+                                airline_code = airline_id
                             
-                            reference_data['airlines'][airline_code] = airline_name
-                            logger.info(f"Added airline {airline_code}: {airline_name} from {carrier_type}")
+                            # Ensure airline_code is a string and not None or empty
+                            if not airline_code or not isinstance(airline_code, str):
+                                logger.warning(f"Invalid airline_code extracted: {airline_code} (type: {type(airline_code)})")
+                                continue
+                                
+                            airline_name = carrier.get('Name')
                             
-                            # Set default airline if not set yet (first airline found)
-                            if reference_data['default_airline'] is None:
-                                reference_data['default_airline'] = {
-                                    'code': airline_code,
-                                    'name': airline_name
-                                }
-                        else:
-                            logger.warning(f"Missing code or name - Code: {airline_code}, Name: {airline_name}")
+                            logger.info(f"Extracted - Code: {airline_code}, Name: {airline_name}")
+                            
+                            if airline_code and airline_name:
+                                if 'airlines' not in reference_data:
+                                    reference_data['airlines'] = {}
+                                
+                                reference_data['airlines'][airline_code] = airline_name
+                                logger.info(f"Added airline {airline_code}: {airline_name} from {carrier_type}")
+                                
+                                # Set default airline if not set yet (first airline found)
+                                if reference_data['default_airline'] is None:
+                                    reference_data['default_airline'] = {
+                                        'code': airline_code,
+                                        'name': airline_name
+                                    }
+                            else:
+                                logger.warning(f"Missing code or name - Code: {airline_code}, Name: {airline_name}")
+                elif segment_key:
+                    logger.warning(f"Invalid SegmentKey type: {type(segment_key)} - {segment_key}")
                 else:
                     logger.warning(f"Segment missing SegmentKey: {segment}")
         else:

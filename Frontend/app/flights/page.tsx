@@ -219,6 +219,8 @@ export default function FlightsPage() {
     const children = Number(searchParams.get('children')) || 0;
     const infants = Number(searchParams.get('infants')) || 0;
     const cabinClass = searchParams.get('cabinClass') || 'Y';
+    const outboundCabinClass = searchParams.get('outboundCabinClass') || 'Y';
+    const returnCabinClass = searchParams.get('returnCabinClass') || 'Y';
     const tripType = searchParams.get('tripType') || 'one-way';
     
     // Validate required parameters
@@ -255,7 +257,15 @@ export default function FlightsPage() {
       numAdults: adults,
       numChildren: children,
       numInfants: infants,
-      cabinPreference: cabinClass,
+      // Use separate cabin classes for round trips, single cabin class for others
+      ...(tripType === 'round-trip' ? {
+        outboundCabinClass,
+        returnCabinClass,
+        enableRoundtrip: true
+      } : {
+        cabinPreference: cabinClass,
+        enableRoundtrip: false
+      }),
       directOnly: false
     };
     
@@ -269,15 +279,27 @@ export default function FlightsPage() {
         const apiResponse = response.data;
         let apiFlights: any[] = [];
         
-        // The actual structure is response.data.data.offers (not response.data.status)
-        if (apiResponse && apiResponse.data && apiResponse.data.offers) {
+        // Debug: Log response structure (remove in production)
+        console.log('API response received with', apiResponse?.data?.data?.offers?.length || 0, 'offers');
+        
+        // The actual structure is response.data.data.data.offers (triple nested)
+        if (apiResponse && apiResponse.data && apiResponse.data.data && apiResponse.data.data.offers) {
+          apiFlights = apiResponse.data.data.offers;
+          console.log('Found offers in apiResponse.data.data.offers:', apiFlights.length);
+        } else if (apiResponse && apiResponse.data && apiResponse.data.offers) {
+          // Fallback: response.data.data.offers
           apiFlights = apiResponse.data.offers;
-        } else if (apiResponse && apiResponse.offers) {
-          // Fallback: direct offers in response.data
-          apiFlights = apiResponse.offers;
+          console.log('Found offers in apiResponse.data.offers:', apiFlights.length);
         } else if (Array.isArray(apiResponse)) {
           // Fallback: response.data is directly an array
           apiFlights = apiResponse;
+          console.log('Using apiResponse as direct array:', apiFlights.length);
+        } else {
+          console.log('No offers found. API response structure:', {
+            hasData: !!apiResponse.data,
+            dataKeys: apiResponse.data ? Object.keys(apiResponse.data) : [],
+            isArray: Array.isArray(apiResponse)
+          });
         }
         
         console.log('Extracted flights:', apiFlights.length, 'offers');
@@ -333,10 +355,10 @@ export default function FlightsPage() {
     fetchFlights();
 
     // Create a unique search key
-    const searchKey = `flightResults_${origin}_${destination}_${departDate}_${adults}_${children}_${infants}_${cabinClass}`;
+    const searchKey = `flightResults_${origin}_${destination}_${departDate}_${adults}_${children}_${infants}_${tripType === 'round-trip' ? `${outboundCabinClass}_${returnCabinClass}` : cabinClass}`;
 
     // Log search parameters
-    // console.log('Search params:', { origin, destination, departDate, returnDate, adults, children, infants, cabinClass });
+    // console.log('Search params:', { origin, destination, departDate, returnDate, adults, children, infants, cabinClass, outboundCabinClass, returnCabinClass, tripType });
     
     // Clear session storage to force API fetch
     sessionStorage.removeItem(searchKey);

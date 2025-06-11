@@ -195,11 +195,116 @@ async def air_shopping():
         else:
             data = await request.get_json() or {}
             
+        # Early logging to debug the issue
+        logger.info(f"[DEBUG] Request method: {request.method}")
+        logger.info(f"[DEBUG] Raw request data: {data}")
+            
+        # Convert frontend parameter names to backend equivalents
+        parameter_mapping = {
+            'tripType': 'trip_type',
+            'numAdults': 'num_adults',
+            'numChildren': 'num_children',
+            'numInfants': 'num_infants',
+            'cabinClass': 'cabin_class',
+            'outboundCabinClass': 'outbound_cabin_class',
+            'returnCabinClass': 'return_cabin_class',
+            'departDate': 'departure_date',
+            'returnDate': 'return_date',
+            'originCode': 'origin_code',
+            'destinationCode': 'destination_code',
+            'adults': 'num_adults',
+            'children': 'num_children',
+            'infants': 'num_infants'
+        }
+        
+        # Apply parameter mapping
+        converted_data = {}
+        for key, value in data.items():
+            # Use mapped key if it exists, otherwise use original key
+            mapped_key = parameter_mapping.get(key, key)
+            converted_data[mapped_key] = value
+            
+        # Build odSegments from individual parameters if not already present
+        if 'odSegments' not in converted_data and 'origin' in converted_data and 'destination' in converted_data:
+            od_segments = []
+            
+            # Add outbound segment
+            departure_date = converted_data.get('departure_date') or converted_data.get('departDate')
+            if converted_data.get('origin') and converted_data.get('destination') and departure_date:
+                od_segments.append({
+                    'origin': converted_data['origin'],
+                    'destination': converted_data['destination'],
+                    'departureDate': departure_date
+                })
+            
+            # Add return segment for round-trip
+            trip_type = converted_data.get('trip_type', '').lower()
+            if (trip_type in ['round-trip', 'round_trip', 'roundtrip'] and 
+                converted_data.get('returnDate')):
+                od_segments.append({
+                    'origin': converted_data['destination'],
+                    'destination': converted_data['origin'],
+                    'departureDate': converted_data['returnDate']
+                })
+            
+            # Add odSegments to converted_data
+            if od_segments:
+                converted_data['odSegments'] = od_segments
+        
+        # Handle case where odSegments are already present but need processing for round trips
+        elif 'odSegments' in converted_data:
+            trip_type = converted_data.get('trip_type', '').upper()
+            if trip_type == 'ROUND_TRIP' and len(converted_data['odSegments']) == 1:
+                # Check if the single segment has a returnDate (frontend format)
+                segment = converted_data['odSegments'][0]
+                if 'returnDate' in segment:
+                    # Split into two segments
+                    outbound_segment = {
+                        'origin': segment['origin'],
+                        'destination': segment['destination'],
+                        'departureDate': segment['departureDate']
+                    }
+                    return_segment = {
+                        'origin': segment['destination'],
+                        'destination': segment['origin'],
+                        'departureDate': segment['returnDate']
+                    }
+                    converted_data['odSegments'] = [outbound_segment, return_segment]
+                    logger.info(f"[DEBUG] Split round trip segment into two: {converted_data['odSegments']}")
+        
+        # Convert cabin class codes to preference names
+        cabin_code_mapping = {
+            'Y': 'ECONOMY',
+            'W': 'PREMIUM_ECONOMY', 
+            'C': 'BUSINESS',
+            'F': 'FIRST'
+        }
+        
+        # Handle separate cabin classes for round trips
+        if converted_data.get('trip_type') == 'ROUND_TRIP' and 'outbound_cabin_class' in converted_data and 'return_cabin_class' in converted_data:
+            outbound_cabin = converted_data['outbound_cabin_class']
+            return_cabin = converted_data['return_cabin_class']
+            
+            # Set cabin preferences for each segment
+            if 'odSegments' in converted_data and len(converted_data['odSegments']) == 2:
+                converted_data['odSegments'][0]['cabinPreference'] = cabin_code_mapping.get(outbound_cabin, 'ECONOMY')
+                converted_data['odSegments'][1]['cabinPreference'] = cabin_code_mapping.get(return_cabin, 'ECONOMY')
+                logger.info(f"[DEBUG] Mapped outbound cabin {outbound_cabin} to {converted_data['odSegments'][0]['cabinPreference']}")
+                logger.info(f"[DEBUG] Mapped return cabin {return_cabin} to {converted_data['odSegments'][1]['cabinPreference']}")
+                # Remove global cabin preference to avoid conflicts
+                converted_data.pop('cabinPreference', None)
+        elif 'cabin_class' in converted_data:
+            # Handle single cabin class for one-way trips
+            cabin_code = converted_data['cabin_class']
+            converted_data['cabinPreference'] = cabin_code_mapping.get(cabin_code, 'ECONOMY')
+            logger.info(f"[DEBUG] Mapped cabin class {cabin_code} to {converted_data['cabinPreference']}")
+            
         # Log the incoming request for debugging
-        logger.info(f"Request data: {data}")
+        logger.info(f"Original request data: {data}")
+        logger.info(f"Converted request data: {converted_data}")
         
         # Process the request with the flight service
-        result = await process_air_shopping(data)
+        result = await process_air_shopping(converted_data)
         
         # Log success
         logger.info(f"Successfully processed air shopping request - Request ID: {request_id}")

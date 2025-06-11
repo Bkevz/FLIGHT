@@ -406,6 +406,7 @@ export interface FlightOffer {
 export interface FlightSearchResponse {
   status: string;
   data: {
+    data: any;
     offers: FlightOffer[];
     total_offers: number;
     metadata?: any;

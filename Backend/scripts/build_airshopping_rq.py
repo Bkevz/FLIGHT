@@ -2,6 +2,10 @@
 import json
 from datetime import datetime, date # Not strictly used now, but good for future date validation
 from typing import List, Dict, Any, Optional, Literal
+import logging
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 # Define TripType literal for better type hinting
 TripType = Literal["ONE_WAY", "ROUND_TRIP", "MULTI_CITY"]
@@ -12,7 +16,8 @@ def build_airshopping_request(
     num_adults: int,
     num_children: int = 0,
     num_infants: int = 0,
-    cabin_preference_code: str = "Y",  # Y=Economy, C=Business, F=First, W=PremiumEconomy
+    cabin_preference_code: str = "Y",  # Y=Economy, C=Business, F=First, W=PremiumEconomy (fallback for single cabin)
+    cabin_preferences: Optional[List[str]] = None,  # Per-segment cabin preferences
     fare_type_code: str = "PUBL",
     sort_order: Optional[List[Dict[str, str]]] = None
 ) -> Dict[str, Any]:
@@ -25,13 +30,21 @@ def build_airshopping_request(
         num_adults: Number of adult passengers
         num_children: Number of child passengers (default: 0)
         num_infants: Number of infant passengers (default: 0)
-        cabin_preference_code: Cabin class code (Y=Economy, C=Business, F=First, W=PremiumEconomy)
+        cabin_preference_code: Cabin class code (Y=Economy, C=Business, F=First, W=PremiumEconomy) - used when cabin_preferences is None
+        cabin_preferences: Optional list of cabin codes per segment (overrides cabin_preference_code)
         fare_type_code: Fare type code (default: "PUBL" for published fares)
         sort_order: Optional list of sort criteria
 
     Returns:
         Dictionary containing the AirShopping request payload
     """
+    # Debug logging for cabin preferences
+    logger.info(f"[DEBUG] build_airshopping_request called with:")
+    logger.info(f"[DEBUG] - trip_type: {trip_type}")
+    logger.info(f"[DEBUG] - cabin_preference_code: {cabin_preference_code}")
+    logger.info(f"[DEBUG] - cabin_preferences: {cabin_preferences}")
+    logger.info(f"[DEBUG] - od_segments: {od_segments}")
+    
     # Input validation
     if num_adults <= 0:
         raise ValueError("Number of adults must be at least 1")
@@ -80,13 +93,23 @@ def build_airshopping_request(
         })
 
     # Prepare cabin preferences
-    cabin_preferences = {
-        "CabinType": [
-            {
-                "Code": cabin_preference_code,
-                "OriginDestinationReferences": [od_ref]
-            } for od_ref in od_references
-        ]
+    cabin_types = []
+    logger.info(f"[DEBUG] Building cabin preferences for {len(od_references)} segments")
+    
+    for i, od_ref in enumerate(od_references):
+        # Use per-segment cabin preference if provided, otherwise use the single cabin code
+        cabin_code = cabin_preferences[i] if cabin_preferences and i < len(cabin_preferences) else cabin_preference_code
+        logger.info(f"[DEBUG] Segment {i+1} ({od_ref}): Using cabin code '{cabin_code}'")
+        
+        cabin_types.append({
+            "Code": cabin_code,
+            "OriginDestinationReferences": [od_ref]
+        })
+    
+    logger.info(f"[DEBUG] Final cabin_types structure: {json.dumps(cabin_types, indent=2)}")
+    
+    cabin_preferences_obj = {
+        "CabinType": cabin_types
     }
 
     # Prepare fare preferences
@@ -98,7 +121,7 @@ def build_airshopping_request(
 
     # Prepare preferences
     preferences = {
-        "CabinPreferences": cabin_preferences,
+        "CabinPreferences": cabin_preferences_obj,
         "FarePreferences": fare_preferences,
         "PricingMethodPreference": {
             "BestPricingOption": "Y"
@@ -130,6 +153,8 @@ def build_airshopping_request(
         }
     }
 
+    logger.info(f"[DEBUG] Final airshopping_request CabinPreferences: {json.dumps(airshopping_request['Preference']['CabinPreferences'], indent=2)}")
+    
     return airshopping_request
 
 def main():

@@ -72,6 +72,8 @@ export function FlightSearchForm() {
     infants: 0
   })
   const [cabinType, setCabinType] = React.useState("Y")
+  const [outboundCabinType, setOutboundCabinType] = React.useState("Y")
+  const [returnCabinType, setReturnCabinType] = React.useState("Y")
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
   const [results, setResults] = React.useState<FlightOffer[]>([])
@@ -103,6 +105,8 @@ export function FlightSearchForm() {
   const handleOriginChange = (value: string) => setOrigin(value)
   const handleDestinationChange = (value: string) => setDestination(value)
   const handleCabinTypeChange = (value: string) => setCabinType(value)
+  const handleOutboundCabinTypeChange = (value: string) => setOutboundCabinType(value)
+  const handleReturnCabinTypeChange = (value: string) => setReturnCabinType(value)
 
   // Reusable function to render From, To, Depart, Return inputs
   const renderFlightLegInputs = (showReturnDate: boolean, keyPrefix: string = 'leg') => {
@@ -211,7 +215,13 @@ export function FlightSearchForm() {
       searchParams.append('adults', passengers.adults.toString());
       searchParams.append('children', passengers.children.toString());
       searchParams.append('infants', passengers.infants.toString());
-      searchParams.append('cabinClass', cabinType);
+      // Use appropriate cabin type based on trip type
+      if (tripType === 'round-trip') {
+        searchParams.append('outboundCabinClass', outboundCabinType);
+        searchParams.append('returnCabinClass', returnCabinType);
+      } else {
+        searchParams.append('cabinClass', cabinType);
+      }
       
       // Add return date for round trips
       if (tripType === 'round-trip' && returnDate) {
@@ -289,7 +299,7 @@ export function FlightSearchForm() {
           {renderFlightLegInputs(true, 'rt')}
 
           {/* Common Fields */}
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-5">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             {/* Passengers */}
             <div className="w-full sm:col-span-1">
               <PassengersSelector 
@@ -298,11 +308,29 @@ export function FlightSearchForm() {
               />
             </div>
 
-            {/* Cabin Type */}
+            {/* Outbound Cabin Type */}
             <div className="w-full sm:col-span-1">
-              <Select onValueChange={handleCabinTypeChange} value={cabinType}>
+              <Label className="text-sm font-medium mb-2 block">Outbound Cabin</Label>
+              <Select onValueChange={handleOutboundCabinTypeChange} value={outboundCabinType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Cabin Type" />
+                  <SelectValue placeholder="Outbound Cabin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cabinTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Return Cabin Type */}
+            <div className="w-full sm:col-span-1">
+              <Label className="text-sm font-medium mb-2 block">Return Cabin</Label>
+              <Select onValueChange={handleReturnCabinTypeChange} value={returnCabinType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Return Cabin" />
                 </SelectTrigger>
                 <SelectContent>
                   {cabinTypes.map((type) => (

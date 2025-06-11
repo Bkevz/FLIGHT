@@ -84,7 +84,10 @@ export interface FlightSearchRequest {
     numChildren?: number;
     numInfants?: number;
     cabinPreference?: string;
+    outboundCabinClass?: string;
+    returnCabinClass?: string;
     directOnly?: boolean;
+    enableRoundtrip?: boolean;
 }
 
 export interface FlightOffer {
@@ -114,7 +117,7 @@ const debouncedSearchFlights = debounce(async (params: FlightSearchRequest, reso
 
 export const api = {
     // Flight Search with debouncing
-    searchFlights: async (params: FlightSearchRequest) => {
+    searchFlights: async (params: FlightSearchRequest): Promise<{ data: FlightSearchResponse }> => {
         return new Promise((resolve, reject) => {
             debouncedSearchFlights(params, resolve, reject);
         });
