@@ -12,6 +12,22 @@ from typing import List, Dict, Any, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
+def _get_airline_logo_url(airline_code):
+    """Get the logo URL for an airline code."""
+    if not airline_code:
+        return None
+    
+    # Clean and normalize the airline code
+    code = airline_code.strip().upper()
+    
+    # List of available logos
+    available_logos = {"AA", "AC", "AF", "AI", "AS", "AV", "B6", "BA", "CM", "CX", "DL", "EK", "EY", "F9", "FR", "GA", "IB", "JL", "JQ", "KL", "KQ", "LA", "LH", "LX", "MH", "NK", "NZ", "OZ", "PR", "QF", "QR", "SK", "SQ", "SV", "TK", "TP", "UA", "UX", "VA", "VN", "VS", "WN", "WY"}
+    
+    if code in available_logos:
+        return f"/airlines/{code}.svg"
+    
+    return None  # No logo available
+
 def _detect_round_trip_segments(segments: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
     """
     Detect if segments represent a round trip and split them into outbound and return legs.
@@ -134,7 +150,7 @@ def _create_flight_offer_from_segments(segments: List[Dict], airline_code: str,
     airline_details = {
         'code': airline_code,
         'name': _get_airline_name(airline_code),
-        'logo': f'/airlines/{airline_code.lower()}.png',
+        'logo': _get_airline_logo_url(airline_code),
         'flightNumber': f"{airline_code}{segments[0].get('flightNumber', '001')}"
     }
     
