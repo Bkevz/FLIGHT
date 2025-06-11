@@ -1,5 +1,6 @@
 """Data transformation utilities for converting Verteil API responses to frontend-compatible formats."""
 
+import json
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 import logging
@@ -79,6 +80,8 @@ def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
         'segments': {},
         'airports': {},
         'aircraft': {},
+        'airlines': {},
+        'default_airline': None,  # Will store the default airline info
         'carry_on_allowances': {},
         'checked_bag_allowances': {},
         'penalties': {}
@@ -101,11 +104,49 @@ def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
         segments = segment_list.get('FlightSegment', [])
         logger.info(f"Found {len(segments)} flight segments in response")
         if isinstance(segments, list):
+            logger.info(f"Processing {len(segments)} segments")
+            for i, segment in enumerate(segments[:2]):  # Log first 2 segments for debugging
+                logger.info(f"Segment {i} structure: {json.dumps(segment, indent=2)}")
+                
             for segment in segments:
                 segment_key = segment.get('SegmentKey')
                 if segment_key:
                     reference_data['segments'][segment_key] = segment
                     logger.info(f"Added segment {segment_key} to reference data")
+                    
+                    # Extract airline information from the segment
+                    for carrier_type in ['MarketingCarrier', 'OperatingCarrier']:
+                        carrier = segment.get(carrier_type, {})
+                        if not carrier:
+                            logger.debug(f"No {carrier_type} in segment {segment_key}")
+                            continue
+                            
+                        logger.info(f"Processing {carrier_type} for segment {segment_key}")
+                        logger.info(f"Carrier data: {carrier}")
+                        
+                        airline_id = carrier.get('AirlineID', {})
+                        logger.info(f"AirlineID: {airline_id}")
+                        
+                        airline_code = airline_id.get('value') if isinstance(airline_id, dict) else airline_id
+                        airline_name = carrier.get('Name')
+                        
+                        logger.info(f"Extracted - Code: {airline_code}, Name: {airline_name}")
+                        
+                        if airline_code and airline_name:
+                            if 'airlines' not in reference_data:
+                                reference_data['airlines'] = {}
+                            
+                            reference_data['airlines'][airline_code] = airline_name
+                            logger.info(f"Added airline {airline_code}: {airline_name} from {carrier_type}")
+                            
+                            # Set default airline if not set yet (first airline found)
+                            if reference_data['default_airline'] is None:
+                                reference_data['default_airline'] = {
+                                    'code': airline_code,
+                                    'name': airline_name
+                                }
+                        else:
+                            logger.warning(f"Missing code or name - Code: {airline_code}, Name: {airline_name}")
                 else:
                     logger.warning(f"Segment missing SegmentKey: {segment}")
         else:
@@ -113,36 +154,51 @@ def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
         
         logger.info(f"Total segments in reference_data: {len(reference_data['segments'])}")
         
-        # Extract origin-destination references - OriginDestinationList is at root level in actual API response
+        # Extract airport information from FlightSegmentList
+        for segment in reference_data['segments'].values():
+            # Extract departure airport
+            dep_airport = segment.get('Departure', {}).get('AirportCode')
+            if dep_airport:
+                reference_data['airports'][dep_airport] = {
+                    'code': dep_airport,
+                    'name': segment['Departure'].get('AirportName', dep_airport),
+                    'terminal': segment['Departure'].get('Terminal')
+                }
+            
+            # Extract arrival airport
+            arr_airport = segment.get('Arrival', {}).get('AirportCode')
+            if arr_airport:
+                reference_data['airports'][arr_airport] = {
+                    'code': arr_airport,
+                    'name': segment['Arrival'].get('AirportName', arr_airport),
+                    'terminal': segment['Arrival'].get('Terminal')
+                }
+        
+        # Also try to extract from OriginDestinationList if available
         od_list = response.get('OriginDestinationList', {})
         origin_destinations = od_list.get('OriginDestination', [])
         logger.debug(f"Found {len(origin_destinations)} origin-destinations in response")
+        
         if isinstance(origin_destinations, list):
             for od in origin_destinations:
-                od_key = od.get('OriginDestinationKey')
-                if od_key:
-                    reference_data['airports'][od_key] = od
-                    logger.debug(f"Added origin-destination {od_key} to reference data")
-                
-                # Also extract airport information from departure/arrival
-                departure = od.get('Departure', {})
-                arrival = od.get('Arrival', {})
-                
-                dep_airport = departure.get('AirportCode')
-                arr_airport = arrival.get('AirportCode')
-                
-                if dep_airport:
+                # Extract departure airport
+                dep = od.get('Departure', {})
+                dep_airport = dep.get('AirportCode')
+                if dep_airport and dep_airport not in reference_data['airports']:
                     reference_data['airports'][dep_airport] = {
                         'code': dep_airport,
-                        'name': departure.get('AirportName', dep_airport),
-                        'terminal': departure.get('Terminal')
+                        'name': dep.get('AirportName', dep_airport),
+                        'terminal': dep.get('Terminal')
                     }
                 
-                if arr_airport:
+                # Extract arrival airport
+                arr = od.get('Arrival', {})
+                arr_airport = arr.get('AirportCode')
+                if arr_airport and arr_airport not in reference_data['airports']:
                     reference_data['airports'][arr_airport] = {
                         'code': arr_airport,
-                        'name': arrival.get('AirportName', arr_airport),
-                        'terminal': arrival.get('Terminal')
+                        'name': arr.get('AirportName', arr_airport),
+                        'terminal': arr.get('Terminal')
                     }
         
         # Extract carry-on allowance list
@@ -404,8 +460,33 @@ def _transform_segment(segment_data: Dict[str, Any], reference_data: Dict[str, A
     dep_time = extract_time_with_priority(dep_time_raw, dep_datetime)
     arr_time = extract_time_with_priority(arr_time_raw, arr_datetime)
     
-    # Extract airline name using correct path: OperatingCarrier.Name
-    airline_name = segment_data.get('OperatingCarrier', {}).get('Name', 'Unknown Airline')
+    # Get airline information with better fallback handling
+    airline_code = 'Unknown'
+    airline_name = 'Unknown Airline'
+    
+    # Try to get from MarketingCarrier first
+    marketing_carrier = segment_data.get('MarketingCarrier', {})
+    if marketing_carrier:
+        airline_code = marketing_carrier.get('AirlineID', {}).get('value', 'Unknown')
+        # Try to get name directly from segment first
+        if 'Name' in marketing_carrier and marketing_carrier['Name']:
+            airline_name = marketing_carrier['Name']
+        else:
+            airline_name = _get_airline_name(airline_code, reference_data)
+    
+    # Fallback to OperatingCarrier if needed
+    if airline_name in ['Unknown', 'Unknown Airline', f"Airline {airline_code}"]:
+        operating_carrier = segment_data.get('OperatingCarrier', {})
+        if operating_carrier:
+            operating_airline_code = operating_carrier.get('AirlineID', {}).get('value', 'Unknown')
+            if 'Name' in operating_carrier and operating_carrier['Name']:
+                airline_name = operating_carrier['Name']
+            else:
+                airline_name = _get_airline_name(operating_airline_code, reference_data)
+            
+            # If we got a valid name from operating carrier, update the code too
+            if airline_name not in ['Unknown', 'Unknown Airline', f"Airline {operating_airline_code}"]:
+                airline_code = operating_airline_code
     
     # Extract flight duration using correct path: FlightDetail.FlightDuration.Value
     flight_duration = segment_data.get('FlightDetail', {}).get('FlightDuration', {}).get('Value', 'N/A')
@@ -599,7 +680,7 @@ def _extract_penalty_info(priced_offer: Dict[str, Any], reference_data: Dict[str
                         # Extract penalty amounts
                         amounts = detail.get('Amounts', {}).get('Amount', [])
                         penalty_amount = 0
-                        currency = 'USD'
+                        currency = detail.get('Amounts', {}).get('Amount', {}).get('CurrencyAmountValue', {}).get('Code', 'USD')
                         remarks = []
                         
                         for amount in amounts:
@@ -632,93 +713,95 @@ def _extract_penalty_info(priced_offer: Dict[str, Any], reference_data: Dict[str
 
 def _get_airline_name(airline_code: str, reference_data: Dict[str, Any] = None) -> str:
     """
-    Get airline name from code by searching through flight segments in reference data.
-    First checks MarketingCarrier, then falls back to OperatingCarrier if not found.
+    Get airline name by checking multiple sources in order:
+    1. The airlines dictionary in reference_data
+    2. MarketingCarrier in segments
+    3. OperatingCarrier in segments
+    4. Flight segments in reference data
+    5. Known airline codes mapping
     
     Args:
         airline_code: 2-letter IATA airline code
-        reference_data: Dictionary containing flight segments and other reference data
+        reference_data: Dictionary containing airlines and flight segments
         
     Returns:
         Airline name if found, or formatted code if not found
     """
-    if not reference_data or not airline_code:
-        logger.warning(f"Missing reference_data or airline_code: {airline_code}")
+    if not airline_code or not isinstance(airline_code, str):
+        logger.warning(f"Invalid airline code: {airline_code}")
+        return 'Unknown Airline'
+        
+    # Common airline codes mapping as fallback
+    AIRLINE_NAMES = {
+        'EK': 'Emirates',
+        'QR': 'Qatar Airways',
+        'SQ': 'Singapore Airlines',
+        'EY': 'Etihad Airways',
+        'TK': 'Turkish Airlines',
+        'LH': 'Lufthansa',
+        'BA': 'British Airways',
+        'AF': 'Air France',
+        'KL': 'KLM',
+        'AA': 'American Airlines',
+        'DL': 'Delta Air Lines',
+        'UA': 'United Airlines',
+        'QF': 'Qantas',
+        'CX': 'Cathay Pacific',
+        'NH': 'ANA',
+        'JL': 'Japan Airlines',
+        'AC': 'Air Canada',
+        'VS': 'Virgin Atlantic',
+        'LX': 'Swiss International Air Lines'
+    }
+    
+    # Clean and normalize the airline code
+    airline_code = airline_code.strip().upper()
+    
+    # Try to get from airlines dictionary first
+    if reference_data and 'airlines' in reference_data and airline_code in reference_data['airlines']:
+        name = reference_data['airlines'][airline_code]
+        if name and name != 'Unknown':
+            return name
+    
+    # If not found, try to find in segments
+    if reference_data and 'segments' in reference_data:
+        for segment_id, segment in reference_data['segments'].items():
+            try:
+                # Check marketing carrier
+                if 'MarketingCarrier' in segment and segment['MarketingCarrier']:
+                    carrier = segment['MarketingCarrier']
+                    if carrier.get('AirlineID') == airline_code and 'Name' in carrier:
+                        return carrier['Name']
+                
+                # Check operating carrier
+                if 'OperatingCarrier' in segment and segment['OperatingCarrier']:
+                    carrier = segment['OperatingCarrier']
+                    if carrier.get('AirlineID') == airline_code and 'Name' in carrier:
+                        return carrier['Name']
+            except (KeyError, AttributeError) as e:
+                logger.warning(f"Error processing segment {segment_id}: {str(e)}")
+    
+    # Try to get from flight segments
+    if reference_data and 'flights' in reference_data:
+        for flight_id, flight in reference_data['flights'].items():
+            try:
+                if 'MarketingCarrier' in flight and flight['MarketingCarrier']:
+                    carrier = flight['MarketingCarrier']
+                    if carrier.get('AirlineID') == airline_code and 'Name' in carrier:
+                        return carrier['Name']
+            except (KeyError, AttributeError) as e:
+                logger.warning(f"Error processing flight {flight_id}: {str(e)}")
+    
+    # Try the known airline codes mapping
+    if airline_code in AIRLINE_NAMES:
+        return AIRLINE_NAMES[airline_code]
+    
+    # If we have a reference to the airline in the segment but no name, use the code
+    if airline_code != 'Unknown':
         return f"Airline {airline_code}"
     
-    logger.info(f"Looking up airline name for code: {airline_code}")
-    
-    # First try to find in MarketingCarrier
-    for segment_key, segment in reference_data.get('segments', {}).items():
-        # Check MarketingCarrier first
-        marketing_carrier = segment.get('MarketingCarrier', {})
-        marketing_airline_id = marketing_carrier.get('AirlineID', {})
-        marketing_airline_code = marketing_airline_id.get('value') if isinstance(marketing_airline_id, dict) else marketing_airline_id
-        
-        if marketing_airline_code == airline_code:
-            name = marketing_carrier.get('Name')
-            if name:
-                logger.info(f"Found airline name in MarketingCarrier: {name}")
-                return name
-        
-        # If not found in MarketingCarrier, try OperatingCarrier
-        operating_carrier = segment.get('OperatingCarrier', {})
-        operating_airline_id = operating_carrier.get('AirlineID', {})
-        operating_airline_code = operating_airline_id.get('value') if isinstance(operating_airline_id, dict) else operating_airline_id
-        
-        if operating_airline_code == airline_code:
-            name = operating_carrier.get('Name')
-            if name:
-                logger.info(f"Found airline name in OperatingCarrier: {name}")
-                return name
-    
-    # If not found in segments, try a broader search in reference_data
-    def search_in_nested_dict(data, code):
-        if isinstance(data, dict):
-            # Check both MarketingCarrier and OperatingCarrier at this level
-            for carrier_type in ['MarketingCarrier', 'OperatingCarrier']:
-                carrier = data.get(carrier_type, {})
-                if not isinstance(carrier, dict):
-                    continue
-                    
-                # Check both direct AirlineID and nested AirlineID.value
-                airline_id = carrier.get('AirlineID', {})
-                if isinstance(airline_id, dict):
-                    if airline_id.get('value') == code:
-                        return carrier.get('Name')
-                elif airline_id == code:
-                    return carrier.get('Name')
-                    
-                # Also check for direct AirlineCode field
-                if carrier.get('AirlineCode') == code:
-                    return carrier.get('Name')
-            
-            # Recursively search in nested dictionaries
-            for key, value in data.items():
-                # Skip some large structures to avoid excessive recursion
-                if key in ['segments', 'flights', 'airports']:
-                    continue
-                result = search_in_nested_dict(value, code)
-                if result:
-                    return result
-                    
-        elif isinstance(data, (list, tuple)):
-            for item in data:
-                result = search_in_nested_dict(item, code)
-                if result:
-                    return result
-        return None
-    
-    # Perform the search in the entire reference_data
-    logger.info(f"Performing deep search for airline code: {airline_code}")
-    name = search_in_nested_dict(reference_data, airline_code)
-    if name:
-        logger.info(f"Found airline name in deep search: {name}")
-        return name
-    
-    logger.warning(f"Could not find airline name for code: {airline_code}")
-    return f"Airline {airline_code}"
-
+    # As a last resort, return a generic name
+    return 'Airline'
 
 def _transform_penalties_to_fare_rules(penalties: List[Dict[str, Any]]) -> Dict[str, Any]:
     """

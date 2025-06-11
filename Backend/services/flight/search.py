@@ -135,10 +135,10 @@ class FlightSearchService(FlightService):
             cabin_preference = criteria.get('cabinPreference', 'ECONOMY')
             cabin_code = cabin_mapping.get(cabin_preference.upper(), 'Y')
             
-            # Get passenger counts
-            num_adults = criteria.get('num_adults', 1)
-            num_children = criteria.get('num_children', 0)
-            num_infants = criteria.get('num_infants', 0)
+            # Get passenger counts (handle both camelCase and snake_case)
+            num_adults = criteria.get('numAdults', criteria.get('num_adults', 1))
+            num_children = criteria.get('numChildren', criteria.get('num_children', 0))
+            num_infants = criteria.get('numInfants', criteria.get('num_infants', 0))
             
             # Use the request builder to create the payload
             payload = build_airshopping_request(

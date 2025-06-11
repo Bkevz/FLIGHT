@@ -9,7 +9,40 @@ import uuid
 from typing import Dict, Any, Optional
 
 from quart import Blueprint, request, jsonify, current_app, make_response
-from quart_cors import cors
+from quart_cors import cors, route_cors
+import time
+from collections import OrderedDict
+
+# Simple in-memory request deduplication cache
+class RequestDeduplicationCache:
+    def __init__(self, max_size=100, ttl=5):
+        self.cache = OrderedDict()
+        self.max_size = max_size
+        self.ttl = ttl  # seconds
+    
+    def _cleanup(self):
+        current_time = time.time()
+        # Remove expired entries
+        expired_keys = [k for k, (_, timestamp) in self.cache.items() 
+                      if current_time - timestamp > self.ttl]
+        for k in expired_keys:
+            self.cache.pop(k, None)
+        
+        # Trim to max size if needed
+        while len(self.cache) > self.max_size:
+            self.cache.popitem(last=False)
+    
+    def add_request(self, key):
+        self._cleanup()
+        current_time = time.time()
+        self.cache[key] = (current_time, current_time)
+    
+    def is_duplicate(self, key):
+        self._cleanup()
+        return key in self.cache
+
+# Initialize request deduplication cache
+request_cache = RequestDeduplicationCache(max_size=1000, ttl=5)  # 5 second TTL
 
 # Import from the new modular flight service
 from services.flight import (
@@ -28,25 +61,27 @@ logger = logging.getLogger(__name__)
 # Create a Blueprint for Verteil flight routes
 bp = Blueprint('verteil_flights', __name__, url_prefix='/api/verteil')
 
-def _add_cors_headers(response):
-    """Add CORS headers to the response."""
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    response.headers['Access-Control-Allow-Credentials'] = 'true'
-    return response
+# For debugging, allow all origins temporarily
+ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001"]
 
-@bp.after_request
-async def after_request(response):
-    """Add CORS headers to all responses."""
-    return _add_cors_headers(response)
+# Enable CORS for all routes in this blueprint with specific options
+bp = cors(
+    bp,
+    allow_origin=ALLOWED_ORIGINS,
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    expose_headers=["Content-Type"],
+    max_age=600,
+    allow_credentials=True
+)
 
+# Add request logging
 @bp.before_request
-async def handle_preflight():
-    """Handle CORS preflight requests."""
-    if request.method == "OPTIONS":
-        response = await make_response()
-        return _add_cors_headers(response)
+async def log_request():
+    logger.info(f"Incoming request: {request.method} {request.path}")
+    logger.info(f"Headers: {dict(request.headers)}")
+    logger.info(f"Origin: {request.headers.get('Origin')}")
+    logger.info(f"Access-Control-Request-Method: {request.headers.get('Access-Control-Request-Method')}")
 
 def _get_request_id() -> str:
     """Generate a unique request ID."""
@@ -80,6 +115,10 @@ def _create_error_response(
     return response
 
 @bp.route('/air-shopping', methods=['GET', 'POST', 'OPTIONS'])
+@route_cors(allow_origin=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001"], 
+           allow_headers=["Content-Type", "Authorization", "X-Requested-With"], 
+           allow_methods=["GET", "POST", "OPTIONS"],
+           allow_credentials=True)
 async def air_shopping():
     """
     Handle flight search requests with caching and advanced filtering capabilities.
@@ -116,196 +155,93 @@ async def air_shopping():
     - [numInfants]: Number of infant passengers (0-8, default: 0)
     - [cabinPreference]: Cabin class preference (ECONOMY, PREMIUM_ECONOMY, BUSINESS, FIRST)
     - [directOnly]: Boolean to show only direct flights (default: false)
-    - [filters]: Advanced filtering options (optional):
-        - [priceRange]: {min: number, max: number} - Price range filter
-        - [airlines]: string[] - Array of airline codes to include
-        - [maxStops]: number - Maximum number of stops (0 for direct only)
-        - [departureTimeRange]: {min: string, max: string} - Departure time range in HH:MM format
-        - [arrivalTimeRange]: {min: string, max: string} - Arrival time range in HH:MM format
-        - [duration]: {max: number} - Maximum flight duration in minutes
-        - [aircraft]: string[] - Preferred aircraft types
-    - [sortBy]: Sorting preference ('price', 'duration', 'departure', 'arrival', 'stops') (default: 'price')
+    - [filters]: Advanced filtering options (optional)
+    - [sortBy]: Sorting preference ('price', 'duration', 'departure', 'arrival', 'stops')
     - [sortOrder]: Sort order ('asc' or 'desc') (default: 'asc')
     - [enableRoundtrip]: Boolean to enable round trip transformation (default: false)
+    
+    Returns:
+    - Flight search results with enhanced filtering and sorting
     """
-    # if request.method == 'OPTIONS':
-    #     response = await make_response()
-    #     return _add_cors_headers(response)
+    # Handle preflight OPTIONS request
+    if request.method == 'OPTIONS':
+        logger.info("Handling OPTIONS preflight request")
+        return await make_response(), 200
         
     request_id = _get_request_id()
+    logger.info(f"Air shopping request received - Request ID: {request_id}")
+    
+    # Create a fingerprint of the request to detect duplicates
+    request_data = await request.get_data()
+    request_fingerprint = f"{request.remote_addr}:{request.path}:{request_data.decode()}"
+    
+    # Check for duplicate request (skip for OPTIONS)
+    if request.method != 'OPTIONS' and request_cache.is_duplicate(request_fingerprint):
+        logger.warning(f"Duplicate request detected - Request ID: {request_id}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Duplicate request detected. Please wait a moment and try again.',
+            'request_id': request_id
+        }), 429  # Too Many Requests
+    
+    # Add to cache (skip for OPTIONS)
+    if request.method != 'OPTIONS':
+        request_cache.add_request(request_fingerprint)
     
     try:
-        # Parse request data based on method
+        # Get request data based on method
         if request.method == 'GET':
-            args = request.args
-            origin = args.get('origin')
-            destination = args.get('destination')
-            depart_date = args.get('departDate')
+            data = request.args.to_dict()
+        else:
+            data = await request.get_json() or {}
             
-            if not all([origin, destination, depart_date]):
-                error_msg = "Missing required parameters: origin, destination, and departDate are required"
-                logger.warning(f"{error_msg} - Request ID: {request_id}")
-                return jsonify(_create_error_response(error_msg, 400, request_id))
-                
-            # Map cabin class codes to full names
-            cabin_map = {
-                'Y': 'ECONOMY',
-                'W': 'PREMIUM_ECONOMY',
-                'C': 'BUSINESS',
-                'F': 'FIRST'
-            }
-            
-            cabin_class = args.get('cabinClass', 'Y')
-            cabin_preference = cabin_map.get(cabin_class.upper(), 'ECONOMY')
-            
-            # Create odSegments from GET params
-            od_segments = [{
-                'origin': origin.upper(),
-                'destination': destination.upper(),
-                'departureDate': depart_date
-            }]
-            
-            # Add return segment if round trip
-            if args.get('tripType', '').lower() == 'round-trip' and args.get('returnDate'):
-                od_segments.append({
-                    'origin': destination.upper(),
-                    'destination': origin.upper(),
-                    'departureDate': args['returnDate']
-                })
-            
-            # Parse filtering parameters for GET requests
-            filters = {}
-            
-            # Price range filter
-            if args.get('minPrice') or args.get('maxPrice'):
-                price_range = {}
-                if args.get('minPrice'):
-                    try:
-                        price_range['min'] = float(args.get('minPrice'))
-                    except ValueError:
-                        logger.warning(f"Invalid minPrice value: {args.get('minPrice')} - Request ID: {request_id}")
-                if args.get('maxPrice'):
-                    try:
-                        price_range['max'] = float(args.get('maxPrice'))
-                    except ValueError:
-                        logger.warning(f"Invalid maxPrice value: {args.get('maxPrice')} - Request ID: {request_id}")
-                if price_range:
-                    filters['priceRange'] = price_range
-            
-            # Airlines filter
-            if args.get('airlines'):
-                airline_codes = [code.strip().upper() for code in args.get('airlines').split(',') if code.strip()]
-                if airline_codes:
-                    filters['airlines'] = airline_codes
-            
-            # Max stops filter
-            if args.get('maxStops'):
-                try:
-                    max_stops = int(args.get('maxStops'))
-                    if max_stops >= 0:
-                        filters['maxStops'] = max_stops
-                except ValueError:
-                    logger.warning(f"Invalid maxStops value: {args.get('maxStops')} - Request ID: {request_id}")
-            
-            # Departure time range filter
-            if args.get('departTimeMin') or args.get('departTimeMax'):
-                time_range = {}
-                if args.get('departTimeMin'):
-                    time_range['min'] = args.get('departTimeMin')
-                if args.get('departTimeMax'):
-                    time_range['max'] = args.get('departTimeMax')
-                if time_range:
-                    filters['departureTimeRange'] = time_range
-            
-            search_criteria = {
-                'tripType': 'ROUND_TRIP' if args.get('tripType', '').lower() == 'round-trip' else 'ONE_WAY',
-                'odSegments': od_segments,
-                'numAdults': int(args.get('adults', 1)),
-                'numChildren': int(args.get('children', 0)),
-                'numInfants': int(args.get('infants', 0)),
-                'cabinPreference': cabin_preference,
-                'directOnly': False,
-                'enableRoundtrip': args.get('enableRoundtrip', '').lower() == 'true',
-                'request_id': request_id
-            }
-            
-            # Add filters if any were specified
-            if filters:
-                search_criteria['filters'] = filters
-        else:  # POST
-            data = await request.get_json()
-            logger.info(f"Air shopping request received - Request ID: {request_id}")
-            
-            # Basic validation for POST
-            required_fields = ['tripType', 'odSegments', 'numAdults']
-            missing_fields = [f for f in required_fields if f not in data]
-            if missing_fields:
-                error_msg = f"Missing required fields: {', '.join(missing_fields)}"
-                logger.warning(f"{error_msg} - Request ID: {request_id}")
-                return jsonify(_create_error_response(error_msg, 400, request_id))
-            
-            od_segments = data['odSegments']
-            if not isinstance(od_segments, list) or not od_segments:
-                error_msg = "odSegments must be a non-empty list"
-                logger.warning(f"{error_msg} - Request ID: {request_id}")
-                return jsonify(_create_error_response(error_msg, 400, request_id))
-            
-            num_adults = int(data['numAdults'])
-            if num_adults < 1 or num_adults > 9:
-                error_msg = "Number of adults must be between 1 and 9"
-                logger.warning(f"{error_msg} - Request ID: {request_id}")
-                return jsonify(_create_error_response(error_msg, 400, request_id))
-            
-            search_criteria = {
-                'tripType': data['tripType'],
-                'odSegments': od_segments,
-                'numAdults': num_adults,
-                'numChildren': int(data.get('numChildren', 0)),
-                'numInfants': int(data.get('numInfants', 0)),
-                'cabinPreference': data.get('cabinPreference', 'ECONOMY'),
-                'directOnly': bool(data.get('directOnly', False)),
-                'enableRoundtrip': bool(data.get('enableRoundtrip', False)),
-                'request_id': request_id
-            }
-            
-            # Add advanced filtering options if provided
-            if 'filters' in data and isinstance(data['filters'], dict):
-                search_criteria['filters'] = data['filters']
-                logger.info(f"Applied filters: {data['filters']} - Request ID: {request_id}")
-            
-            # Add sorting options if provided
-            if 'sortBy' in data:
-                valid_sort_options = ['price', 'duration', 'departure', 'arrival', 'stops']
-                if data['sortBy'] in valid_sort_options:
-                    search_criteria['sortBy'] = data['sortBy']
-                else:
-                    logger.warning(f"Invalid sortBy value: {data['sortBy']} - Request ID: {request_id}")
-            
-            if 'sortOrder' in data:
-                valid_sort_orders = ['asc', 'desc']
-                if data['sortOrder'] in valid_sort_orders:
-                    search_criteria['sortOrder'] = data['sortOrder']
-                else:
-                    logger.warning(f"Invalid sortOrder value: {data['sortOrder']} - Request ID: {request_id}")
-        result = await process_air_shopping(search_criteria)
+        # Log the incoming request for debugging
+        logger.info(f"Request data: {data}")
         
-        logger.info(f"Air shopping request completed - Request ID: {request_id}")
-        # process_air_shopping already returns the correct structure with status, data, and request_id
-        return jsonify(result)
+        # Process the request with the flight service
+        result = await process_air_shopping(data)
         
-    except json.JSONDecodeError:
-        error_msg = "Invalid JSON payload"
+        # Log success
+        logger.info(f"Successfully processed air shopping request - Request ID: {request_id}")
+        
+        # Return the result
+        response = jsonify({
+            'status': 'success',
+            'data': result,
+            'request_id': request_id
+        })
+        
+        return response
+        
+    except json.JSONDecodeError as e:
+        error_msg = f"Invalid JSON in request: {str(e)}"
         logger.error(f"{error_msg} - Request ID: {request_id}")
-        return jsonify(_create_error_response(error_msg, 400, request_id))
-    except ValueError as e:
-        logger.error(f"Validation error: {str(e)} - Request ID: {request_id}")
-        return jsonify(_create_error_response(str(e), 400, request_id))
+        return jsonify(_create_error_response(
+            message="Invalid JSON in request body",
+            status_code=400,
+            request_id=request_id,
+            details={"error": str(e)}
+        )), 400
+        
     except FlightServiceError as e:
-        logger.error(f"Flight service error: {str(e)} - Request ID: {request_id}")
-        return jsonify(_create_error_response(str(e), 500, request_id, e.details if hasattr(e, 'details') else None))
+        error_msg = f"Flight service error: {str(e)}"
+        logger.error(f"{error_msg} - Request ID: {request_id}")
+        return jsonify(_create_error_response(
+            message=str(e),
+            status_code=getattr(e, 'status_code', 500),
+            request_id=request_id,
+            details=getattr(e, 'details', None)
+        )), getattr(e, 'status_code', 500)
+        
     except Exception as e:
-        logger.error(f"Unexpected error: {str(e)} - Request ID: {request_id}", exc_info=True)
-        return jsonify(_create_error_response("An unexpected error occurred", 500, request_id))
+        error_msg = f"Unexpected error: {str(e)}"
+        logger.error(f"{error_msg} - Request ID: {request_id}", exc_info=True)
+        return jsonify(_create_error_response(
+            message="An unexpected error occurred",
+            status_code=500,
+            request_id=request_id,
+            details={"error": str(e) if str(e) else "Unknown error"}
+        )), 500
 
 @bp.route('/flight-price', methods=['POST', 'OPTIONS'])
 async def flight_price():
@@ -321,9 +257,6 @@ async def flight_price():
     Returns:
     - Pricing details for the selected flight offer
     """
-    if request.method == 'OPTIONS':
-        response = await make_response()
-        return _add_cors_headers(response)
         
     request_id = _get_request_id()
     

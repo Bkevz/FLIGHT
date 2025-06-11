@@ -23,7 +23,7 @@ def create_app(test_config=None):
     app = Quart(__name__, instance_relative_config=True)
     
     # Configure CORS to allow requests from the frontend
-    app.config['CORS_ORIGINS'] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    app.config['CORS_ORIGINS'] = ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001"]
     app.config['CORS_ALLOW_HEADERS'] = ["Content-Type", "Authorization"]
     app.config['CORS_METHODS'] = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     app.config['CORS_EXPOSE_HEADERS'] = ["Content-Type"]

@@ -215,7 +215,9 @@ export default function FlightsPage() {
     const destination = searchParams.get('destination') || '';
     const departDate = searchParams.get('departDate') || '';
     const returnDate = searchParams.get('returnDate') || '';
-    const passengers = Number(searchParams.get('passengers')) || 1;
+    const adults = Number(searchParams.get('adults')) || 1;
+    const children = Number(searchParams.get('children')) || 0;
+    const infants = Number(searchParams.get('infants')) || 0;
     const cabinClass = searchParams.get('cabinClass') || 'Y';
     const tripType = searchParams.get('tripType') || 'one-way';
     
@@ -225,16 +227,34 @@ export default function FlightsPage() {
       return;
     }
     
+    // Convert trip type to backend format
+    const convertTripType = (type: string): 'ONE_WAY' | 'ROUND_TRIP' | 'MULTI_CITY' => {
+      switch (type.toLowerCase()) {
+        case 'round-trip':
+        case 'roundtrip':
+          return 'ROUND_TRIP';
+        case 'multi-city':
+        case 'multicity':
+          return 'MULTI_CITY';
+        case 'one-way':
+        case 'oneway':
+        default:
+          return 'ONE_WAY';
+      }
+    };
+
     // Prepare search parameters for the API
     const flightSearchParams: FlightSearchRequest = {
-      tripType: tripType.toUpperCase() as 'ONE_WAY' | 'ROUND_TRIP' | 'MULTI_CITY',
+      tripType: convertTripType(tripType),
       odSegments: [{
         origin,
         destination,
         departureDate: departDate,
         ...(tripType === 'round-trip' && returnDate ? { returnDate } : {})
       }],
-      numAdults: passengers,
+      numAdults: adults,
+      numChildren: children,
+      numInfants: infants,
       cabinPreference: cabinClass,
       directOnly: false
     };
@@ -311,10 +331,10 @@ export default function FlightsPage() {
     fetchFlights();
 
     // Create a unique search key
-    const searchKey = `flightResults_${origin}_${destination}_${departDate}_${passengers}_${cabinClass}`;
+    const searchKey = `flightResults_${origin}_${destination}_${departDate}_${adults}_${children}_${infants}_${cabinClass}`;
 
     // Log search parameters
-    console.log('Search params:', { origin, destination, departDate, returnDate, passengers, cabinClass });
+    // console.log('Search params:', { origin, destination, departDate, returnDate, adults, children, infants, cabinClass });
     
     // Clear session storage to force API fetch
     sessionStorage.removeItem(searchKey);
