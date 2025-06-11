@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { debounce } from 'lodash';
 import { logger } from '@/lib/logger';
 import type { FlightSearchResponse } from '@/types/flight-api';
 
@@ -101,10 +102,22 @@ export interface FlightOffer {
     }>;
 }
 
+// Create debounced search function to prevent rapid successive requests
+const debouncedSearchFlights = debounce(async (params: FlightSearchRequest, resolve: (value: any) => void, reject: (reason?: any) => void) => {
+    try {
+        const response = await apiClient.post<FlightSearchResponse>('/api/verteil/air-shopping', params);
+        resolve(response);
+    } catch (error) {
+        reject(error);
+    }
+}, 1000); // 1 second debounce delay
+
 export const api = {
-    // Flight Search
+    // Flight Search with debouncing
     searchFlights: async (params: FlightSearchRequest) => {
-        return apiClient.post<FlightSearchResponse>('/api/verteil/air-shopping', params);
+        return new Promise((resolve, reject) => {
+            debouncedSearchFlights(params, resolve, reject);
+        });
     },
 
     // Flight Pricing

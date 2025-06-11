@@ -42,7 +42,7 @@ class RequestDeduplicationCache:
         return key in self.cache
 
 # Initialize request deduplication cache
-request_cache = RequestDeduplicationCache(max_size=1000, ttl=5)  # 5 second TTL
+request_cache = RequestDeduplicationCache(max_size=1000, ttl=2)  # 2 second TTL - reduced from 5 to improve UX
 
 # Import from the new modular flight service
 from services.flight import (

@@ -265,19 +265,21 @@ export default function FlightsPage() {
         const response = await api.searchFlights(flightSearchParams);
         
         // Transform API response to match the expected flight format
-        // Backend returns {status: 'success', data: {offers: [...]}}
+        // Backend returns response.data with nested data structure
         const apiResponse = response.data;
         let apiFlights: any[] = [];
         
-        if (apiResponse.status === 'success' && apiResponse.data) {
-          apiFlights = apiResponse.data.offers || [];
-        } else if (Array.isArray(apiResponse)) {
-          apiFlights = apiResponse;
-        } else if (apiResponse.data && apiResponse.data.offers) {
+        // The actual structure is response.data.data.offers (not response.data.status)
+        if (apiResponse && apiResponse.data && apiResponse.data.offers) {
           apiFlights = apiResponse.data.offers;
+        } else if (apiResponse && apiResponse.offers) {
+          // Fallback: direct offers in response.data
+          apiFlights = apiResponse.offers;
+        } else if (Array.isArray(apiResponse)) {
+          // Fallback: response.data is directly an array
+          apiFlights = apiResponse;
         }
         
-        // console.log('API Response:', apiResponse);
         console.log('Extracted flights:', apiFlights.length, 'offers');
         
         // Use backend-transformed data directly - minimal transformation for UI compatibility
