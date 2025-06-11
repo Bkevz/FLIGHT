@@ -95,8 +95,11 @@ def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
         if isinstance(flights, list):
             for flight in flights:
                 flight_key = flight.get('FlightKey')
-                if flight_key:
+                # Ensure flight_key is a valid string for use as dictionary key
+                if flight_key and isinstance(flight_key, str):
                     reference_data['flights'][flight_key] = flight
+                elif flight_key:
+                    logger.warning(f"Invalid FlightKey type: {type(flight_key)} - {flight_key}")
         
         # Extract flight segment references - FlightSegmentList is inside DataLists
         segment_list = data_lists.get('FlightSegmentList', {})
@@ -110,9 +113,13 @@ def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
                 
             for segment in segments:
                 segment_key = segment.get('SegmentKey')
-                if segment_key:
+                # Ensure segment_key is a valid string for use as dictionary key
+                if segment_key and isinstance(segment_key, str):
                     reference_data['segments'][segment_key] = segment
                     logger.info(f"Added segment {segment_key} to reference data")
+                elif segment_key:
+                    logger.warning(f"Invalid SegmentKey type: {type(segment_key)} - {segment_key}")
+                    continue
                     
                     # Extract airline information from the segment
                     for carrier_type in ['MarketingCarrier', 'OperatingCarrier']:
@@ -127,7 +134,17 @@ def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
                         airline_id = carrier.get('AirlineID', {})
                         logger.info(f"AirlineID: {airline_id}")
                         
-                        airline_code = airline_id.get('value') if isinstance(airline_id, dict) else airline_id
+                        # Extract airline code safely, ensuring it's always a string
+                        if isinstance(airline_id, dict):
+                            airline_code = airline_id.get('value')
+                        else:
+                            airline_code = airline_id
+                        
+                        # Ensure airline_code is a string and not None or empty
+                        if not airline_code or not isinstance(airline_code, str):
+                            logger.warning(f"Invalid airline_code extracted: {airline_code} (type: {type(airline_code)})")
+                            continue
+                            
                         airline_name = carrier.get('Name')
                         
                         logger.info(f"Extracted - Code: {airline_code}, Name: {airline_name}")
@@ -157,22 +174,40 @@ def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
         # Extract airport information from FlightSegmentList
         for segment in reference_data['segments'].values():
             # Extract departure airport
-            dep_airport = segment.get('Departure', {}).get('AirportCode')
-            if dep_airport:
+            dep_airport_raw = segment.get('Departure', {}).get('AirportCode')
+            # Handle airport code extraction similar to airline code
+            if isinstance(dep_airport_raw, dict):
+                dep_airport = dep_airport_raw.get('value')
+            else:
+                dep_airport = dep_airport_raw
+            
+            # Ensure dep_airport is a valid string for use as dictionary key
+            if dep_airport and isinstance(dep_airport, str):
                 reference_data['airports'][dep_airport] = {
                     'code': dep_airport,
                     'name': segment['Departure'].get('AirportName', dep_airport),
                     'terminal': segment['Departure'].get('Terminal')
                 }
+            elif dep_airport_raw:
+                logger.warning(f"Invalid departure AirportCode extraction: {type(dep_airport_raw)} - {dep_airport_raw}")
             
             # Extract arrival airport
-            arr_airport = segment.get('Arrival', {}).get('AirportCode')
-            if arr_airport:
+            arr_airport_raw = segment.get('Arrival', {}).get('AirportCode')
+            # Handle airport code extraction similar to airline code
+            if isinstance(arr_airport_raw, dict):
+                arr_airport = arr_airport_raw.get('value')
+            else:
+                arr_airport = arr_airport_raw
+            
+            # Ensure arr_airport is a valid string for use as dictionary key
+            if arr_airport and isinstance(arr_airport, str):
                 reference_data['airports'][arr_airport] = {
                     'code': arr_airport,
                     'name': segment['Arrival'].get('AirportName', arr_airport),
                     'terminal': segment['Arrival'].get('Terminal')
                 }
+            elif arr_airport_raw:
+                logger.warning(f"Invalid arrival AirportCode extraction: {type(arr_airport_raw)} - {arr_airport_raw}")
         
         # Also try to extract from OriginDestinationList if available
         od_list = response.get('OriginDestinationList', {})
@@ -183,44 +218,71 @@ def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
             for od in origin_destinations:
                 # Extract departure airport
                 dep = od.get('Departure', {})
-                dep_airport = dep.get('AirportCode')
-                if dep_airport and dep_airport not in reference_data['airports']:
+                dep_airport_raw = dep.get('AirportCode')
+                # Handle airport code extraction similar to airline code
+                if isinstance(dep_airport_raw, dict):
+                    dep_airport = dep_airport_raw.get('value')
+                else:
+                    dep_airport = dep_airport_raw
+                
+                # Ensure dep_airport is a valid string for use as dictionary key
+                if dep_airport and isinstance(dep_airport, str) and dep_airport not in reference_data['airports']:
                     reference_data['airports'][dep_airport] = {
                         'code': dep_airport,
                         'name': dep.get('AirportName', dep_airport),
                         'terminal': dep.get('Terminal')
                     }
+                elif dep_airport_raw and not isinstance(dep_airport, str):
+                    logger.warning(f"Invalid departure AirportCode extraction in OriginDestination: {type(dep_airport_raw)} - {dep_airport_raw}")
                 
                 # Extract arrival airport
                 arr = od.get('Arrival', {})
-                arr_airport = arr.get('AirportCode')
-                if arr_airport and arr_airport not in reference_data['airports']:
+                arr_airport_raw = arr.get('AirportCode')
+                # Handle airport code extraction similar to airline code
+                if isinstance(arr_airport_raw, dict):
+                    arr_airport = arr_airport_raw.get('value')
+                else:
+                    arr_airport = arr_airport_raw
+                
+                # Ensure arr_airport is a valid string for use as dictionary key
+                if arr_airport and isinstance(arr_airport, str) and arr_airport not in reference_data['airports']:
                     reference_data['airports'][arr_airport] = {
                         'code': arr_airport,
                         'name': arr.get('AirportName', arr_airport),
                         'terminal': arr.get('Terminal')
                     }
+                elif arr_airport_raw and not isinstance(arr_airport, str):
+                    logger.warning(f"Invalid arrival AirportCode extraction in OriginDestination: {type(arr_airport_raw)} - {arr_airport_raw}")
         
         # Extract carry-on allowance list
         carry_on_list = data_lists.get('CarryOnAllowanceList', {}).get('CarryOnAllowance', [])
         for carry_on in carry_on_list:
             list_key = carry_on.get('ListKey')
-            if list_key:
+            # Ensure list_key is a valid string for use as dictionary key
+            if list_key and isinstance(list_key, str):
                 reference_data['carry_on_allowances'][list_key] = carry_on
+            elif list_key:
+                logger.warning(f"Invalid ListKey type for carry-on allowance: {type(list_key)} - {list_key}")
         
         # Extract checked bag allowance list
         checked_bag_list = data_lists.get('CheckedBagAllowanceList', {}).get('CheckedBagAllowance', [])
         for checked_bag in checked_bag_list:
             list_key = checked_bag.get('ListKey')
-            if list_key:
+            # Ensure list_key is a valid string for use as dictionary key
+            if list_key and isinstance(list_key, str):
                 reference_data['checked_bag_allowances'][list_key] = checked_bag
+            elif list_key:
+                logger.warning(f"Invalid ListKey type for checked bag allowance: {type(list_key)} - {list_key}")
         
         # Extract penalty list
         penalty_list = data_lists.get('PenaltyList', {}).get('Penalty', [])
         for penalty in penalty_list:
             object_key = penalty.get('ObjectKey')
-            if object_key:
+            # Ensure object_key is a valid string for use as dictionary key
+            if object_key and isinstance(object_key, str):
                 reference_data['penalties'][object_key] = penalty
+            elif object_key:
+                logger.warning(f"Invalid ObjectKey type for penalty: {type(object_key)} - {object_key}")
         
     except Exception as e:
         logger.warning(f"Error extracting reference data: {str(e)}")
@@ -664,8 +726,13 @@ def _extract_penalty_info(priced_offer: Dict[str, Any], reference_data: Dict[str
             for penalty_ref in penalty_refs:
                 penalty_data = reference_data['penalties'].get(penalty_ref)
                 if penalty_data:
-                    details = penalty_data.get('Details', {}).get('Detail', [])
+                    details_data = penalty_data.get('Details', {})
+                    details = details_data.get('Detail', []) if isinstance(details_data, dict) else []
                     for detail in details:
+                        # Ensure detail is a dictionary before calling .get()
+                        if not isinstance(detail, dict):
+                            logger.warning(f"Invalid detail type: {type(detail)}, expected dict")
+                            continue
                         penalty_type = detail.get('Type', 'Unknown')
                         application_code = detail.get('Application', {}).get('Code', '')
                         
@@ -678,12 +745,26 @@ def _extract_penalty_info(priced_offer: Dict[str, Any], reference_data: Dict[str
                         }.get(application_code, f"Code {application_code}")
                         
                         # Extract penalty amounts
-                        amounts = detail.get('Amounts', {}).get('Amount', [])
+                        amounts_data = detail.get('Amounts', {})
+                        amounts = amounts_data.get('Amount', []) if isinstance(amounts_data, dict) else []
                         penalty_amount = 0
-                        currency = detail.get('Amounts', {}).get('Amount', {}).get('CurrencyAmountValue', {}).get('Code', 'USD')
+                        currency = 'USD'  # Default currency
                         remarks = []
                         
+                        # Try to get default currency from first amount if available
+                        if amounts and isinstance(amounts, list) and len(amounts) > 0:
+                            first_amount = amounts[0]
+                            if isinstance(first_amount, dict):
+                                currency_amount = first_amount.get('CurrencyAmountValue', {})
+                                if isinstance(currency_amount, dict):
+                                    currency = currency_amount.get('Code', 'USD')
+                        
                         for amount in amounts:
+                            # Ensure amount is a dictionary before calling .get()
+                            if not isinstance(amount, dict):
+                                logger.warning(f"Invalid amount type: {type(amount)}, expected dict")
+                                continue
+                                
                             currency_amount = amount.get('CurrencyAmountValue', {})
                             penalty_amount = currency_amount.get('value', 0)
                             currency = currency_amount.get('Code', 'USD')
@@ -757,6 +838,10 @@ def _get_airline_name(airline_code: str, reference_data: Dict[str, Any] = None) 
     # Clean and normalize the airline code
     airline_code = airline_code.strip().upper()
     
+    # Check if code is empty after stripping
+    if not airline_code:
+        return 'Unknown Airline'
+    
     # Try to get from airlines dictionary first
     if reference_data and 'airlines' in reference_data and airline_code in reference_data['airlines']:
         name = reference_data['airlines'][airline_code]
@@ -770,13 +855,29 @@ def _get_airline_name(airline_code: str, reference_data: Dict[str, Any] = None) 
                 # Check marketing carrier
                 if 'MarketingCarrier' in segment and segment['MarketingCarrier']:
                     carrier = segment['MarketingCarrier']
-                    if carrier.get('AirlineID') == airline_code and 'Name' in carrier:
+                    airline_id = carrier.get('AirlineID', {})
+                    # Extract carrier code safely
+                    if isinstance(airline_id, dict):
+                        carrier_code = airline_id.get('value')
+                    else:
+                        carrier_code = airline_id
+                    
+                    # Ensure carrier_code is a valid string
+                    if carrier_code and isinstance(carrier_code, str) and carrier_code == airline_code and 'Name' in carrier:
                         return carrier['Name']
                 
                 # Check operating carrier
                 if 'OperatingCarrier' in segment and segment['OperatingCarrier']:
                     carrier = segment['OperatingCarrier']
-                    if carrier.get('AirlineID') == airline_code and 'Name' in carrier:
+                    airline_id = carrier.get('AirlineID', {})
+                    # Extract carrier code safely
+                    if isinstance(airline_id, dict):
+                        carrier_code = airline_id.get('value')
+                    else:
+                        carrier_code = airline_id
+                    
+                    # Ensure carrier_code is a valid string
+                    if carrier_code and isinstance(carrier_code, str) and carrier_code == airline_code and 'Name' in carrier:
                         return carrier['Name']
             except (KeyError, AttributeError) as e:
                 logger.warning(f"Error processing segment {segment_id}: {str(e)}")
@@ -787,7 +888,15 @@ def _get_airline_name(airline_code: str, reference_data: Dict[str, Any] = None) 
             try:
                 if 'MarketingCarrier' in flight and flight['MarketingCarrier']:
                     carrier = flight['MarketingCarrier']
-                    if carrier.get('AirlineID') == airline_code and 'Name' in carrier:
+                    airline_id = carrier.get('AirlineID', {})
+                    # Extract carrier code safely
+                    if isinstance(airline_id, dict):
+                        carrier_code = airline_id.get('value')
+                    else:
+                        carrier_code = airline_id
+                    
+                    # Ensure carrier_code is a valid string
+                    if carrier_code and isinstance(carrier_code, str) and carrier_code == airline_code and 'Name' in carrier:
                         return carrier['Name']
             except (KeyError, AttributeError) as e:
                 logger.warning(f"Error processing flight {flight_id}: {str(e)}")
