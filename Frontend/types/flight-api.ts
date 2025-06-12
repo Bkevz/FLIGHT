@@ -107,12 +107,14 @@ export interface FlightSegmentDetails {
   departure: { 
     airport: string; 
     datetime: string; 
+    time: string;
     terminal?: string;
     airportName?: string;
   };
   arrival: { 
     airport: string; 
     datetime: string; 
+    time: string;
     terminal?: string;
     airportName?: string; 
   };
@@ -380,12 +382,14 @@ export interface FlightOffer {
   departure: { 
     airport: string; 
     datetime: string;
+    time: string;
     terminal?: string;
     airportName?: string;
   };
   arrival: { 
     airport: string; 
     datetime: string;
+    time: string;
     terminal?: string;
     airportName?: string;
   };

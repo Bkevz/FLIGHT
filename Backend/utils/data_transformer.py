@@ -41,9 +41,13 @@ def transform_verteil_to_frontend(verteil_response: Dict[str, Any], enable_round
         logger.info(f"Reference data extracted: flights={len(reference_data['flights'])}, segments={len(reference_data['segments'])}")
         
         for i, airline_offer_group in enumerate(airline_offers):
-            airline_code = airline_offer_group.get('Owner', {}).get('value', 'Unknown')
+            # Extract airline code using robust method
+            airline_code = _extract_airline_code_robust(airline_offer_group)
             airline_offers_list = airline_offer_group.get('AirlineOffer', [])
             logger.info(f"Processing airline offer group {i}: airline_code={airline_code}, offers_count={len(airline_offers_list) if isinstance(airline_offers_list, list) else 'Not a list'}")
+            
+            # Debug the airline offer group structure
+            logger.info(f"Airline offer group keys: {list(airline_offer_group.keys())}")
             
             for j, offer in enumerate(airline_offers_list):
                 priced_offer = offer.get('PricedOffer', {})
@@ -65,11 +69,70 @@ def transform_verteil_to_frontend(verteil_response: Dict[str, Any], enable_round
                     logger.warning(f"No PricedOffer found in offer {j}")
         
         logger.info(f"Transformed {len(flight_offers)} flight offers from Verteil response")
-        return flight_offers
+        return {
+            'offers': flight_offers,
+            'reference_data': reference_data
+        }
         
     except Exception as e:
         logger.error(f"Error transforming Verteil response: {str(e)}")
-        return []
+        return {
+            'offers': [],
+            'reference_data': {}
+        }
+
+def _extract_airline_code_robust(airline_offer_group: Dict[str, Any]) -> str:
+    """Robust airline code extraction with multiple fallbacks and detailed logging."""
+    logger.info(f"Extracting airline code from offer group with keys: {list(airline_offer_group.keys()) if isinstance(airline_offer_group, dict) else 'Not a dict'}")
+    
+    # Primary method: Extract from OfferID.Owner in individual offers
+    airline_offers_list = airline_offer_group.get('AirlineOffer', [])
+    logger.info(f"Found {len(airline_offers_list) if isinstance(airline_offers_list, list) else 'invalid'} airline offers")
+    
+    if isinstance(airline_offers_list, list) and airline_offers_list:
+        first_offer = airline_offers_list[0]
+        if isinstance(first_offer, dict):
+            # Check OfferID structure for Owner field
+            offer_id_data = first_offer.get('OfferID')
+            logger.info(f"OfferID data: {offer_id_data}, type: {type(offer_id_data)}")
+            
+            if isinstance(offer_id_data, dict):
+                owner = offer_id_data.get('Owner')
+                logger.info(f"OfferID.Owner: {owner}, type: {type(owner)}")
+                
+                if owner and isinstance(owner, str) and owner.strip():
+                    airline_code = owner.strip()
+                    logger.info(f"Successfully extracted airline code from OfferID.Owner: {airline_code}")
+                    return airline_code
+                else:
+                    logger.warning(f"OfferID.Owner is empty or invalid: {owner}")
+            
+            # Fallback: Check if OfferID is a string and extract pattern
+            elif isinstance(offer_id_data, str) and len(offer_id_data) >= 2:
+                # Many airline codes are 2-3 characters at the start of offer IDs
+                potential_code = offer_id_data[:2].upper()
+                if potential_code.isalpha():
+                    logger.info(f"Extracted potential airline code from OfferID string: {potential_code}")
+                    return potential_code
+    
+    # Legacy fallback: Check Owner at airline_offer_group level (for backward compatibility)
+    owner_data = airline_offer_group.get('Owner')
+    logger.info(f"Checking legacy Owner data: {owner_data}, type: {type(owner_data)}")
+    
+    if isinstance(owner_data, dict):
+        value = owner_data.get('value')
+        if value and isinstance(value, str) and value.strip():
+            airline_code = value.strip()
+            logger.info(f"Successfully extracted airline code from legacy Owner.value: {airline_code}")
+            return airline_code
+    elif isinstance(owner_data, str) and owner_data.strip():
+        airline_code = owner_data.strip()
+        logger.info(f"Successfully extracted airline code from legacy Owner string: {airline_code}")
+        return airline_code
+    
+    # Final fallback
+    logger.error("Could not extract airline code from any source, using 'Unknown'")
+    return 'Unknown'
 
 def _extract_reference_data(response: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -405,6 +468,7 @@ def _transform_single_offer(
         
         # Generate unique offer ID
         offer_id = f"{airline_code}-{'-'.join(all_segment_refs)}-{price}"
+        logger.info(f"Generated offer ID: {offer_id} (airline_code={airline_code}, segment_refs={all_segment_refs}, price={price})")
         
         # Build price breakdown - pass airline_offer for correct price extraction
         price_breakdown = _build_price_breakdown(price_detail, priced_offer, airline_offer)

@@ -260,7 +260,9 @@ def transform_verteil_to_frontend_with_roundtrip(verteil_response: Dict) -> List
         
         # Process each airline offer group
         for airline_offer_group in airline_offers:
-            airline_code = airline_offer_group.get('Owner', {}).get('value', 'KQ')
+            # Use the robust airline code extraction from the main transformer
+            from utils.data_transformer import _extract_airline_code_robust
+            airline_code = _extract_airline_code_robust(airline_offer_group)
             airline_offers_list = airline_offer_group.get('AirlineOffer', [])
             
             logger.info(f"Processing airline {airline_code} with {len(airline_offers_list)} offers")
@@ -278,7 +280,10 @@ def transform_verteil_to_frontend_with_roundtrip(verteil_response: Dict) -> List
                     all_offers.extend(offers)
         
         logger.info(f"Total offers created: {len(all_offers)}")
-        return all_offers
+        return {
+            'offers': all_offers,
+            'reference_data': reference_data
+        }
         
     except Exception as e:
         logger.error(f"Error transforming Verteil response: {str(e)}")

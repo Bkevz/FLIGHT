@@ -156,7 +156,10 @@ class FlightPricingService(FlightService):
     def _build_pricing_payload(
         self,
         airshopping_response: Dict[str, Any],
-        offer_id: str
+        offer_id: str,
+        shopping_response_id: str,
+        currency: str,
+        request_id: str
     ) -> Dict[str, Any]:
         """
         Build the FlightPrice request payload using the request builder.

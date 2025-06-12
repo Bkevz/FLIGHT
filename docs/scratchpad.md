@@ -2,15 +2,74 @@
 
 ## Current Active Tasks
 
-### Flight Booking Application Implementation
-- **File**: `docs/implementation-plan/flight-booking-app-implementation.md`
-- **Status**: Round Trip Transformation COMPLETED - Ready for Next Task
-- **Priority**: High
-- **Description**: Complete flight booking application with comprehensive frontend-to-backend integration
-- **Recent Completion**: ✅ Round Trip Transformation - Enhanced data transformer to split round trip flights into separate outbound/return offers
-- **Next Task**: Continue with remaining implementation plan tasks
+### Flight Selection Data Flow Fix
+- **File**: `docs/implementation-plan/flight-selection-data-flow-fix.md`
+- **Status**: DEBUGGING COMPLETED - Testing Phase
+- **Priority**: CRITICAL
+- **Description**: Fix the "No flight search data found" error when users select flights from search results
+- **Root Cause**: Missing data bridge between flight results and flight details pages + Data structure access issue
+- **Completed Tasks**: ✅ Task 1 (Data Storage), ✅ Task 2 (Navigation), ✅ Task 3 (Data Retrieval), ✅ Data Structure Fix
+- **Current Phase**: Ready for end-to-end testing and validation
+- **Branch**: `fix/flight-selection-data-flow`
 
 ## Lessons Learned
+
+### [2025-01-07] Shopping Response ID Access Fix (Latest - Attempt 2)
+- **Issue**: "Shopping response ID not found" error - shopping_response_id still showing as null despite being present in nestedDataKeys
+- **Root Cause**: Misunderstanding of data storage structure - the data is stored as `airShoppingResponse: apiResponse` where `apiResponse = response.data`, creating a deeper nesting than initially understood
+- **Analysis**: 
+  - Console logs show shopping_response_id exists in nestedDataKeys but access attempts return null
+  - Data structure: `airShoppingResponseData` contains `airShoppingResponse: apiResponse` where `apiResponse` is `response.data`
+  - This means the actual path is `airShoppingResponseData.data.data.data.shopping_response_id` (triple nested)
+  - Previous fix was checking wrong nesting levels
+- **Solution**: 
+  - Updated debug logs to check all possible nesting levels including triple nested structure
+  - Reordered access logic to check triple nested structure first: `airShoppingResponseData.data.data.data.shopping_response_id`
+  - Added fallbacks for double nested, single nested, and direct access
+  - Added console logs to indicate which structure was found
+- **Files Modified**: 
+  - `Frontend/app/flights/[id]/page.tsx` (lines 122-130, 199-223): Enhanced debug logging and corrected access logic
+- **Key Improvements**: 
+  - Comprehensive debug logging for all nesting levels
+  - Correct understanding of data storage structure
+  - Systematic approach to checking all possible locations
+  - Clear logging to indicate which structure contains the data
+- **Prevention**: Always trace data flow from storage to access to understand complete nesting structure
+
+### [2025-01-07] Backend API Request Handling Fix
+- **Issue**: Backend error "argument of type 'NoneType' is not iterable" and "Missing required fields: shopping_response_id"
+- **Root Cause**: Backend `request.get_json()` returning None due to invalid JSON or missing Content-Type header
+- **Analysis**: 
+  - Frontend was sending requests but backend couldn't parse the JSON data
+  - Error occurred in field validation loop: `[f for f in required_fields if f not in data]` when `data` was None
+  - Frontend also had inconsistent data structure access for `shopping_response_id`
+- **Solution**: 
+  - **Backend**: Added null check for request data with descriptive error message
+  - **Frontend**: Implemented flexible `shopping_response_id` detection with multiple fallback strategies
+  - Added comprehensive logging for debugging request data structure
+- **Files Modified**: 
+  - `Backend/routes/verteil_flights.py` (lines 370-379): Added data validation and logging
+  - `Frontend/app/flights/[id]/page.tsx` (lines 188-218): Enhanced data structure handling
+- **Key Improvements**: 
+  - Better error messages for invalid requests
+  - Flexible data access patterns for nested API responses
+  - Enhanced debugging logs for request data structure
+- **Prevention**: Always validate request data existence before processing and use flexible data access patterns
+
+### [2025-01-07] Flight Data Structure Access Issue Fixed
+- **Issue**: "airShoppingResponseData.data.offers is undefined" error when accessing flight details
+- **Root Cause**: Inconsistent data structure access patterns between flight results and flight details pages
+- **Analysis**: 
+  - Flight results page stores complete API response as `airShoppingResponse: apiResponse`
+  - Flight details page was hardcoded to access `airShoppingResponseData.data.offers`
+  - Actual structure varies: `apiResponse.data.data.offers` (triple nested) vs `apiResponse.data.offers` (double nested)
+- **Solution**: Implemented flexible data structure detection with multiple fallback strategies
+  - Strategy 1: `airShoppingResponseData.data.data.offers` (triple nested)
+  - Strategy 2: `airShoppingResponseData.data.offers` (double nested)
+  - Strategy 3: `airShoppingResponseData.offers` (direct array)
+- **Files Modified**: `Frontend/app/flights/[id]/page.tsx` (lines 115-156)
+- **Key Improvement**: Added comprehensive logging and error messages showing available data structure
+- **Prevention**: Always use flexible data access patterns when dealing with nested API responses
 
 ### [2025-01-07] ThirdPartyId Configuration Analysis Completed
 - **Issue Identified**: Configuration shows `VERTEIL_THIRD_PARTY_ID=EK` but API responses contain data from multiple airlines (KQ, WY, etc.)

@@ -48,11 +48,8 @@ export function FlightFilters({
   const [departureTimeRange, setDepartureTimeRange] = React.useState([0, 24])
   const [arrivalTimeRange, setArrivalTimeRange] = React.useState([0, 24])
 
-  const formatTimeFromHours = (hours: number) => {
-    const h = Math.floor(hours)
-    const m = Math.floor((hours - h) * 60)
-    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`
-  }
+  // Data formatting is now handled by the backend
+  // Frontend components should use FlightOffer data directly
 
   return (
     <div className="space-y-6">
@@ -154,7 +151,7 @@ export function FlightFilters({
         <CollapsibleContent className="pt-2">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
-              {formatTimeFromHours(departureTimeRange[0])} - {formatTimeFromHours(departureTimeRange[1])}
+              {Math.floor(departureTimeRange[0]).toString().padStart(2, '0')}:00 - {Math.floor(departureTimeRange[1]).toString().padStart(2, '0')}:00
             </span>
           </div>
           <Slider
@@ -185,7 +182,7 @@ export function FlightFilters({
         <CollapsibleContent className="pt-2">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
-              {formatTimeFromHours(arrivalTimeRange[0])} - {formatTimeFromHours(arrivalTimeRange[1])}
+              {Math.floor(arrivalTimeRange[0]).toString().padStart(2, '0')}:00 - {Math.floor(arrivalTimeRange[1]).toString().padStart(2, '0')}:00
             </span>
           </div>
           <Slider

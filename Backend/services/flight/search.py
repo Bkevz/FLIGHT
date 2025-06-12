@@ -182,9 +182,12 @@ class FlightSearchService(FlightService):
         Returns:
             Processed response data with enhanced flight information and metadata
         """
+        # Extract ShoppingResponseID from metadata structure
+        shopping_response_id = self._extract_shopping_response_id(response)
+        
         processed = {
             'offers': [],
-            'shopping_response_id': response.get('ShoppingResponseID'),
+            'shopping_response_id': shopping_response_id,
             'transaction_id': response.get('TransactionID'),
             'metadata': {
                 'total_offers': 0,
@@ -243,6 +246,56 @@ class FlightSearchService(FlightService):
         processed['offers'].sort(key=lambda x: x.get('price', {}).get('total', float('inf')))
         
         return processed
+    
+    def _extract_shopping_response_id(self, response: Dict[str, Any]) -> str:
+        """
+        Extract ShoppingResponseID from the metadata structure.
+        
+        Args:
+            response: Raw API response
+            
+        Returns:
+            ShoppingResponseID string or None if not found
+        """
+        try:
+            # Navigate to the metadata structure
+            metadata = response.get('Metadata', {})
+            other_metadata = metadata.get('Other', {})
+            
+            if isinstance(other_metadata, dict):
+                other_metadata_list = other_metadata.get('OtherMetadata', [])
+                if not isinstance(other_metadata_list, list):
+                    other_metadata_list = [other_metadata_list]
+                
+                for other_meta in other_metadata_list:
+                    if isinstance(other_meta, dict):
+                        desc_metadatas = other_meta.get('DescriptionMetadatas', {})
+                        desc_metadata_list = desc_metadatas.get('DescriptionMetadata', [])
+                        
+                        if not isinstance(desc_metadata_list, list):
+                            desc_metadata_list = [desc_metadata_list]
+                        
+                        for desc_metadata in desc_metadata_list:
+                            if isinstance(desc_metadata, dict) and desc_metadata.get('MetadataKey') == 'SHOPPING_RESPONSE_IDS':
+                                aug_point = desc_metadata.get('AugmentationPoint', {})
+                                aug_points = aug_point.get('AugPoint', [])
+                                
+                                if not isinstance(aug_points, list):
+                                    aug_points = [aug_points]
+                                
+                                for point in aug_points:
+                                    if isinstance(point, dict):
+                                        shopping_id = point.get('Key')
+                                        if shopping_id:
+                                            logger.info(f"Found ShoppingResponseID: {shopping_id}")
+                                            return shopping_id
+            
+            logger.warning("ShoppingResponseID not found in metadata structure")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error extracting ShoppingResponseID: {str(e)}")
+            return None
 
     def _parse_duration(self, duration_str: str) -> int:
         """
@@ -746,17 +799,27 @@ async def process_air_shopping(search_criteria: Dict[str, Any]) -> Dict[str, Any
                 logger.info("Transforming Verteil API response to frontend format")
                 # Check if round trip transformation is enabled
                 enable_roundtrip = search_criteria.get('enableRoundtrip', False)
-                transformed_offers = transform_verteil_to_frontend(raw_response, enable_roundtrip=enable_roundtrip)
+                transformed_data = transform_verteil_to_frontend(raw_response, enable_roundtrip=enable_roundtrip)
+                
+                # Extract offers from the transformed data (now returns a dict with 'offers' and 'reference_data')
+                if isinstance(transformed_data, dict) and 'offers' in transformed_data:
+                    offers_list = transformed_data['offers']
+                    reference_data = transformed_data.get('reference_data', {})
+                else:
+                    # Fallback for backward compatibility
+                    offers_list = transformed_data if isinstance(transformed_data, list) else []
+                    reference_data = {}
                 
                 # Apply filtering and sorting if specified
-                filtered_offers = _apply_filters_and_sorting(transformed_offers, search_criteria)
+                filtered_offers = _apply_filters_and_sorting(offers_list, search_criteria)
                 
                 # Add filtered and sorted offers to the result
                 result['data']['offers'] = filtered_offers
                 result['data']['total_offers'] = len(filtered_offers)
-                result['data']['total_unfiltered_offers'] = len(transformed_offers)
+                result['data']['total_unfiltered_offers'] = len(offers_list)
+                result['data']['reference_data'] = reference_data
                 
-                logger.info(f"Successfully transformed {len(transformed_offers)} flight offers, {len(filtered_offers)} after filtering")
+                logger.info(f"Successfully transformed {len(offers_list)} flight offers, {len(filtered_offers)} after filtering")
             else:
                 logger.warning("No response data found for transformation")
                 result['data']['offers'] = []

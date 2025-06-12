@@ -40,45 +40,205 @@ export default function FlightDetailsPage() {
       setError(null)
 
       try {
-        // Get the air shopping response from URL state or localStorage
-        const airShoppingResponseStr = searchParams.get('airShoppingResponse') || localStorage.getItem('airShoppingResponse')
+        // Enhanced data retrieval with multiple fallback strategies
+        let airShoppingResponseData = null;
+        let flightDataSource = 'unknown';
         
-        if (!airShoppingResponseStr) {
-          throw new Error("No flight search data found. Please go back to search results.")
+        // Strategy 1: Try to get from new localStorage storage system
+        try {
+          const currentFlightDataKey = localStorage.getItem('currentFlightDataKey');
+          if (currentFlightDataKey) {
+            const storedFlightDataStr = localStorage.getItem(currentFlightDataKey);
+            if (storedFlightDataStr) {
+              const storedFlightData = JSON.parse(storedFlightDataStr);
+              
+              // Check if data is not expired
+              if (storedFlightData.expiresAt && storedFlightData.expiresAt > Date.now()) {
+                airShoppingResponseData = storedFlightData.airShoppingResponse;
+                flightDataSource = 'localStorage-new';
+                console.log('Flight data retrieved from new localStorage system');
+              } else {
+                console.log('Stored flight data has expired, removing...');
+                localStorage.removeItem(currentFlightDataKey);
+                localStorage.removeItem('currentFlightDataKey');
+              }
+            }
+          }
+        } catch (storageError) {
+          console.warn('Failed to retrieve from new localStorage system:', storageError);
         }
+        
+        // Strategy 2: Fallback to URL parameters (legacy)
+        if (!airShoppingResponseData) {
+          const airShoppingResponseStr = searchParams.get('airShoppingResponse');
+          if (airShoppingResponseStr) {
+            airShoppingResponseData = JSON.parse(airShoppingResponseStr);
+            flightDataSource = 'url-params';
+            console.log('Flight data retrieved from URL parameters');
+          }
+        }
+        
+        // Strategy 3: Fallback to old localStorage (legacy)
+        if (!airShoppingResponseData) {
+          const legacyDataStr = localStorage.getItem('airShoppingResponse');
+          if (legacyDataStr) {
+            airShoppingResponseData = JSON.parse(legacyDataStr);
+            flightDataSource = 'localStorage-legacy';
+            console.log('Flight data retrieved from legacy localStorage');
+          }
+        }
+        
+        // Strategy 4: Try to find any flightData_ keys in localStorage
+        if (!airShoppingResponseData) {
+          const flightDataKeys = Object.keys(localStorage).filter(key => key.startsWith('flightData_'));
+          for (const key of flightDataKeys) {
+            try {
+              const data = JSON.parse(localStorage.getItem(key) || '{}');
+              if (data.airShoppingResponse && data.expiresAt && data.expiresAt > Date.now()) {
+                airShoppingResponseData = data.airShoppingResponse;
+                flightDataSource = 'localStorage-search';
+                console.log('Flight data retrieved from localStorage search:', key);
+                break;
+              }
+            } catch (e) {
+              // Remove corrupted data
+              localStorage.removeItem(key);
+            }
+          }
+        }
+        
+        if (!airShoppingResponseData) {
+          throw new Error("No flight search data found. Please go back to search results and try again.")
+        }
+        
+        console.log('Flight data source:', flightDataSource);
+        console.log('airShoppingResponseData structure:', {
+          hasData: !!airShoppingResponseData.data,
+          dataKeys: airShoppingResponseData.data ? Object.keys(airShoppingResponseData.data) : [],
+          hasNestedData: !!(airShoppingResponseData.data && airShoppingResponseData.data.data),
+          nestedDataKeys: (airShoppingResponseData.data && airShoppingResponseData.data.data) ? Object.keys(airShoppingResponseData.data.data) : []
+        });
+        
+        // Debug: Log the actual shopping_response_id values at different levels
+        console.log('Debug shopping_response_id values:');
 
-        // Parse the air shopping response
-        const airShoppingResponseData = JSON.parse(airShoppingResponseStr)
+        console.log('- airShoppingResponseData.shopping_response_id:', airShoppingResponseData.shopping_response_id);
+        console.log('- airShoppingResponseData.data:', airShoppingResponseData.data);
+        console.log('- airShoppingResponseData.data.shopping_response_id:', airShoppingResponseData.data?.shopping_response_id);
+        console.log('- airShoppingResponseData.data.data:', airShoppingResponseData.data?.data);
+        console.log('- airShoppingResponseData.data.data.shopping_response_id:', airShoppingResponseData.data?.data?.shopping_response_id);
+        console.log('- airShoppingResponseData.data.data.data:', airShoppingResponseData.data?.data?.data);
+        console.log('- airShoppingResponseData.data.data.data.shopping_response_id:', airShoppingResponseData.data?.data?.data?.shopping_response_id);
         setAirShoppingResponse(airShoppingResponseData)
 
+        // Find the offers array - handle multiple possible structures
+        let offers = null;
+        if (airShoppingResponseData.data && airShoppingResponseData.data.data && airShoppingResponseData.data.data.offers) {
+          // Triple nested structure: response.data.data.data.offers
+          offers = airShoppingResponseData.data.data.offers;
+          console.log('Using triple nested structure, found', offers.length, 'offers');
+        } else if (airShoppingResponseData.data && airShoppingResponseData.data.offers) {
+          // Double nested structure: response.data.data.offers
+          offers = airShoppingResponseData.data.offers;
+          console.log('Using double nested structure, found', offers.length, 'offers');
+        } else if (Array.isArray(airShoppingResponseData.offers)) {
+          // Direct offers array: response.offers
+          offers = airShoppingResponseData.offers;
+          console.log('Using direct offers array, found', offers.length, 'offers');
+        }
+
+        if (!offers || !Array.isArray(offers)) {
+          throw new Error(`airShoppingResponseData.data.offers is undefined. Available structure: ${JSON.stringify({
+            hasData: !!airShoppingResponseData.data,
+            dataKeys: airShoppingResponseData.data ? Object.keys(airShoppingResponseData.data) : [],
+            hasNestedData: !!(airShoppingResponseData.data && airShoppingResponseData.data.data),
+            nestedDataKeys: (airShoppingResponseData.data && airShoppingResponseData.data.data) ? Object.keys(airShoppingResponseData.data.data) : []
+          }, null, 2)}`);
+        }
+
         // Find the selected offer by ID
-        const selectedOffer = airShoppingResponseData.data.offers.find(
+        const selectedOffer = offers.find(
           (offer: any) => offer.id === flightId
         )
 
         if (!selectedOffer) {
-          throw new Error("Selected flight offer not found")
+          throw new Error(`Selected flight offer not found. Available offer IDs: ${offers.map((o: any) => o.id).join(', ')}`);
         }
 
         setFlightOffer(selectedOffer)
 
         // Handle return flight for round-trip
-        if (tripType === 'round-trip' && airShoppingResponseData.data.offers.length > 1) {
-          // Find return flight (assuming it's the second offer or has return segments)
-          const returnOffer = airShoppingResponseData.data.offers.find(
-            (offer: any) => offer.id !== flightId && offer.segments?.some((seg: any) => seg.direction === 'return')
-          ) || airShoppingResponseData.data.offers[1] // Fallback to second offer
+        if (tripType === 'round-trip' && offers.length > 1) {
+          // Find return flight by looking for corresponding return ID or by direction
+          let returnOffer;
+          
+          // First try to find return flight by replacing 'outbound' with 'return' in the ID
+          if (flightId.includes('-outbound')) {
+            const returnFlightId = flightId.replace('-outbound', '-return');
+            returnOffer = offers.find(
+              (offer: any) => offer.id === returnFlightId
+            );
+          }
+          
+          // If not found, try to find by direction or other criteria
+          if (!returnOffer) {
+            returnOffer = offers.find(
+              (offer: any) => offer.id !== flightId && (
+                offer.direction === 'return' || 
+                offer.segments?.some((seg: any) => seg.direction === 'return') ||
+                offer.id.includes('-return')
+              )
+            ) || offers[1]; // Fallback to second offer
+          }
           
           if (returnOffer) {
             setReturnFlightOffer(returnOffer)
           }
         }
 
+        // Find shopping_response_id - handle multiple possible structures
+        let shoppingResponseId = null;
+        let airShoppingRsData = null;
+
+        // Based on the data structure, check all possible locations
+        // The data is stored as airShoppingResponse: apiResponse where apiResponse = response.data
+        // So the actual shopping_response_id is in airShoppingResponseData.data.data.shopping_response_id
+        if (airShoppingResponseData.data?.data?.data?.shopping_response_id) {
+          shoppingResponseId = airShoppingResponseData.data.data.data.shopping_response_id;
+          airShoppingRsData = airShoppingResponseData.data.data.data;
+          console.log('Found shopping_response_id in triple nested structure');
+        } else if (airShoppingResponseData.data?.data?.shopping_response_id) {
+          shoppingResponseId = airShoppingResponseData.data.data.shopping_response_id;
+          airShoppingRsData = airShoppingResponseData.data.data;
+          console.log('Found shopping_response_id in double nested structure');
+        } else if (airShoppingResponseData.data?.shopping_response_id) {
+          shoppingResponseId = airShoppingResponseData.data.shopping_response_id;
+          airShoppingRsData = airShoppingResponseData.data;
+          console.log('Found shopping_response_id in single nested structure');
+        } else if (airShoppingResponseData.shopping_response_id) {
+          shoppingResponseId = airShoppingResponseData.shopping_response_id;
+          airShoppingRsData = airShoppingResponseData;
+          console.log('Found shopping_response_id in direct structure');
+        }
+        
+        console.log('Shopping response ID found:', shoppingResponseId);
+        console.log('Air shopping RS data keys:', airShoppingRsData ? Object.keys(airShoppingRsData) : 'null');
+        
+        if (!shoppingResponseId) {
+          throw new Error(`Shopping response ID not found. Available data structure: ${JSON.stringify({
+            hasData: !!airShoppingResponseData.data,
+            dataKeys: airShoppingResponseData.data ? Object.keys(airShoppingResponseData.data) : [],
+            hasNestedData: !!(airShoppingResponseData.data && airShoppingResponseData.data.data),
+            nestedDataKeys: (airShoppingResponseData.data && airShoppingResponseData.data.data) ? Object.keys(airShoppingResponseData.data.data) : [],
+            directKeys: Object.keys(airShoppingResponseData)
+          }, null, 2)}`);
+        }
+        
         // Call the flight-price API endpoint
         const response = await api.getFlightPrice(
           selectedOffer.id,
-          airShoppingResponseData.data.shopping_response_id,
-          airShoppingResponseData.data
+          shoppingResponseId,
+          airShoppingRsData
         )
 
         // Set the priced offer data
@@ -94,17 +254,8 @@ export default function FlightDetailsPage() {
     fetchFlightPrice()
   }, [flightId, searchParams])
 
-  // Helper function to format date
-  const formatDate = (dateString: string) => {
-    if (!dateString) return ""
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    })
-  }
+  // Note: Date formatting is now handled by the backend
+  // Frontend should display dates directly from FlightOffer interface
 
   // Show loading state
   if (isLoading) {
@@ -172,13 +323,27 @@ export default function FlightDetailsPage() {
             
             <Alert variant="destructive" className="my-8">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
+              <AlertTitle>Flight Data Not Found</AlertTitle>
+              <AlertDescription>
+                {error}
+                <br /><br />
+                This usually happens when:
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>You navigated directly to this page without searching for flights first</li>
+                  <li>Your flight search data has expired (older than 24 hours)</li>
+                  <li>Your browser storage was cleared</li>
+                </ul>
+              </AlertDescription>
             </Alert>
             
-            <Button asChild>
-              <Link href="/flights">Return to Flight Search</Link>
-            </Button>
+            <div className="space-y-4">
+              <Button asChild>
+                <Link href="/">Start New Flight Search</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/flights">Back to Search Results</Link>
+              </Button>
+            </div>
           </div>
         </main>
       </div>
@@ -188,10 +353,11 @@ export default function FlightDetailsPage() {
   // If we have flight data, render the flight details
   if (flightOffer && pricedOffer) {
     // Price data from priced offer or fallback to flight offer
-    const totalPrice = pricedOffer.data.priced_offer?.total_amount || flightOffer.price || 0
-    const currency = pricedOffer.data.priced_offer?.currency || flightOffer.currency || "USD"
-    const taxes = pricedOffer.data.priced_offer?.breakdown?.[0]?.taxes || flightOffer.priceBreakdown?.taxes || 0
-    const baseFare = pricedOffer.data.priced_offer?.breakdown?.[0]?.base || flightOffer.priceBreakdown?.baseFare || (totalPrice - taxes)
+    // Note: pricedOffer is already the data from response.data, so no need for .data
+    const totalPrice = pricedOffer.priced_offer?.total_amount || flightOffer.price || 0
+    const currency = pricedOffer.priced_offer?.currency || flightOffer.currency || "USD"
+    const taxes = pricedOffer.priced_offer?.breakdown?.[0]?.taxes || flightOffer.priceBreakdown?.taxes || 0
+    const baseFare = pricedOffer.priced_offer?.breakdown?.[0]?.base || flightOffer.priceBreakdown?.baseFare || (totalPrice - taxes)
     
     // Format flight data for the components using the actual API response structure
     const formattedFlight: FlightOffer = {
@@ -205,12 +371,14 @@ export default function FlightDetailsPage() {
       departure: {
         airport: flightOffer.departure?.airport || "",
         datetime: flightOffer.departure?.datetime || "",
+        time: flightOffer.departure?.time || "",
         terminal: flightOffer.departure?.terminal || "",
         airportName: flightOffer.departure?.airportName || "",
       },
       arrival: {
         airport: flightOffer.arrival?.airport || "",
         datetime: flightOffer.arrival?.datetime || "",
+        time: flightOffer.arrival?.time || "",
         terminal: flightOffer.arrival?.terminal || "",
         airportName: flightOffer.arrival?.airportName || "",
       },
@@ -289,8 +457,8 @@ export default function FlightDetailsPage() {
                 originCode={formattedFlight.departure.airport || ''}
                 destination={formattedFlight.arrival.airportName || ''}
                 destinationCode={formattedFlight.arrival.airport || ''}
-                departDate={formatDate(formattedFlight.departure.datetime)}
-                returnDate={returnFlightOffer ? formatDate(returnFlightOffer.departure?.datetime) : undefined}
+                departDate={formattedFlight.departure.datetime}
+                returnDate={returnFlightOffer?.departure?.datetime}
                 passengers={1} // Update with actual passenger count from search
                 price={formattedFlight.price}
                 currency={formattedFlight.currency}
@@ -305,7 +473,7 @@ export default function FlightDetailsPage() {
                   <div className="rounded-lg border">
                     <div className="p-4 sm:p-6">
                       <h2 className="text-xl font-semibold">Flight Details</h2>
-                      <p className="text-sm text-muted-foreground">{formatDate(formattedFlight.departure.datetime)}</p>
+                      <p className="text-sm text-muted-foreground">{formattedFlight.departure.datetime}</p>
                     </div>
                     <Separator />
                     <EnhancedFlightCard flight={formattedFlight} />
@@ -317,7 +485,7 @@ export default function FlightDetailsPage() {
                     <div className="rounded-lg border">
                       <div className="p-4 sm:p-6">
                         <h2 className="text-xl font-semibold">Outbound Flight</h2>
-                        <p className="text-sm text-muted-foreground">{formatDate(formattedFlight.departure.datetime)}</p>
+                        <p className="text-sm text-muted-foreground">{formattedFlight.departure.datetime}</p>
                       </div>
                       <Separator />
                       <EnhancedFlightCard flight={formattedFlight} />
@@ -327,7 +495,7 @@ export default function FlightDetailsPage() {
                       <div className="rounded-lg border">
                         <div className="p-4 sm:p-6">
                           <h2 className="text-xl font-semibold">Return Flight</h2>
-                          <p className="text-sm text-muted-foreground">{formatDate(returnFlightOffer.departure?.datetime)}</p>
+                          <p className="text-sm text-muted-foreground">{returnFlightOffer.departure?.datetime}</p>
                         </div>
                         <Separator />
                         <EnhancedFlightCard
@@ -350,7 +518,7 @@ export default function FlightDetailsPage() {
                     <div className="rounded-lg border">
                       <div className="p-4 sm:p-6">
                         <h2 className="text-xl font-semibold">Flight Segment 1</h2>
-                        <p className="text-sm text-muted-foreground">{formatDate(formattedFlight.departure.datetime)}</p>
+                        <p className="text-sm text-muted-foreground">{formattedFlight.departure.datetime}</p>
                       </div>
                       <Separator />
                       <EnhancedFlightCard flight={formattedFlight} />

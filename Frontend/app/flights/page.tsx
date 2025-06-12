@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Filter } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { api } from "@/utils/api-client"
 import type { FlightSearchRequest } from "@/utils/api-client"
+import type { FlightOffer } from "@/types/flight-api"
 
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -14,7 +15,6 @@ import { MainNav } from "@/components/main-nav"
 import { UserNav } from "@/components/user-nav"
 import { FlightFilters } from "@/components/flight-filters"
 import { EnhancedFlightCard } from "@/components/enhanced-flight-card"
-import { FlightCard } from "@/components/flight-card"
 import { FlightSortOptions } from "@/components/flight-sort-options"
 import { FlightSearchSummary } from "@/components/flight-search-summary"
 
@@ -25,28 +25,9 @@ interface StopDetail {
   duration: string
 }
 
-// Helper functions for formatting display data
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-function getAirportCity(code: string): string {
-  const airports = {
-    'JFK': 'New York',
-    'LAX': 'Los Angeles',
-    'CDG': 'Paris',
-    'LHR': 'London',
-    'HND': 'Tokyo',
-    'DXB': 'Dubai',
-    'SYD': 'Sydney',
-    'YYZ': 'Toronto',
-    'YUL': 'Montreal',
-    'MUC': 'Munich',
-    'FRA': 'Frankfurt',
-    'ZRH': 'Zurich'
-  };
-  return airports[code as keyof typeof airports] || code;
+// Helper function to safely get airport display name
+function getAirportDisplay(airport: string, airportName?: string): string {
+  return airportName || airport || 'Unknown';
 }
 
 // This interface matches the FlightCard component's expectations
@@ -60,20 +41,22 @@ interface Flight {
   }
   departure: {
     airport: string
-    city: string
-    time: string
-    date: string
+    datetime: string
+    terminal?: string
+    airportName?: string
   }
   arrival: {
     airport: string
-    city: string
-    time: string
-    date: string
+    datetime: string
+    terminal?: string
+    airportName?: string
   }
   duration: string
   stops: number
-  stopDetails?: StopDetail[]
+  stopDetails: string[]
   price: number
+  currency: string
+  baggage: any // Using any for now to match FlightOffer structure
 }
 
 // This interface matches the API response format
@@ -87,15 +70,17 @@ interface ApiFlightResponse {
   }
   departure: {
     airport: string
-    city: string
+    datetime: string
     time: string
-    date: string
+    terminal?: string
+    airportName?: string
   }
   arrival: {
     airport: string
-    city: string
+    datetime: string
     time: string
-    date: string
+    terminal?: string
+    airportName?: string
   }
   duration: string
   stops: number
@@ -118,8 +103,8 @@ const initialFilters: FlightFiltersState = {
 }
 
 export default function FlightsPage() {
-  const [flights, setFlights] = useState<Flight[]>([])
-  const [allFlights, setAllFlights] = useState<Flight[]>([])
+  const [flights, setFlights] = useState<FlightOffer[]>([])
+  const [allFlights, setAllFlights] = useState<FlightOffer[]>([])
   const [filters, setFilters] = useState<FlightFiltersState>(initialFilters)
   const [loading, setLoading] = useState(true)
   const searchParams = useSearchParams()
@@ -304,44 +289,77 @@ export default function FlightsPage() {
         
         console.log('Extracted flights:', apiFlights.length, 'offers');
         
-        // Use backend-transformed data directly - minimal transformation for UI compatibility
-        const directFlights = apiFlights.map((offer: any) => {
-          // Convert backend stopDetails (array of airport codes) to frontend format
-          const stopDetails = offer.stopDetails ? offer.stopDetails.map((stop: string) => ({
-            airport: stop,
-            city: getAirportCity(stop),
-            duration: ''
-          })) : [];
+        // Store complete flight data in localStorage for flight details page
+        // This includes the complete airShoppingResponse needed for pricing API calls
+        const flightDataForStorage = {
+          airShoppingResponse: apiResponse, // Complete API response
+          searchParams: {
+            origin,
+            destination,
+            departDate,
+            returnDate,
+            tripType,
+            passengers: {
+              adults,
+              children,
+              infants
+            },
+            cabinClass,
+            outboundCabinClass,
+            returnCabinClass
+          },
+          timestamp: Date.now(),
+          expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours expiration
+        };
+        
+        // Create a unique storage key based on search parameters
+        const storageKey = `flightData_${origin}_${destination}_${departDate}_${tripType}_${Date.now()}`;
+        
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(flightDataForStorage));
+          // Store the current storage key for easy retrieval
+          localStorage.setItem('currentFlightDataKey', storageKey);
+          console.log('Flight data stored in localStorage with key:', storageKey);
           
-          return {
-            id: offer.id,
-            airline: {
-              name: offer.airline.name,
-              logo: offer.airline?.logo,
-              code: offer.airline?.code,
-              flightNumber: offer.airline?.flightNumber
-            },
-            departure: {
-              airport: offer.departure?.airport,
-              city: getAirportCity(offer.departure?.airport),
-              time: offer.departure?.time,
-              date: formatDate(offer.departure?.datetime)
-            },
-            arrival: {
-              airport: offer.arrival?.airport,
-              city: getAirportCity(offer.arrival?.airport),
-              time: offer.arrival?.time,
-              date: formatDate(offer.arrival?.datetime)
-            },
-            duration: offer.duration,
-             stops: offer.stops,
-             stopDetails: stopDetails,
-             price: offer.price,
-             currency: offer.currency,
-             baggage: offer.baggage,
-             penalties: offer.penalties
-           };
-        });
+          // Clean up old flight data (older than 24 hours)
+          const now = Date.now();
+          Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('flightData_')) {
+              try {
+                const data = JSON.parse(localStorage.getItem(key) || '{}');
+                if (data.expiresAt && data.expiresAt < now) {
+                  localStorage.removeItem(key);
+                  console.log('Removed expired flight data:', key);
+                }
+              } catch (e) {
+                // Remove corrupted data
+                localStorage.removeItem(key);
+              }
+            }
+          });
+        } catch (storageError) {
+          console.warn('Failed to store flight data in localStorage:', storageError);
+          // Continue execution even if storage fails
+        }
+        
+        // Use backend-provided FlightOffer data directly
+        const directFlights = apiFlights.map((offer: any) => ({
+          id: offer.id,
+          airline: offer.airline,
+          departure: offer.departure,
+          arrival: offer.arrival,
+          duration: offer.duration,
+          stops: offer.stops,
+          stopDetails: offer.stopDetails || [],
+          price: offer.price,
+          currency: offer.currency,
+          baggage: offer.baggage,
+          fare: offer.fare,
+          aircraft: offer.aircraft,
+          segments: offer.segments,
+          priceBreakdown: offer.priceBreakdown,
+          additionalServices: offer.additionalServices
+        }));
         
         setAllFlights(directFlights);
       } catch (error) {
@@ -369,161 +387,8 @@ export default function FlightsPage() {
 
   // Note: Removed convertApiResponseToFlights function as we now use backend-transformed data directly
 
-  // Helper function to convert Flight data to FlightOffer format
-  function convertToFlightOffer(flight: Flight): any {
-    // Generate a fare class based on price range
-    const getFareClass = (price: number) => {
-      if (price > 80000) return "First";
-      if (price > 50000) return "Business";
-      if (price > 30000) return "Premium Economy";
-      return "Economy";
-    };
-    
-    // Generate price breakdown
-    const baseFare = Math.round(flight.price * 0.75);
-    const taxes = Math.round(flight.price * 0.15);
-    const fees = Math.round(flight.price * 0.1);
-    
-    const fareClass = getFareClass(flight.price);
-
-    return {
-      id: flight.id,
-      airline: flight.airline,
-      departure: {
-        airport: flight.departure.airport,
-        datetime: `${flight.departure.date.split('T')[0]}T${flight.departure.time}:00`,
-        airportName: flight.departure.city,
-      },
-      arrival: {
-        airport: flight.arrival.airport,
-        datetime: `${flight.arrival.date.split('T')[0]}T${flight.arrival.time}:00`,
-        airportName: flight.arrival.city,
-      },
-      duration: flight.duration,
-      stops: flight.stops,
-      stopDetails: flight.stopDetails ? flight.stopDetails.map(stop => stop.airport) : [],
-      price: flight.price,
-      currency: "USD",
-      
-      // Enhanced fare information
-      fare: {
-        fareBasisCode: `${flight.airline.code}${fareClass.substring(0, 1)}${Math.floor(Math.random() * 100)}`,
-        fareClass: fareClass,
-        fareName: `${fareClass} ${flight.price > 30000 ? "Flex" : "Standard"}`,
-        fareFamily: flight.price > 50000 ? "Premium" : "Standard",
-        rules: {
-          refundable: flight.price > 40000,
-          changeFee: flight.price <= 40000,
-          changeBeforeDeparture: {
-            allowed: true,
-            fee: flight.price > 40000 ? 0 : 15000,
-            currency: "USD"
-          },
-          changeAfterDeparture: {
-            allowed: flight.price > 30000,
-            fee: flight.price > 50000 ? 0 : 25000,
-            currency: "USD"
-          },
-          cancelBeforeDeparture: {
-            allowed: true,
-            fee: flight.price > 50000 ? 0 : 20000,
-            currency: "USD"
-          }
-        }
-      },
-      
-      // Enhanced baggage information
-      baggage: {
-        carryOn: {
-          description: "1 carry-on bag included",
-          quantity: 1,
-          weight: {
-            value: 7,
-            unit: "kg"
-          },
-          dimensions: "56 x 36 x 23 cm",
-          personalItem: {
-            description: "1 personal item (small bag)",
-            dimensions: "40 x 30 x 15 cm",
-            weight: {
-              value: 2,
-              unit: "kg"
-            }
-          }
-        },
-        checkedBaggage: {
-          description: `${fareClass === "Economy" ? "Not included" : "Included"} checked baggage allowance`,
-          pieces: fareClass === "Economy" ? 0 : (fareClass === "Premium Economy" ? 1 : 2),
-          weight: {
-            value: 23,
-            unit: "kg"
-          },
-          dimensions: "158 cm (length + width + height)",
-          policyType: "PIECE_BASED",
-          additionalBaggagePrices: [
-            {
-              amount: 5000,
-              currency: "USD"
-            }
-          ],
-          prepaidDiscount: {
-            percentage: 20,
-            description: "Save 20% when adding bags during booking"
-          }
-        }
-      },
-      
-      // Enhanced price breakdown
-      priceBreakdown: {
-        baseFare,
-        taxes,
-        fees,
-        totalPrice: flight.price,
-        currency: "USD",
-        taxBreakdown: [
-          { code: "YQ", description: "Fuel Surcharge", amount: Math.round(taxes * 0.6) },
-          { code: "XF", description: "Passenger Facility Charge", amount: Math.round(taxes * 0.2) },
-          { code: "AY", description: "Security Fee", amount: Math.round(taxes * 0.2) }
-        ],
-        feeBreakdown: [
-          { code: "OT", description: "Service Fee", amount: Math.round(fees * 0.8) },
-          { code: "XA", description: "Airport Fee", amount: Math.round(fees * 0.2) }
-        ]
-      },
-      
-      // Additional services
-      additionalServices: {
-        wifiAvailable: true,
-        powerOutlets: true,
-        entertainmentSystem: flight.price > 30000,
-        meals: {
-          available: true,
-          complimentary: flight.price > 30000,
-          description: flight.price > 50000 ? "Premium multi-course meals" : "Standard meals",
-          options: flight.price > 50000 ? ["Western", "Asian", "Vegetarian", "Religious"] : ["Standard", "Vegetarian"]
-        },
-        seatSelection: {
-          available: true,
-          complimentary: flight.price > 40000,
-          cost: 1000,
-          currency: "USD",
-          description: flight.price > 40000 ? "Complimentary seat selection" : "Seat selection available for purchase"
-        },
-        priorityBoarding: {
-          available: true,
-          complimentary: flight.price > 50000,
-          cost: 1500,
-          currency: "USD"
-        }
-      },
-      
-      // Aircraft information
-      aircraft: {
-        code: flight.airline.code === "LH" ? "32Q" : (flight.airline.code === "AC" ? "789" : "77W"),
-        name: flight.airline.code === "LH" ? "Airbus A321neo" : (flight.airline.code === "AC" ? "Boeing 787-9" : "Boeing 777-300ER")
-      }
-    };
-  }
+  // Note: Data transformation is now handled by the backend
+  // Frontend components should use FlightOffer data directly
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -551,10 +416,10 @@ export default function FlightsPage() {
 
             <Suspense fallback={<Skeleton className="h-8 w-full max-w-md" />}>
               <FlightSearchSummary
-                origin={`${getAirportCity(searchParams.get('origin') || 'JFK')} (${searchParams.get('origin') || 'JFK'})`}
-                destination={`${getAirportCity(searchParams.get('destination') || 'CDG')} (${searchParams.get('destination') || 'CDG'})`}
-                departDate={formatDate(searchParams.get('departDate') ?? '2025-04-20')}
-                returnDate={searchParams.get('returnDate') ? formatDate(searchParams.get('returnDate') ?? '') : undefined}
+                origin={`${getAirportDisplay(searchParams.get('origin') || 'JFK')} (${searchParams.get('origin') || 'JFK'})`}
+                destination={`${getAirportDisplay(searchParams.get('destination') || 'CDG')} (${searchParams.get('destination') || 'CDG'})`}
+                departDate={searchParams.get('departDate') ?? '2025-04-20'}
+                returnDate={searchParams.get('returnDate') || undefined}
                 passengers={Number(searchParams.get('passengers')) || 1}
               />
             </Suspense>
@@ -635,7 +500,7 @@ export default function FlightsPage() {
                     </div>
                   ) : flights.length > 0 ? (
                     flights.map((flight) => (
-                      <EnhancedFlightCard key={flight.id} flight={convertToFlightOffer(flight)} />
+                      <EnhancedFlightCard key={flight.id} flight={flight} />
                     ))
                   ) : (
                     <div className="rounded-lg border p-8 text-center">

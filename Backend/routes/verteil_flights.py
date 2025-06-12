@@ -304,6 +304,8 @@ async def air_shopping():
         logger.info(f"Converted request data: {converted_data}")
         
         # Process the request with the flight service
+        # Add configuration to the request data
+        converted_data['config'] = dict(current_app.config)
         result = await process_air_shopping(converted_data)
         
         # Log success
@@ -369,6 +371,14 @@ async def flight_price():
         data = await request.get_json()
         logger.info(f"Flight price request received - Request ID: {request_id}")
         
+        # Check if data is None (invalid JSON or missing content-type)
+        if data is None:
+            error_msg = "Invalid request: No JSON data received. Please check Content-Type header and request body."
+            logger.error(f"{error_msg} - Request ID: {request_id}")
+            return jsonify(_create_error_response(error_msg, 400, request_id))
+        
+        logger.info(f"Request data keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'} - Request ID: {request_id}")
+        
         # Validate required fields
         required_fields = ['offer_id', 'shopping_response_id', 'air_shopping_rs']
         missing_fields = [f for f in required_fields if f not in data]
@@ -383,7 +393,8 @@ async def flight_price():
             'shopping_response_id': data['shopping_response_id'],
             'air_shopping_response': data['air_shopping_rs'],
             'currency': data.get('currency', 'USD'),
-            'request_id': request_id
+            'request_id': request_id,
+            'config': dict(current_app.config)  # Pass the app configuration
         }
         
         # Process the flight price request

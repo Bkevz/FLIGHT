@@ -34,31 +34,10 @@ const airports = [
   { code: "DXB", name: "Dubai International Airport", city: "Dubai" },
 ]
 
-// Helper function to get city from airport code
-function getCity(code: string): string {
+// Helper function to get airport display name
+function getAirportDisplay(code: string): string {
   const airport = airports.find((a) => a.code === code)
-  return airport ? airport.city : code
-}
-
-// Helper function to parse ISO 8601 duration strings (e.g., "PT7H55M") into minutes
-function parseISODuration(durationString: string): number {
-  if (!durationString || !durationString.startsWith('PT')) {
-    return 0;
-  }
-  let totalMinutes = 0;
-  const timeString = durationString.substring(2); // Remove "PT"
-
-  const hourMatch = timeString.match(/(\d+)H/);
-  if (hourMatch) {
-    totalMinutes += parseInt(hourMatch[1], 10) * 60;
-  }
-
-  const minuteMatch = timeString.match(/(\d+)M/);
-  if (minuteMatch) {
-    totalMinutes += parseInt(minuteMatch[1], 10);
-  }
-
-  return totalMinutes;
+  return airport ? `${airport.city} (${airport.code})` : code
 }
 
 export function FlightSearchForm() {
