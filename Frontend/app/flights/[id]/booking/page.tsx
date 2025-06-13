@@ -28,7 +28,7 @@ export default function BookingPage() {
   if (!isLoaded || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <LoadingSpinner size="lg" />
+        <LoadingSpinner />
       </div>
     )
   }
