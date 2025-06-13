@@ -20,7 +20,10 @@ import { Button } from "@/components/ui/button"
 export default function FlightDetailsPage() {
   const searchParams = useSearchParams()
   const params = useParams()
-  const flightId = params.id as string
+  const flightId = decodeURIComponent(params.id as string)
+  
+  console.log('Raw flight ID from URL:', params.id)
+  console.log('Decoded flight ID:', flightId)
   
   // Get trip type from search parameters
   const tripType = searchParams.get('tripType') || 'one-way'

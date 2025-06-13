@@ -165,7 +165,7 @@ export function BookingForm() {
     sessionStorage.setItem("bookingData", JSON.stringify(bookingData))
 
     if (isSignedIn) {
-      router.push(`/flights/${flightId}/payment`)
+      router.push(`/flights/${encodeURIComponent(flightId)}/payment`)
     } else {
       // Store the redirect URL in session storage
       const redirectUrl = `/flights/${flightId}/payment`

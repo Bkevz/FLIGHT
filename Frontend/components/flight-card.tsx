@@ -152,10 +152,10 @@ export function FlightCard({ flight }: FlightCardProps) {
             </div>
 
             <div className="mt-4 flex flex-col space-y-2">
-              <Link href={`/flights/${flight.id}`}>
+              <Link href={`/flights/${encodeURIComponent(flight.id)}`}>
                 <Button className="w-full">Select</Button>
               </Link>
-              <Link href={`/flights/${flight.id}/details`}>
+              <Link href={`/flights/${encodeURIComponent(flight.id)}/details`}>
                 <Button variant="outline" className="w-full">
                   View Details
                 </Button>

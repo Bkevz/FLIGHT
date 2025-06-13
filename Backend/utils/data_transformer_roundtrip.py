@@ -91,10 +91,10 @@ def _detect_round_trip_segments(segments: List[Dict]) -> Tuple[List[Dict], List[
     # Not a round trip, return all segments as outbound
     return segments, []
 
-def _create_flight_offer_from_segments(segments: List[Dict], airline_code: str, 
+def _create_flight_offer_from_segments(segments: List[Dict], airline_code: str,
                                      price: float, currency: str, offer_id_suffix: str,
                                      price_detail: Dict, priced_offer: Dict, 
-                                     airline_offer: Dict, reference_data: Dict) -> Dict:
+                                     airline_offer: Dict, reference_data: Dict, offer_price: Dict = None) -> Dict:
     """
     Create a flight offer from a list of segments (either outbound or return).
     
@@ -125,9 +125,29 @@ def _create_flight_offer_from_segments(segments: List[Dict], airline_code: str,
     # Calculate total duration
     duration = _calculate_duration(first_segment, last_segment)
     
-    # Generate unique offer ID
-    segment_refs = [f"SEG{i}" for i in range(len(segments))]
-    offer_id = f"{airline_code}-{'-'.join(segment_refs)}-{price}-{offer_id_suffix}"
+    # Extract OfferID from the API response instead of generating complex IDs
+    offer_id_obj = priced_offer.get('OfferID')
+    if offer_id_obj and isinstance(offer_id_obj, dict):
+        offer_id_value = offer_id_obj.get('value')
+        if offer_id_value:
+            offer_id = f"{offer_id_value}_{offer_id_suffix}"
+            logger.info(f"Using OfferID from API: {offer_id}")
+        else:
+            # Fallback to simple UUID-based ID if OfferID value not found
+            import uuid
+            import time
+            timestamp = int(time.time())
+            offer_id = f"flight_{timestamp}_{str(uuid.uuid4())[:8]}_{offer_id_suffix}"
+            logger.warning(f"OfferID value not found, generated fallback ID: {offer_id}")
+    else:
+        # Fallback to simple UUID-based ID if OfferID not found
+        import uuid
+        import time
+        timestamp = int(time.time())
+        offer_id = f"flight_{timestamp}_{str(uuid.uuid4())[:8]}_{offer_id_suffix}"
+        logger.warning(f"OfferID not found, generated fallback ID: {offer_id}")
+        if offer_price:
+            logger.info(f"Available offer_price keys: {list(offer_price.keys())}")
     
     # Build price breakdown
     price_breakdown = _build_price_breakdown(price_detail, priced_offer, airline_offer)
@@ -207,7 +227,7 @@ def transform_single_offer_with_roundtrip(airline_code: str, priced_offer: Dict,
         if outbound_segments:
             outbound_offer = _create_flight_offer_from_segments(
                 outbound_segments, airline_code, price, currency, "outbound",
-                price_detail, priced_offer, airline_offer, reference_data
+                price_detail, priced_offer, airline_offer, reference_data, offer_price
             )
             if outbound_offer:
                 outbound_offer['tripType'] = 'round-trip' if return_segments else 'one-way'
@@ -218,7 +238,7 @@ def transform_single_offer_with_roundtrip(airline_code: str, priced_offer: Dict,
         if return_segments:
             return_offer = _create_flight_offer_from_segments(
                 return_segments, airline_code, price, currency, "return",
-                price_detail, priced_offer, airline_offer, reference_data
+                price_detail, priced_offer, airline_offer, reference_data, offer_price
             )
             if return_offer:
                 return_offer['tripType'] = 'round-trip'

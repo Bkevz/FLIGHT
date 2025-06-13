@@ -466,9 +466,27 @@ def _transform_single_offer(
             # Fallback to datetime calculation
             duration = _calculate_duration(first_segment, last_segment)
         
-        # Generate unique offer ID
-        offer_id = f"{airline_code}-{'-'.join(all_segment_refs)}-{price}"
-        logger.info(f"Generated offer ID: {offer_id} (airline_code={airline_code}, segment_refs={all_segment_refs}, price={price})")
+        # Extract OfferID from the API response instead of generating complex IDs
+        offer_id_obj = priced_offer.get('OfferID')
+        if offer_id_obj and isinstance(offer_id_obj, dict):
+            offer_id = offer_id_obj.get('value')
+            if offer_id:
+                logger.info(f"Using OfferID from API: {offer_id}")
+            else:
+                # Fallback to simple UUID-based ID if OfferID value not found
+                import uuid
+                import time
+                timestamp = int(time.time())
+                offer_id = f"flight_{timestamp}_{str(uuid.uuid4())[:8]}"
+                logger.warning(f"OfferID value not found, generated fallback ID: {offer_id}")
+        else:
+            # Fallback to simple UUID-based ID if OfferID not found
+            import uuid
+            import time
+            timestamp = int(time.time())
+            offer_id = f"flight_{timestamp}_{str(uuid.uuid4())[:8]}"
+            logger.warning(f"OfferID not found, generated fallback ID: {offer_id}")
+            logger.info(f"Available offer_price keys: {list(offer_price.keys())}")
         
         # Build price breakdown - pass airline_offer for correct price extraction
         price_breakdown = _build_price_breakdown(price_detail, priced_offer, airline_offer)

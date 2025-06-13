@@ -263,7 +263,7 @@ export function EnhancedFlightCard({ flight, showExtendedDetails = false }: Enha
               )}
             </div>
             
-            <Link href={`/flights/${flight.id}?from=search`} className="w-full">
+            <Link href={`/flights/${encodeURIComponent(flight.id)}?from=search`} className="w-full">
               <Button className="w-full">
                 Select Flight
               </Button>

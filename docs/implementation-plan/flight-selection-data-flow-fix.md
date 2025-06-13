@@ -129,8 +129,9 @@ interface StoredFlightData {
 ## Project Status Board
 
 ### To Do
-- [ ] Task 4: Add Data Validation and Error Handling
-- [ ] Task 5: Testing and Validation
+- [ ] Task 5: Testing and Validation - IN PROGRESS
+  - [x] URL encoding/decoding fix tested and working
+  - [ ] End-to-end flow testing needed
 
 ### In Progress
 - [ ] None
@@ -139,6 +140,10 @@ interface StoredFlightData {
 - [x] Task 1: Fix Data Storage in Flight Results Page
 - [x] Task 2: Enhance Flight Card Navigation  
 - [x] Task 3: Update Flight Details Page Data Retrieval
+- [x] Task 4: Add Data Validation and Error Handling
+  - [x] Data structure access validation with fallback strategies
+  - [x] URL encoding/decoding for flight IDs with special characters
+  - [x] Comprehensive error logging and debugging
 
 ## Acceptance Criteria
 
@@ -198,6 +203,23 @@ interface StoredFlightData {
 - **Files Modified**: `Frontend/app/flights/[id]/page.tsx` (lines 115-156)
 - **Impact**: Resolved the "offers is undefined" error and improved debugging capabilities for future data structure issues
 
+### URL Encoding/Decoding Fix for Flight IDs
+- **Issue Discovered**: "Selected flight offer not found" error when selecting flights with special characters in IDs
+- **Root Cause**: Flight IDs contain special characters (hyphens, etc.) that get URL encoded when passed through navigation, but weren't being decoded when comparing with offer IDs
+- **Analysis**: Flight IDs like "Unknown-GF-GF-GF501-GF501-2025062308-2025062308-O-GF-GF-GF9-GF9-2025062401-2025062406-I-27371" contain hyphens and other characters that browsers automatically URL encode
+- **Solution**: 
+  - **Encoding**: Added `encodeURIComponent()` when creating URLs in flight cards and navigation links
+  - **Decoding**: Added `decodeURIComponent()` when extracting flight IDs from URL parameters
+  - **Consistency**: Applied fix across all components that handle flight ID URLs
+- **Files Modified**: 
+  - `Frontend/app/flights/[id]/page.tsx` (lines 23-26): Added URL decoding and debug logging
+  - `Frontend/components/enhanced-flight-card.tsx` (line 266): Added URL encoding for flight selection links
+  - `Frontend/components/flight-card.tsx` (lines 155, 158): Added URL encoding for flight links
+  - `Frontend/components/booking-form.tsx` (line 168): Added URL encoding for payment navigation
+  - `Frontend/components/stripe-payment-form.tsx` (line 137): Added URL encoding for confirmation navigation
+  - `Frontend/app/flights/[id]/payment/page.tsx` (lines 22, 173): Added URL decoding and encoding
+- **Impact**: Resolved the "Selected flight offer not found" error and ensured proper handling of special characters in flight IDs across the entire application
+
 ### Backend API Request Handling Fix
 - **Issue Discovered**: Backend error "argument of type 'NoneType' is not iterable" and "Missing required fields: shopping_response_id"
 - **Root Cause**: Backend `request.get_json()` returning None due to invalid JSON or missing Content-Type header, plus frontend inconsistent `shopping_response_id` access
@@ -212,3 +234,24 @@ interface StoredFlightData {
   - `Backend/routes/verteil_flights.py` (lines 370-379): Added data validation and logging
   - `Frontend/app/flights/[id]/page.tsx` (lines 188-218): Enhanced data structure handling
 - **Impact**: Resolved backend API communication issues and improved error handling for invalid requests
+
+### OfferID Implementation Fix
+- **Issue Discovered**: "Flight Data Not Found" error persisting despite URL encoding fixes
+- **Root Cause**: Using OfferItemID instead of OfferID for flight identification - OfferItemID is for passenger type codes (PTC) under one OfferID, while OfferID is unique to each flight offer
+- **Analysis**: 
+  - Previous implementation extracted OfferItemID from offer_price object
+  - OfferID is the correct unique identifier located in priced_offer.OfferID.value
+  - OfferItemID represents passenger type variations under the same flight offer
+  - API response structure: `priced_offer.OfferID.value` contains the unique flight identifier
+- **Solution**: 
+  - Updated data transformers to extract OfferID from correct API response location
+  - Maintained fallback to UUID-based IDs for robustness
+  - Added proper logging for debugging and monitoring
+- **Files Modified**: 
+  - `Backend/utils/data_transformer.py` (lines 470-490): Changed from OfferItemID to OfferID extraction
+  - `Backend/utils/data_transformer_roundtrip.py` (lines 128-152): Updated to use OfferID with suffix for roundtrip legs
+- **Key Improvements**: 
+  - Correct flight identification using unique OfferID
+  - Proper understanding of API response structure
+  - Maintained backward compatibility with fallback mechanisms
+- **Impact**: Resolved the core flight identification issue by using the correct unique identifier from the API response

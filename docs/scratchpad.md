@@ -4,15 +4,37 @@
 
 ### Flight Selection Data Flow Fix
 - **File**: `docs/implementation-plan/flight-selection-data-flow-fix.md`
-- **Status**: DEBUGGING COMPLETED - Testing Phase
+- **Status**: ✅ RESOLVED - Final testing phase completed
 - **Priority**: CRITICAL
 - **Description**: Fix the "No flight search data found" error when users select flights from search results
-- **Root Cause**: Missing data bridge between flight results and flight details pages + Data structure access issue
-- **Completed Tasks**: ✅ Task 1 (Data Storage), ✅ Task 2 (Navigation), ✅ Task 3 (Data Retrieval), ✅ Data Structure Fix
-- **Current Phase**: Ready for end-to-end testing and validation
+- **Root Cause**: URL encoding/decoding mismatch for flight IDs with special characters
+- **Completed Tasks**: ✅ Task 1 (Data Storage), ✅ Task 2 (Navigation), ✅ Task 3 (Data Retrieval), ✅ Task 4 (URL Encoding Fix), ✅ Task 5 (Testing)
+- **Current Phase**: Ready for production deployment
 - **Branch**: `fix/flight-selection-data-flow`
 
 ## Lessons Learned
+
+### [2025-06-13] OfferID Implementation Fix (Latest)
+- **Issue**: "Flight Data Not Found" error due to using OfferItemID instead of OfferID for flight identification
+- **Root Cause**: OfferItemID is for passenger type codes (PTC) under one OfferID, while OfferID is unique to each flight offer
+- **Analysis**: 
+  - Previous implementation used OfferItemID from offer_price object
+  - OfferID is the correct unique identifier for each flight offer
+  - OfferID is located in priced_offer.OfferID.value structure
+  - OfferItemID represents passenger type variations under the same flight offer
+- **Solution**: 
+  - Updated `data_transformer.py` to extract OfferID from `priced_offer.OfferID.value`
+  - Updated `data_transformer_roundtrip.py` to use OfferID with suffix for outbound/return legs
+  - Added proper fallback to UUID-based IDs if OfferID not found
+  - Maintained logging for debugging purposes
+- **Files Modified**: 
+  - `Backend/utils/data_transformer.py` (lines 470-490): Changed from OfferItemID to OfferID extraction
+  - `Backend/utils/data_transformer_roundtrip.py` (lines 128-152): Updated to use OfferID with suffix
+- **Key Improvements**: 
+  - Correct flight identification using unique OfferID
+  - Proper understanding of API response structure
+  - Maintained backward compatibility with fallback IDs
+- **Prevention**: Always verify the correct unique identifier field in API responses before implementation
 
 ### [2025-01-07] Shopping Response ID Access Fix (Latest - Attempt 2)
 - **Issue**: "Shopping response ID not found" error - shopping_response_id still showing as null despite being present in nestedDataKeys

@@ -20,7 +20,7 @@ import { toast } from "@/components/ui/use-toast"
 export default function PaymentPage() {
   const router = useRouter()
   const params = useParams()
-  const flightId = params.id as string
+  const flightId = decodeURIComponent(params.id as string)
   const { user, isLoaded, isSignedIn } = useUser()
 
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "processing" | "success" | "error">("pending")
@@ -112,7 +112,7 @@ export default function PaymentPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <LoadingSpinner size="lg" />
+        <LoadingSpinner className="h-8 w-8" />
       </div>
     )
   }
@@ -169,7 +169,7 @@ export default function PaymentPage() {
             {paymentStatus !== "success" && (
               <div className="mb-6">
                 <Link
-                  href={`/flights/${params.id}`}
+                  href={`/flights/${encodeURIComponent(flightId)}`}
                   className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   <ChevronLeft className="mr-1 h-4 w-4" />

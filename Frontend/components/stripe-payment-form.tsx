@@ -134,7 +134,7 @@ export function StripePaymentForm({
 
         // Redirect to confirmation page after a short delay
         setTimeout(() => {
-          router.push(`/flights/${flightDetails.id}/payment/confirmation?reference=${bookingReference}`)
+          router.push(`/flights/${encodeURIComponent(flightDetails.id)}/payment/confirmation?reference=${bookingReference}`)
         }, 1500)
       } else {
         setError(`Payment status: ${paymentIntent.status}. Please try again.`)
