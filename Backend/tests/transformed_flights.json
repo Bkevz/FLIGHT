@@ -1,0 +1,218 @@
+[
+  {
+    "airline_name": "Kenya Airways",
+    "flight_number": "KQ112",
+    "origin": "NBO",
+    "destination": "CDG",
+    "departure_date": "2025-06-06",
+    "departure_time": "23:50",
+    "arrival_date": "2025-06-07",
+    "arrival_time": "07:30",
+    "flight_duration": "8h 40m",
+    "cabin_class": "BUSINESS",
+    "fare_basis": "ZPRKE",
+    "baggage_allowance": {
+      "carry_on_allowance": "BAGGAGEALLOWANCE_CARRYON-2 x 9 kg",
+      "checked_allowance": "BAGGAGEALLOWANCE_CHECKED-2 x 32 kg"
+    },
+    "pricing": {
+      "base_fare_per_traveler": 13745,
+      "taxes_per_traveler": 3436,
+      "discount_per_traveler": 687,
+      "total_price_per_traveler": 16494,
+      "currency": "INR",
+      "traveler_count": 1,
+      "total_base_fare": 13745,
+      "total_taxes": 3436,
+      "total_discount": 687,
+      "total_price": 16494
+    },
+    "penalties": {
+      "cancel_fee_min": 0,
+      "cancel_fee_max": 554575,
+      "change_fee_min": 0,
+      "change_fee_max": 554575
+    },
+    "passenger_type": "INF"
+  },
+  {
+    "airline_name": "Kenya Airways",
+    "flight_number": "KQ112",
+    "origin": "NBO",
+    "destination": "CDG",
+    "departure_date": "2025-06-06",
+    "departure_time": "23:50",
+    "arrival_date": "2025-06-07",
+    "arrival_time": "07:30",
+    "flight_duration": "8h 40m",
+    "cabin_class": null,
+    "fare_basis": "ZPRKE",
+    "baggage_allowance": {
+      "carry_on_allowance": "BAGGAGEALLOWANCE_CARRYON-2 x 9 kg",
+      "checked_allowance": "BAGGAGEALLOWANCE_CHECKED-2 x 32 kg"
+    },
+    "pricing": {
+      "base_fare_per_traveler": 13745,
+      "taxes_per_traveler": 3436,
+      "discount_per_traveler": 687,
+      "total_price_per_traveler": 16494,
+      "currency": "INR",
+      "traveler_count": 1,
+      "total_base_fare": 13745,
+      "total_taxes": 3436,
+      "total_discount": 687,
+      "total_price": 16494
+    },
+    "penalties": {
+      "cancel_fee_min": 0,
+      "cancel_fee_max": 554575,
+      "change_fee_min": 0,
+      "change_fee_max": 554575
+    },
+    "passenger_type": "INF"
+  },
+  {
+    "airline_name": "Kenya Airways",
+    "flight_number": "KQ112",
+    "origin": "NBO",
+    "destination": "CDG",
+    "departure_date": "2025-06-06",
+    "departure_time": "23:50",
+    "arrival_date": "2025-06-07",
+    "arrival_time": "07:30",
+    "flight_duration": "8h 40m",
+    "cabin_class": "BUSINESS",
+    "fare_basis": "ZPRKE",
+    "baggage_allowance": {
+      "carry_on_allowance": "BAGGAGEALLOWANCE_CARRYON-2 x 9 kg",
+      "checked_allowance": "BAGGAGEALLOWANCE_CHECKED-2 x 32 kg"
+    },
+    "pricing": {
+      "base_fare_per_traveler": 137420,
+      "taxes_per_traveler": 53163,
+      "discount_per_traveler": 6871,
+      "total_price_per_traveler": 183712,
+      "currency": "INR",
+      "traveler_count": 2,
+      "total_base_fare": 274840,
+      "total_taxes": 106326,
+      "total_discount": 13742,
+      "total_price": 367424
+    },
+    "penalties": {
+      "cancel_fee_min": 20615,
+      "cancel_fee_max": 554575,
+      "change_fee_min": 15460,
+      "change_fee_max": 554575
+    },
+    "passenger_type": "ADT"
+  },
+  {
+    "airline_name": "Kenya Airways",
+    "flight_number": "KQ112",
+    "origin": "NBO",
+    "destination": "CDG",
+    "departure_date": "2025-06-06",
+    "departure_time": "23:50",
+    "arrival_date": "2025-06-07",
+    "arrival_time": "07:30",
+    "flight_duration": "8h 40m",
+    "cabin_class": null,
+    "fare_basis": "ZPRKE",
+    "baggage_allowance": {
+      "carry_on_allowance": "BAGGAGEALLOWANCE_CARRYON-2 x 9 kg",
+      "checked_allowance": "BAGGAGEALLOWANCE_CHECKED-2 x 32 kg"
+    },
+    "pricing": {
+      "base_fare_per_traveler": 137420,
+      "taxes_per_traveler": 53163,
+      "discount_per_traveler": 6871,
+      "total_price_per_traveler": 183712,
+      "currency": "INR",
+      "traveler_count": 2,
+      "total_base_fare": 274840,
+      "total_taxes": 106326,
+      "total_discount": 13742,
+      "total_price": 367424
+    },
+    "penalties": {
+      "cancel_fee_min": 20615,
+      "cancel_fee_max": 554575,
+      "change_fee_min": 15460,
+      "change_fee_max": 554575
+    },
+    "passenger_type": "ADT"
+  },
+  {
+    "airline_name": "Kenya Airways",
+    "flight_number": "KQ112",
+    "origin": "NBO",
+    "destination": "CDG",
+    "departure_date": "2025-06-06",
+    "departure_time": "23:50",
+    "arrival_date": "2025-06-07",
+    "arrival_time": "07:30",
+    "flight_duration": "8h 40m",
+    "cabin_class": "BUSINESS",
+    "fare_basis": "ZPRKE",
+    "baggage_allowance": {
+      "carry_on_allowance": "BAGGAGEALLOWANCE_CARRYON-2 x 9 kg",
+      "checked_allowance": "BAGGAGEALLOWANCE_CHECKED-2 x 32 kg"
+    },
+    "pricing": {
+      "base_fare_per_traveler": 103065,
+      "taxes_per_traveler": 53163,
+      "discount_per_traveler": 5153,
+      "total_price_per_traveler": 151075,
+      "currency": "INR",
+      "traveler_count": 1,
+      "total_base_fare": 103065,
+      "total_taxes": 53163,
+      "total_discount": 5153,
+      "total_price": 151075
+    },
+    "penalties": {
+      "cancel_fee_min": 20615,
+      "cancel_fee_max": 554575,
+      "change_fee_min": 15460,
+      "change_fee_max": 554575
+    },
+    "passenger_type": "CHD"
+  },
+  {
+    "airline_name": "Kenya Airways",
+    "flight_number": "KQ112",
+    "origin": "NBO",
+    "destination": "CDG",
+    "departure_date": "2025-06-06",
+    "departure_time": "23:50",
+    "arrival_date": "2025-06-07",
+    "arrival_time": "07:30",
+    "flight_duration": "8h 40m",
+    "cabin_class": null,
+    "fare_basis": "ZPRKE",
+    "baggage_allowance": {
+      "carry_on_allowance": "BAGGAGEALLOWANCE_CARRYON-2 x 9 kg",
+      "checked_allowance": "BAGGAGEALLOWANCE_CHECKED-2 x 32 kg"
+    },
+    "pricing": {
+      "base_fare_per_traveler": 103065,
+      "taxes_per_traveler": 53163,
+      "discount_per_traveler": 5153,
+      "total_price_per_traveler": 151075,
+      "currency": "INR",
+      "traveler_count": 1,
+      "total_base_fare": 103065,
+      "total_taxes": 53163,
+      "total_discount": 5153,
+      "total_price": 151075
+    },
+    "penalties": {
+      "cancel_fee_min": 20615,
+      "cancel_fee_max": 554575,
+      "change_fee_min": 15460,
+      "change_fee_max": 554575
+    },
+    "passenger_type": "CHD"
+  }
+]

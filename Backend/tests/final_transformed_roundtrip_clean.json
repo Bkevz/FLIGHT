@@ -1,0 +1,176 @@
+[
+  {
+    "segments": [
+      {
+        "airline_name": "Emirates",
+        "flight_number": "EK501",
+        "origin": "BOM",
+        "destination": "DXB",
+        "departure_date": "2025-06-03",
+        "departure_time": "04:15",
+        "arrival_date": "2025-06-03",
+        "arrival_time": "06:05",
+        "flight_duration": "3h 20m"
+      },
+      {
+        "airline_name": "Emirates",
+        "flight_number": "EK29",
+        "origin": "DXB",
+        "destination": "LHR",
+        "departure_date": "2025-06-03",
+        "departure_time": "09:40",
+        "arrival_date": "2025-06-03",
+        "arrival_time": "14:25",
+        "flight_duration": "7h 45m"
+      }
+    ],
+    "fare_basis": "TLXAPIN1",
+    "passenger_type": "ADT",
+    "traveler_count": 2,
+    "baggage_allowance": {
+      "carry_on_allowance": "CARRY7KG 15LB UPTO45LI 115LCM",
+      "checked_allowance": "CHECKED ALLOWANCE"
+    },
+    "pricing": {
+      "base_fare_per_traveler": 14300,
+      "taxes_per_traveler": 44581,
+      "discount_per_traveler": 715,
+      "total_price_per_traveler": 58166,
+      "currency": "INR",
+      "traveler_count": 2,
+      "total_base_fare": 28600,
+      "total_taxes": 89162,
+      "total_discount": 1430,
+      "total_price": 116332
+    },
+    "penalties": {
+      "cancel_fee_min": 0,
+      "cancel_fee_max": 18000,
+      "change_fee_min": 0,
+      "change_fee_max": 12000
+    },
+    "total_amount_per_ptc": {
+      "passenger_type": "ADT",
+      "traveler_count": 2,
+      "price_per_ptc": 58166,
+      "currency": "INR",
+      "total_amount": 116332
+    }
+  },
+  {
+    "segments": [
+      {
+        "airline_name": "Emirates",
+        "flight_number": "EK501",
+        "origin": "BOM",
+        "destination": "DXB",
+        "departure_date": "2025-06-03",
+        "departure_time": "04:15",
+        "arrival_date": "2025-06-03",
+        "arrival_time": "06:05",
+        "flight_duration": "3h 20m"
+      },
+      {
+        "airline_name": "Emirates",
+        "flight_number": "EK29",
+        "origin": "DXB",
+        "destination": "LHR",
+        "departure_date": "2025-06-03",
+        "departure_time": "09:40",
+        "arrival_date": "2025-06-03",
+        "arrival_time": "14:25",
+        "flight_duration": "7h 45m"
+      }
+    ],
+    "fare_basis": "TLXAPIN1CH",
+    "passenger_type": "CHD",
+    "traveler_count": 2,
+    "baggage_allowance": {
+      "carry_on_allowance": "CARRY7KG 15LB UPTO45LI 115LCM",
+      "checked_allowance": "CHECKED ALLOWANCE"
+    },
+    "pricing": {
+      "base_fare_per_traveler": 10725,
+      "taxes_per_traveler": 34035,
+      "discount_per_traveler": 536,
+      "total_price_per_traveler": 44224,
+      "currency": "INR",
+      "traveler_count": 2,
+      "total_base_fare": 21450,
+      "total_taxes": 68070,
+      "total_discount": 1072,
+      "total_price": 88448
+    },
+    "penalties": {
+      "cancel_fee_min": 0,
+      "cancel_fee_max": 18000,
+      "change_fee_min": 0,
+      "change_fee_max": 12000
+    },
+    "total_amount_per_ptc": {
+      "passenger_type": "CHD",
+      "traveler_count": 2,
+      "price_per_ptc": 44224,
+      "currency": "INR",
+      "total_amount": 88448
+    }
+  },
+  {
+    "segments": [
+      {
+        "airline_name": "Emirates",
+        "flight_number": "EK501",
+        "origin": "BOM",
+        "destination": "DXB",
+        "departure_date": "2025-06-03",
+        "departure_time": "04:15",
+        "arrival_date": "2025-06-03",
+        "arrival_time": "06:05",
+        "flight_duration": "3h 20m"
+      },
+      {
+        "airline_name": "Emirates",
+        "flight_number": "EK29",
+        "origin": "DXB",
+        "destination": "LHR",
+        "departure_date": "2025-06-03",
+        "departure_time": "09:40",
+        "arrival_date": "2025-06-03",
+        "arrival_time": "14:25",
+        "flight_duration": "7h 45m"
+      }
+    ],
+    "fare_basis": "TLXAPIN1IN",
+    "passenger_type": "INF",
+    "traveler_count": 2,
+    "baggage_allowance": {
+      "carry_on_allowance": "CARRY5KG 11LBUPTO 45LI 115LCM",
+      "checked_allowance": "CHECKED ALLOWANCE"
+    },
+    "pricing": {
+      "base_fare_per_traveler": 1430,
+      "taxes_per_traveler": 6029,
+      "discount_per_traveler": 72,
+      "total_price_per_traveler": 7387,
+      "currency": "INR",
+      "traveler_count": 2,
+      "total_base_fare": 2860,
+      "total_taxes": 12058,
+      "total_discount": 144,
+      "total_price": 14774
+    },
+    "penalties": {
+      "cancel_fee_min": 0,
+      "cancel_fee_max": 18000,
+      "change_fee_min": 0,
+      "change_fee_max": 12000
+    },
+    "total_amount_per_ptc": {
+      "passenger_type": "INF",
+      "traveler_count": 2,
+      "price_per_ptc": 7387,
+      "currency": "INR",
+      "total_amount": 14774
+    }
+  }
+]

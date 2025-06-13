@@ -65,10 +65,7 @@ class FlightPricingService(FlightService):
             # Build the request payload
             payload = self._build_pricing_payload(
                 airshopping_response=airshopping_response,
-                offer_id=offer_id,
-                shopping_response_id=shopping_response_id,
-                currency=currency,
-                request_id=request_id
+                offer_id=offer_id
             )
             
             # Make the API request with dynamic airline code
@@ -156,10 +153,7 @@ class FlightPricingService(FlightService):
     def _build_pricing_payload(
         self,
         airshopping_response: Dict[str, Any],
-        offer_id: str,
-        shopping_response_id: str,
-        currency: str,
-        request_id: str
+        offer_id: str
     ) -> Dict[str, Any]:
         """
         Build the FlightPrice request payload using the request builder.
@@ -167,9 +161,6 @@ class FlightPricingService(FlightService):
         Args:
             airshopping_response: The AirShopping response
             offer_id: The ID of the offer to price
-            shopping_response_id: The ShoppingResponseID from AirShoppingRS
-            currency: Currency code
-            request_id: Request ID for tracking
             
         Returns:
             Dictionary containing the request payload
