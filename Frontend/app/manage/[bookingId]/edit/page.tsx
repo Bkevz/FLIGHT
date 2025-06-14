@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation"
 import { useUser } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, Save } from "lucide-react"
+import { ArrowLeft, Save, Plane } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { MainNav } from "@/components/main-nav"

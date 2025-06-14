@@ -39,21 +39,38 @@ export function PassengerForm({ passengerNumber, passengerData, onPassengerChang
         </RadioGroup>
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor={`title-${passengerNumber}`}>Title</Label>
+        <Select 
+          value={passengerData?.title || ''} 
+          onValueChange={(value) => handleInputChange('title', value)} >
+          <SelectTrigger>
+            <SelectValue placeholder="Select title" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="mr">Mr.</SelectItem>
+            <SelectItem value="mrs">Mrs.</SelectItem>
+            <SelectItem value="ms">Ms.</SelectItem>
+            <SelectItem value="miss">Miss</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor={`first-name-${passengerNumber}`}>First Name</Label>
+          <Label htmlFor={`first-name-${passengerNumber}`}>Given Name (First Name)</Label>
           <Input 
             id={`first-name-${passengerNumber}`} 
-            placeholder="Enter first name" 
+            placeholder="Enter given name" 
             value={passengerData?.firstName || ''} 
             onChange={(e) => handleInputChange('firstName', e.target.value)} 
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor={`last-name-${passengerNumber}`}>Last Name</Label>
+          <Label htmlFor={`last-name-${passengerNumber}`}>Surname (Last Name)</Label>
           <Input 
             id={`last-name-${passengerNumber}`} 
-            placeholder="Enter last name" 
+            placeholder="Enter surname" 
             value={passengerData?.lastName || ''} 
             onChange={(e) => handleInputChange('lastName', e.target.value)} 
           />
@@ -140,7 +157,11 @@ export function PassengerForm({ passengerNumber, passengerData, onPassengerChang
 
       <div className="space-y-2">
         <Label>Travel Document</Label>
-        <RadioGroup defaultValue="passport" className="flex flex-wrap gap-4">
+        <RadioGroup 
+          value={passengerData?.documentType || "passport"} 
+          onValueChange={(value) => handleInputChange('documentType', value)} 
+          className="flex flex-wrap gap-4"
+        >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="passport" id={`passport-${passengerNumber}`} />
             <Label htmlFor={`passport-${passengerNumber}`}>Passport</Label>

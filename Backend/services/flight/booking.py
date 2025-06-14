@@ -243,11 +243,134 @@ class FlightBookingService(FlightService):
         if not passengers:
             raise ValidationError("At least one passenger is required")
             
+        # Validate each passenger's required fields
+        for i, passenger in enumerate(passengers):
+            self._validate_passenger_data(passenger, i + 1)
+            
         if not payment_info:
             raise ValidationError("Payment information is required")
             
         if not contact_info or not contact_info.get('email'):
             raise ValidationError("Contact information with email is required")
+            
+        # Validate contact info fields
+        self._validate_contact_info(contact_info)
+    
+    def _validate_passenger_data(self, passenger: Dict[str, Any], passenger_number: int) -> None:
+        """
+        Validate individual passenger data for completeness.
+        
+        Args:
+            passenger: Passenger data dictionary
+            passenger_number: Passenger number for error messages
+            
+        Raises:
+            ValidationError: If required passenger data is missing or invalid
+        """
+        required_fields = {
+            'type': 'Passenger type',
+            'title': 'Title',
+            'firstName': 'First name',
+            'lastName': 'Last name',
+            'gender': 'Gender',
+            'nationality': 'Nationality'
+        }
+        
+        missing_fields = []
+        
+        # Check basic required fields
+        for field, field_name in required_fields.items():
+            if not passenger.get(field) or str(passenger.get(field)).strip() == '':
+                missing_fields.append(field_name)
+        
+        # Validate date of birth
+        dob = passenger.get('dob', {})
+        if not dob or not all([dob.get('year'), dob.get('month'), dob.get('day')]):
+            missing_fields.append('Date of birth')
+        else:
+            # Validate date format
+            try:
+                year = int(dob.get('year', 0))
+                month = int(dob.get('month', 0))
+                day = int(dob.get('day', 0))
+                
+                if year < 1900 or year > 2024:
+                    missing_fields.append('Valid birth year')
+                if month < 1 or month > 12:
+                    missing_fields.append('Valid birth month')
+                if day < 1 or day > 31:
+                    missing_fields.append('Valid birth day')
+            except (ValueError, TypeError):
+                missing_fields.append('Valid date of birth format')
+        
+        # Validate travel document for adults and children
+        passenger_type = passenger.get('type', '').lower()
+        if passenger_type in ['adult', 'child']:
+            if not passenger.get('documentType'):
+                missing_fields.append('Document type')
+            if not passenger.get('documentNumber') or str(passenger.get('documentNumber')).strip() == '':
+                missing_fields.append('Document number')
+            
+            # Validate document expiry date
+            expiry_date = passenger.get('expiryDate', {})
+            if not expiry_date or not all([expiry_date.get('year'), expiry_date.get('month'), expiry_date.get('day')]):
+                missing_fields.append('Document expiry date')
+            else:
+                try:
+                    year = int(expiry_date.get('year', 0))
+                    month = int(expiry_date.get('month', 0))
+                    day = int(expiry_date.get('day', 0))
+                    
+                    if year < 2024 or year > 2040:
+                        missing_fields.append('Valid expiry year')
+                    if month < 1 or month > 12:
+                        missing_fields.append('Valid expiry month')
+                    if day < 1 or day > 31:
+                        missing_fields.append('Valid expiry day')
+                except (ValueError, TypeError):
+                    missing_fields.append('Valid expiry date format')
+            
+            if not passenger.get('issuingCountry') or str(passenger.get('issuingCountry')).strip() == '':
+                missing_fields.append('Document issuing country')
+        
+        # Validate passenger type-specific requirements
+        if passenger_type == 'infant':
+            # Infants typically don't need separate documents but need valid birth date
+            pass
+        elif passenger_type not in ['adult', 'child', 'infant']:
+            missing_fields.append('Valid passenger type (adult, child, or infant)')
+        
+        if missing_fields:
+            error_msg = f"Passenger {passenger_number} is missing required fields: {', '.join(missing_fields)}"
+            raise ValidationError(error_msg)
+    
+    def _validate_contact_info(self, contact_info: Dict[str, str]) -> None:
+        """
+        Validate contact information completeness.
+        
+        Args:
+            contact_info: Contact information dictionary
+            
+        Raises:
+            ValidationError: If required contact information is missing or invalid
+        """
+        email = contact_info.get('email', '').strip()
+        phone = contact_info.get('phone', '').strip()
+        
+        if not email:
+            raise ValidationError("Email address is required")
+        
+        # Basic email validation
+        if '@' not in email or '.' not in email.split('@')[-1]:
+            raise ValidationError("Valid email address is required")
+        
+        if not phone:
+            raise ValidationError("Phone number is required")
+        
+        # Basic phone validation (should contain only digits, spaces, +, -, (, ))
+        import re
+        if not re.match(r'^[\d\s\+\-\(\)]+$', phone):
+            raise ValidationError("Valid phone number is required")
     
     def _build_booking_payload(
         self,
@@ -278,26 +401,47 @@ class FlightBookingService(FlightService):
                     flight_price_response, passengers, payment_info, contact_info, request_id
                 )
             
-            # Transform passenger data to match the expected format
+            # Transform frontend passenger data to match the expected format
             transformed_passengers = []
             for passenger in passengers:
+                # Map frontend passenger type to expected format
+                pax_type = passenger.get('type', 'adult')
+                ptc_mapping = {
+                    'adult': 'ADT',
+                    'child': 'CHD', 
+                    'infant': 'INF'
+                }
+                ptc = ptc_mapping.get(pax_type, 'ADT')
+                
+                # Format birth date from frontend dob object
+                dob = passenger.get('dob', {})
+                birth_date = None
+                if dob and dob.get('year') and dob.get('month') and dob.get('day'):
+                    birth_date = f"{dob['year']}-{dob['month'].zfill(2)}-{dob['day'].zfill(2)}"
+                
                 transformed_passenger = {
-                    'type': passenger.get('type', 'ADT'),
-                    'title': passenger.get('title'),
-                    'first_name': passenger.get('first_name'),
-                    'last_name': passenger.get('last_name'),
-                    'date_of_birth': passenger.get('date_of_birth'),
-                    'gender': passenger.get('gender'),
-                    'nationality': passenger.get('nationality')
+                    'type': ptc,
+                    'title': "Mr" if passenger.get('gender', '').lower() == 'male' else "Ms",
+                    'first_name': passenger.get('firstName', ''),
+                    'last_name': passenger.get('lastName', ''),
+                    'date_of_birth': birth_date,
+                    'gender': passenger.get('gender', '').lower(),
+                    'nationality': passenger.get('nationality', '')
                 }
                 
                 # Add document information if available
-                if passenger.get('passport_number'):
+                if passenger.get('documentNumber'):
+                    # Format expiry date from frontend expiryDate object
+                    expiry = passenger.get('expiryDate', {})
+                    expiry_date = None
+                    if expiry and expiry.get('year') and expiry.get('month') and expiry.get('day'):
+                        expiry_date = f"{expiry['year']}-{expiry['month'].zfill(2)}-{expiry['day'].zfill(2)}"
+                    
                     transformed_passenger['documents'] = [{
                         'type': 'Passport',
-                        'number': passenger.get('passport_number'),
-                        'expiry_date': passenger.get('passport_expiry'),
-                        'issuing_country': passenger.get('nationality')
+                        'number': passenger.get('documentNumber'),
+                        'expiry_date': expiry_date,
+                        'issuing_country': passenger.get('issuingCountry', '')
                     }]
                 
                 # Add contact info to first passenger

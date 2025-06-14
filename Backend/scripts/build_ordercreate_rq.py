@@ -561,139 +561,46 @@ def process_payments_for_order_create(
 
 
 def main():
-    input_fprs_file = 'FlightPriceResponse.json'
-    output_ocrq_file = 'OrderCreateRQ_generated.json'
+    """
+    Main function for testing the OrderCreateRQ generation.
+    This function is kept for backward compatibility and testing purposes.
+    For production use, call generate_order_create_rq() directly with your data.
+    """
+    import sys
+    
+    if len(sys.argv) < 4:
+        print("Usage: python build_ordercreate_rq.py <flight_price_response_file> <passengers_file> <payment_file> [output_file]")
+        print("")
+        print("Example:")
+        print("  python build_ordercreate_rq.py flight_price.json passengers.json payment.json order_create.json")
+        print("")
+        print("For production use, import and call generate_order_create_rq() directly.")
+        return
+    
+    input_fprs_file = sys.argv[1]
+    passengers_file = sys.argv[2]
+    payment_file = sys.argv[3]
+    output_file = sys.argv[4] if len(sys.argv) > 4 else 'OrderCreateRQ_generated.json'
     
     try:
+        # Load flight price response
         with open(input_fprs_file, 'r', encoding='utf-8') as f:
             flight_price_response_data = json.load(f)
-    except FileNotFoundError:
-        print(f"Error: Input file '{input_fprs_file}' not found.")
+        
+        # Load passengers data
+        with open(passengers_file, 'r', encoding='utf-8') as f:
+            passengers_input = json.load(f)
+        
+        # Load payment data
+        with open(payment_file, 'r', encoding='utf-8') as f:
+            payment_input = json.load(f)
+            
+    except FileNotFoundError as e:
+        print(f"Error: File not found - {e}")
         return
-    except json.JSONDecodeError:
-        print(f"Error: Input file '{input_fprs_file}' is not valid JSON.")
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON in file - {e}")
         return
-
-    # --- Example Dynamic Passenger Data ---
-    passengers_input = [
-        {
-            "ObjectKey": "T1", 
-            "PTC": "ADT",
-            "Name": {"Title": "Mr", "Given": ["AMONI"], "Surname": "KEVIN"},
-            "Gender": "Male",
-            "BirthDate": "1980-05-25",
-            "Contacts": { 
-                "Contact": [{
-                    "PhoneContact": {"Number": [{"CountryCode": "254", "value": "0700000000"}], "Application": "Home"},
-                    "EmailContact": {"Address": {"value": "kevinamoni20@example.com"}},
-                    "AddressContact": {"Street": ["Nairobi, Kenya 30500"],"PostalCode": "301","CityName": "Nairobi","CountryCode": {"value": "KE"}}
-                }]
-            },
-            "Documents": [{
-                "Type": "PT", "ID": "A12345678", "DateOfExpiration": "2030-12-31", 
-                "CountryOfIssuance": "KE", "DateOfIssue": "2020-01-15", "CountryOfResidence": "KE"
-            }]
-        },
-        {
-            "ObjectKey": "T2", "PTC": "ADT",
-            "Name": {"Title": "Mrs", "Given": ["REBECCA"], "Surname": "MIANO"},
-            "Gender": "Female", "BirthDate": "1998-05-25",
-            "Documents": [{"Type": "PT", "ID": "B87654321", "DateOfExpiration": "2028-11-20", "CountryOfIssuance": "GB"}]
-        },
-        {
-            "ObjectKey": "T3", "PTC": "CHD",
-            "Name": {"Title": "Mstr", "Given": ["Michael"], "Surname": "Losuru"},
-            "Gender": "Male", "BirthDate": "2014-05-25",
-            "Documents": [{"Type": "PT", "ID": "C24681357", "DateOfExpiration": "2027-06-10", "CountryOfIssuance": "KE"}]
-        },
-        {
-            "ObjectKey": "T1.1", "PTC": "INF",
-            "Name": {"Title": "Mstr", "Given": ["John"], "Surname": "Doe"},
-            "Gender": "Male", "BirthDate": "2024-05-25", "PassengerAssociation": "T1",
-            "Documents": [{"Type": "PT", "ID": "D97531024", "DateOfExpiration": "2029-05-24", "CountryOfIssuance": "KE"}]
-        },
-        {
-            "ObjectKey": "T2.1", "PTC": "INF",
-            "Name": {"Title": "Ms", "Given": ["Sally"], "Surname": "Asekon"},
-            "Gender": "Female", "BirthDate": "2025-01-25", "PassengerAssociation": "T2",
-            "Documents": [{"Type": "PT", "ID": "D97531024", "DateOfExpiration": "2029-05-24", "CountryOfIssuance": "KE"}]
-        }
-    ]
-
-    # --- Example Dynamic Payment Info ---
-    total_order_price_from_fprs = 0
-    currency_from_fprs = "INR" 
-    surcharge_details_from_fprs = None
-
-    try: # Safely extract total price and surcharge
-        first_priced_offer_fprs = flight_price_response_data.get('PricedFlightOffers', {}).get('PricedFlightOffer', [{}])[0]
-        if first_priced_offer_fprs: # Check if it's not an empty dict
-            # Get total price (this is usually inclusive of surcharge in FlightPriceRS.TotalPrice)
-            total_price_node = first_priced_offer_fprs.get('TotalPrice', {}).get('SimpleCurrencyPrice', {})
-            total_price_with_surcharge_fprs = float(total_price_node.get('value', 0))
-            currency_from_fprs = total_price_node.get('Code', "INR")
-
-            # Attempt to find explicit surcharge to deduct it for OrderTotalBeforeSurcharge
-            # This logic needs to be robust based on how Verteil returns surcharge
-            # For this example, we'll assume if surcharge exists, it's already in TotalPrice
-            # and we might need to find the explicit surcharge value if it's itemized.
-            # For now, we'll assume TotalPrice from FPRS IS the OrderTotalBeforeSurcharge for simplicity,
-            # and any surcharge info will be passed separately if it needs to be *added again* explicitly
-            # in OrderCreateRQ. This part is tricky without seeing an FPRS with explicit surcharge.
-            
-            # A more robust approach: sum base amounts and taxes of all OfferPrice items
-            calculated_base_plus_tax = 0
-            temp_currency = currency_from_fprs
-            for op_item in first_priced_offer_fprs.get('OfferPrice', []):
-                pd_item = op_item.get('RequestedDate', {}).get('PriceDetail', {})
-                base_val = float(pd_item.get('BaseAmount', {}).get('value', 0))
-                tax_val = float(pd_item.get('Taxes', {}).get('Total', {}).get('value', 0))
-                calculated_base_plus_tax += (base_val + tax_val)
-                if not temp_currency and pd_item.get('BaseAmount', {}).get('Code'):
-                    temp_currency = pd_item.get('BaseAmount', {}).get('Code')
-            
-            order_total_before_surcharge_val = calculated_base_plus_tax
-            currency_from_fprs = temp_currency
-
-            # Example: IF a surcharge was explicitly returned and itemized in FlightPriceRS
-            # surcharge_details_from_fprs = {"value": 20.00, "Code": "INR"} # Fictional
-            
-            # This example uses the CASH method as per your OrderCreateRQ.txt
-            payment_input = {
-                "OrderTotalBeforeSurcharge": order_total_before_surcharge_val,
-                "Currency": currency_from_fprs,
-                "MethodType": "Cash", 
-                "Details": {"CashInd": True}
-            }
-            if surcharge_details_from_fprs: # If we had a surcharge to explicitly add
-                 payment_input["Surcharge"] = surcharge_details_from_fprs
-
-            # To test PaymentCard:
-            # payment_input = {
-            #     "OrderTotalBeforeSurcharge": order_total_before_surcharge_val,
-            #     "Currency": currency_from_fprs,
-            #     "MethodType": "PaymentCard", 
-            #     "Details": {
-            #         "CardCode": "VI",
-            #         "CardNumberToken": "tok_simulated_token_1234", 
-            #         "CardHolderName": {"value": "Amoni Kevin", "refs": []}, # refs can be passenger ObjectKey
-            #         "EffectiveExpireDate": {"Expiration": "1228"}, 
-            #         "CardType": "Credit",
-            #         # "SeriesCode": {"value":"123"}, # Optional, usually not sent with tokens
-            #         # "CardHolderBillingAddress": { ... } 
-            #     }
-            # }
-            # if surcharge_details_from_fprs:
-            #      payment_input["Surcharge"] = surcharge_details_from_fprs
-
-
-    except (IndexError, KeyError, TypeError, AttributeError) as e:
-        print(f"Error extracting price/surcharge details from FlightPriceRS: {e}. Using defaults.")
-        payment_input = { # Fallback
-            "OrderTotalBeforeSurcharge": 0, "Currency": "INR",
-            "MethodType": "Cash", "Details": {"CashInd": True}
-        }
-
 
     try:
         order_create_payload = generate_order_create_rq(
@@ -702,9 +609,9 @@ def main():
             payment_input
         )
         
-        with open(output_ocrq_file, 'w', encoding='utf-8') as f:
+        with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(order_create_payload, f, indent=2, ensure_ascii=False)
-        print(f"OrderCreateRQ successfully generated and saved to '{output_ocrq_file}'")
+        print(f"OrderCreateRQ successfully generated and saved to '{output_file}'")
             
     except ValueError as ve:
         print(f"ValueError during OrderCreateRQ generation: {ve}")

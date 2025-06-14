@@ -2,6 +2,31 @@
 
 ## Current Active Tasks
 
+### Passenger Count Validation Enhancement
+- **File**: `docs/implementation-plan/passenger-count-validation-enhancement.md`
+- **Status**: 🔄 TASK 2 COMPLETED - Form validation implemented
+- **Priority**: HIGH
+- **Description**: Implement comprehensive passenger count validation and form completion checks
+- **Root Cause**: Missing validation for passenger form completion and count consistency
+- **Goal**: Ensure all passenger forms are completed and validated before proceeding to payment
+- **Current Phase**: Implementation in progress
+- **Branch**: `feature/passenger-count-validation`
+- **Next Action**: Continue with Task 3 - Real-time integrity checks (partially implemented)
+- **Completed Tasks**: 
+  - ✅ Task 1: Feature branch setup
+  - ✅ Task 2: Form completion validation with real-time feedback and progress indicators
+
+### Passenger Transformation Refactor
+- **File**: `docs/implementation-plan/passenger-transformation-refactor.md`
+- **Status**: ✅ COMPLETED - Implementation and testing finished
+- **Priority**: HIGH
+- **Description**: Refactor redundant passenger data transformation logic across three layers (API endpoint, service layer, NDC builder)
+- **Root Cause**: Code duplication and violation of separation of concerns
+- **Goal**: Remove transformation logic from API endpoint, let service layer handle frontend format directly
+- **Current Phase**: Implementation completed, all tests passing
+- **Branch**: `refactor/passenger-transformation-cleanup`
+- **Completion Date**: 2025-01-07
+
 ### Flight Selection Data Flow Fix
 - **File**: `docs/implementation-plan/flight-selection-data-flow-fix.md`
 - **Status**: ✅ RESOLVED - Final testing phase completed

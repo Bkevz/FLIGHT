@@ -350,7 +350,7 @@ async def air_shopping():
             details={"error": str(e) if str(e) else "Unknown error"}
         )), 500
 
-@bp.route('/flight-price', methods=['POST', 'OPTIONS'])
+@bp.route('/flight-price', methods=['POST'])
 async def flight_price():
     """
     Handle flight price requests.
@@ -420,3 +420,77 @@ async def flight_price():
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)} - Request ID: {request_id}", exc_info=True)
         return jsonify(_create_error_response("An unexpected error occurred", 500, request_id))
+
+
+@bp.route('/order-create', methods=['POST'])
+async def create_order():
+    """
+    Create a flight booking order.
+    
+    Expected request body:
+    {
+        "flight_offer": {...},  # Flight offer data from frontend
+        "passengers": [...],    # Passenger details from frontend
+        "payment": {...},       # Payment information
+        "contact_info": {...}   # Contact information
+    }
+    """
+    request_id = _generate_request_id()
+    
+    try:
+        # Get request data
+        data = await request.get_json()
+        if not data:
+            return jsonify(_create_error_response("Request body is required", 400, request_id))
+        
+        # Extract data from frontend request
+        flight_offer = data.get('flight_offer', {})
+        frontend_passengers = data.get('passengers', [])
+        payment_info = data.get('payment', {})
+        contact_info = data.get('contact_info', {})
+        
+        # Validate required data
+        if not flight_offer:
+            return jsonify(_create_error_response("Flight offer is required", 400, request_id))
+        
+        if not frontend_passengers:
+            return jsonify(_create_error_response("At least one passenger is required", 400, request_id))
+        
+        if not payment_info:
+            return jsonify(_create_error_response("Payment information is required", 400, request_id))
+        
+        if not contact_info or not contact_info.get('email'):
+            return jsonify(_create_error_response("Contact information with email is required", 400, request_id))
+        
+        # Prepare order data for the booking service (pass raw frontend data)
+        order_data = {
+            'flight_price_response': flight_offer,  # Use flight_offer as flight_price_response
+            'passengers': frontend_passengers,  # Pass raw frontend passenger data
+            'payment_info': payment_info,
+            'contact_info': contact_info,
+            'request_id': request_id
+        }
+        
+        logger.info(f"Processing order creation - Request ID: {request_id}")
+        
+        # Call the booking service
+        result = await process_order_create(order_data)
+        
+        if result.get('status') == 'success':
+            logger.info(f"Order created successfully - Request ID: {request_id}")
+            return jsonify({
+                'status': 'success',
+                'data': result.get('data', {}),
+                'request_id': request_id
+            })
+        else:
+            logger.error(f"Order creation failed - Request ID: {request_id}, Error: {result.get('error')}")
+            return jsonify(_create_error_response(
+                result.get('error', 'Failed to create order'), 
+                500, 
+                request_id
+            ))
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in order creation: {str(e)} - Request ID: {request_id}", exc_info=True)
+        return jsonify(_create_error_response("An unexpected error occurred during order creation", 500, request_id))
