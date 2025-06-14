@@ -39,7 +39,27 @@
 
 ## Lessons Learned
 
-### [2025-06-13] OfferID Implementation Fix (Latest)
+### [2025-06-14] Flight Pricing Data Structure Mismatch Fix (Latest)
+- **Issue**: "No AirlineOffers found or invalid format in AirShoppingRS" error when trying to get flight pricing
+- **Root Cause**: Data structure inconsistency between airline code extraction and pricing payload building methods
+- **Analysis**: 
+  - `_extract_airline_code_from_offer` method was looking for 'AirShoppingRS' wrapper in response
+  - `_build_pricing_payload` method was accessing data without the wrapper
+  - `build_flight_price_request` function expects unwrapped data structure
+  - Frontend sends data wrapped in 'AirShoppingRS' but backend methods handled it inconsistently
+- **Solution**: 
+  - Updated both methods to handle wrapped and unwrapped response formats
+  - Added conditional logic to detect 'AirShoppingRS' wrapper and unwrap data when needed
+  - Ensured `build_flight_price_request` always receives unwrapped data structure
+- **Files Modified**: 
+  - `Backend/services/flight/pricing.py` (lines 112-120, 173-193): Added wrapper detection and unwrapping logic
+- **Key Improvements**: 
+  - Consistent data structure handling across all pricing methods
+  - Backward compatibility with both wrapped and unwrapped formats
+  - Clear separation between API response format and internal processing format
+- **Prevention**: Always ensure consistent data structure handling across all methods that process the same data
+
+### [2025-06-13] OfferID Implementation Fix
 - **Issue**: "Flight Data Not Found" error due to using OfferItemID instead of OfferID for flight identification
 - **Root Cause**: OfferItemID is for passenger type codes (PTC) under one OfferID, while OfferID is unique to each flight offer
 - **Analysis**: 

@@ -111,8 +111,12 @@ class FlightPricingService(FlightService):
             The airline code (e.g., 'KQ', 'WY') or None if not found
         """
         try:
-            # Navigate to the offers in the response
-            offers_group = airshopping_response.get('AirShoppingRS', {}).get('OffersGroup', {})
+            # Handle both wrapped and unwrapped response formats
+            # Check if response is wrapped in 'AirShoppingRS'
+            if 'AirShoppingRS' in airshopping_response:
+                offers_group = airshopping_response['AirShoppingRS'].get('OffersGroup', {})
+            else:
+                offers_group = airshopping_response.get('OffersGroup', {})
             
             # Look for the specific offer
             air_line_offers = offers_group.get('AirlineOffers', [])
@@ -168,7 +172,17 @@ class FlightPricingService(FlightService):
         try:
             # Find the selected offer index based on offer_id
             selected_offer_index = 0
-            offers_group = airshopping_response.get('OffersGroup', {})
+            
+            # Handle both wrapped and unwrapped response formats
+            # Check if response is wrapped in 'AirShoppingRS'
+            if 'AirShoppingRS' in airshopping_response:
+                offers_group = airshopping_response['AirShoppingRS'].get('OffersGroup', {})
+                # Pass the unwrapped data to build_flight_price_request
+                unwrapped_response = airshopping_response['AirShoppingRS']
+            else:
+                offers_group = airshopping_response.get('OffersGroup', {})
+                unwrapped_response = airshopping_response
+            
             airline_offers_list = offers_group.get('AirlineOffers', [])
             
             if airline_offers_list and isinstance(airline_offers_list, list):
@@ -178,9 +192,9 @@ class FlightPricingService(FlightService):
                         selected_offer_index = i
                         break
             
-            # Use the request builder to create the payload
+            # Use the request builder to create the payload with unwrapped data
             payload = build_flight_price_request(
-                airshopping_response=airshopping_response,
+                airshopping_response=unwrapped_response,
                 selected_offer_index=selected_offer_index
             )
             

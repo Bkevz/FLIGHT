@@ -49,6 +49,37 @@ jest.mock('next/link', () => ({
   },
 }))
 
+// Mock next/router
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    route: '/',
+    pathname: '',
+    query: '',
+    asPath: '',
+    push: jest.fn(),
+    events: {
+      on: jest.fn(),
+      off: jest.fn(),
+    },
+    beforePopState: jest.fn(() => null),
+    prefetch: jest.fn(() => null),
+  }),
+}))
+
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  usePathname: jest.fn(() => ''),
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    refresh: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+  }),
+  useSearchParams: jest.fn(() => new URLSearchParams()),
+  redirect: jest.fn(),
+}));
+
 // Suppress console errors during tests
 const originalError = console.error
 beforeAll(() => {

@@ -129,21 +129,23 @@ class FlightService:
         headers = await self._get_headers(service_name, airline_code) # _get_headers is now async
 
         # Propagate request_id from calling context (e.g., route handler) if available
-        # Otherwise, use the one generated in _get_headers or generate a new one for the payload
+        # Otherwise, use the one generated in _get_headers or generate a new one for logging
         log_request_id = kwargs.get('request_id', headers.get('X-Request-ID', str(uuid.uuid4())))
-        if 'request_id' not in payload: # Ensure payload has a request_id
-             payload['request_id'] = log_request_id
-        else: # If payload already has one, use that for logging consistency
+        
+        # Ensure request_id is never in the payload - remove it if present
+        api_payload = {k: v for k, v in payload.items() if k != 'request_id'}
+        
+        # If payload originally had request_id, use that for logging consistency
+        if 'request_id' in payload:
             log_request_id = payload['request_id']
 
-
-        logger.info(f"Making {method} request to {url} for service {service_name} (ReqID: {log_request_id}).")       
+        logger.info(f"Making {method} request to {url} for service {service_name} (ReqID: {log_request_id}).")
         # Log final headers and payload for debugging
         # logger.info(f"Final headers for {service_name} (ReqID: {log_request_id}): {json.dumps(headers, indent=2)}")
-        logger.info(f"Final payload for {service_name} (ReqID: {log_request_id}): {json.dumps(payload, indent=2)}")
+        logger.info(f"Final payload for {service_name} (ReqID: {log_request_id}): {json.dumps(api_payload, indent=2)}")
         logger.info(f"Request URL: {url}")
         logger.info(f"Request method: {method}")
-        # logger.debug(f"Payload for ReqID {log_request_id}: {json.dumps(payload)}") # Avoid logging sensitive data in prod
+        # logger.debug(f"Payload for ReqID {log_request_id}: {json.dumps(api_payload)}") # Avoid logging sensitive data in prod
 
         max_retries = int(self.config.get('VERTEIL_MAX_RETRIES', 3))
         retry_delay_base = int(self.config.get('VERTEIL_RETRY_DELAY', 1))
@@ -154,7 +156,7 @@ class FlightService:
                 async with session.request(
                     method=method,
                     url=url,
-                    json=payload, # Verteil API endpoints expect JSON body
+                    json=api_payload, # Verteil API endpoints expect JSON body without request_id
                     headers=headers,
                     **{k:v for k,v in kwargs.items() if k != 'request_id'} # Pass other kwargs, but not request_id as it's in payload
                 ) as response:

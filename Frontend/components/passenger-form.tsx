@@ -17,7 +17,7 @@ export function PassengerForm({ passengerNumber, passengerData, onPassengerChang
   };
 
   return (
-    <div className="space-y-4 rounded-md border p-4">
+    <div className="space-y-4 rounded-md border p-4" data-testid={`passenger-form-${passengerNumber - 1}`}>
       <div>
         <RadioGroup
           value={passengerData?.type || "adult"} 
@@ -61,6 +61,7 @@ export function PassengerForm({ passengerNumber, passengerData, onPassengerChang
           <Label htmlFor={`first-name-${passengerNumber}`}>Given Name (First Name)</Label>
           <Input 
             id={`first-name-${passengerNumber}`} 
+            data-testid={`passenger-${passengerNumber - 1}-firstName`} 
             placeholder="Enter given name" 
             value={passengerData?.firstName || ''} 
             onChange={(e) => handleInputChange('firstName', e.target.value)} 
@@ -70,6 +71,7 @@ export function PassengerForm({ passengerNumber, passengerData, onPassengerChang
           <Label htmlFor={`last-name-${passengerNumber}`}>Surname (Last Name)</Label>
           <Input 
             id={`last-name-${passengerNumber}`} 
+            data-testid={`passenger-${passengerNumber - 1}-lastName`} 
             placeholder="Enter surname" 
             value={passengerData?.lastName || ''} 
             onChange={(e) => handleInputChange('lastName', e.target.value)} 
