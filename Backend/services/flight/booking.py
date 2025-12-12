@@ -12,6 +12,7 @@ from .core import FlightService
 from .decorators import async_cache, async_rate_limited
 from .exceptions import FlightServiceError, ValidationError, BookingError
 from .types import BookingResponse, SearchCriteria
+from .response_navigator import FlightResponseNavigator
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +74,11 @@ except Exception as e:
 
 class FlightBookingService(FlightService):
     """Service for handling flight booking operations."""
+
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        """Initialize booking service with navigator utility."""
+        super().__init__(config)
+        self.navigator = FlightResponseNavigator()
 
     async def __aenter__(self):
         """Async context manager entry."""
@@ -148,7 +154,41 @@ class FlightBookingService(FlightService):
             # Build the request payload first (this will enhance the flight_price_response)
             logger.info(f"[DEBUG] About to call _build_booking_payload (ReqID: {request_id})")
             print(f"[PRINT DEBUG] About to call _build_booking_payload (ReqID: {request_id})")
-            payload = self._build_booking_payload(
+
+            # NEW: Check if ancillary pricing is needed before building payload
+            temp_pricing_info = None
+            temp_ancillary_response = None
+
+            if servicelist_response and seatavailability_response:
+                from scripts.build_flightprice_ancillary_rq import detect_pricing_required
+
+                temp_pricing_info = detect_pricing_required(
+                    servicelist_response=servicelist_response,
+                    seatavailability_response=seatavailability_response,
+                    selected_services=selected_services,
+                    selected_seats=selected_seats
+                )
+
+                # If pricing is required, call ancillary pricing API
+                if temp_pricing_info and temp_pricing_info.get('requires_pricing', False):
+                    try:
+                        logger.info(f"[DEBUG] Ancillary pricing required, calling API (ReqID: {request_id})")
+                        temp_ancillary_response = await self._call_ancillary_pricing_api(
+                            flight_price_response=flight_price_response,
+                            servicelist_response=servicelist_response,
+                            seatavailability_response=seatavailability_response,
+                            selected_services=selected_services,
+                            selected_seats=selected_seats,
+                            pricing_info=temp_pricing_info,
+                            request_id=request_id
+                        )
+                        logger.info(f"[DEBUG] Ancillary pricing API call completed successfully (ReqID: {request_id})")
+                    except Exception as e:
+                        logger.error(f"[DEBUG] Ancillary pricing API call failed: {e} (ReqID: {request_id})")
+                        logger.error(f"[DEBUG] Falling back to original flight_price_response (ReqID: {request_id})")
+                        temp_ancillary_response = None
+
+            payload = await self._build_booking_payload(
                 flight_price_response=flight_price_response,
                 passengers=passengers,
                 payment_info=payment_info,
@@ -162,8 +202,8 @@ class FlightBookingService(FlightService):
                 selected_seats=selected_seats,
                 seat_availability_cache_key=seat_availability_cache_key,  # 🚀 Pass cache keys
                 service_list_cache_key=service_list_cache_key,  # 🚀 Pass cache keys
-                pricing_info=pricing_info,  # NEW: Pass pricing requirements info
-                ancillary_pricing_response=ancillary_pricing_response  # NEW: Pass pricing response
+                pricing_info=temp_pricing_info,  # NEW: Pass pricing requirements info
+                ancillary_pricing_response=temp_ancillary_response  # NEW: Pass pricing response
             )
             logger.info(f"[DEBUG] Finished calling _build_booking_payload (ReqID: {request_id})")
             print(f"[PRINT DEBUG] Finished calling _build_booking_payload (ReqID: {request_id})")
@@ -229,100 +269,12 @@ class FlightBookingService(FlightService):
                 logger.info(f"Found airline code '{owner}' in OrderCreate payload ShoppingResponse.Owner")
                 return owner
             
-            # For multi-airline responses, extract from flight price response structure
-            if self._is_multi_airline_flight_price_response(original_flight_price_response):
-                return self._extract_airline_from_multi_airline_price_response(original_flight_price_response)
-
-            # Fallback to the original extraction method
-            return self._extract_airline_code_from_price_response(original_flight_price_response)
+            # Fallback: Use consolidated navigator utility
+            return self.navigator.extract_airline_code(original_flight_price_response)
 
         except Exception as e:
             logger.error(f"Error extracting airline code from enhanced payload: {str(e)}", exc_info=True)
             return 'UNKNOWN'
-
-    def _is_multi_airline_flight_price_response(self, flight_price_response: Dict[str, Any]) -> bool:
-        """
-        Check if the flight price response is from a multi-airline context.
-
-        Args:
-            flight_price_response: The FlightPrice response
-
-        Returns:
-            bool: True if multi-airline response, False otherwise
-        """
-        try:
-            # Check for multiple airline codes in ShoppingResponseID
-            shopping_response_id = flight_price_response.get('ShoppingResponseID', {})
-            if isinstance(shopping_response_id, dict):
-                response_id_value = shopping_response_id.get('ResponseID', {}).get('value', '')
-                # Multi-airline shopping response IDs typically end with airline code
-                if '-' in response_id_value and len(response_id_value.split('-')[-1]) <= 3:
-                    return True
-
-            # Check for airline-prefixed references in DataLists
-            data_lists = flight_price_response.get('DataLists', {})
-            travelers = data_lists.get('AnonymousTravelerList', {}).get('AnonymousTraveler', [])
-            if not isinstance(travelers, list):
-                travelers = [travelers] if travelers else []
-
-            for traveler in travelers:
-                object_key = traveler.get('ObjectKey', '')
-                # Look for airline-prefixed keys like "KL-PAX1", "QR-PAX1"
-                if '-' in object_key and len(object_key.split('-')[0]) <= 3:
-                    return True
-
-            return False
-
-        except Exception as e:
-            logger.error(f"Error detecting multi-airline flight price response: {e}")
-            return False
-
-    def _extract_airline_from_multi_airline_price_response(self, flight_price_response: Dict[str, Any]) -> Optional[str]:
-        """
-        Extract airline code from multi-airline flight price response.
-
-        Args:
-            flight_price_response: The FlightPrice response
-
-        Returns:
-            str: The airline code or None if not found
-        """
-        try:
-            # Method 1: Extract from ShoppingResponseID
-            shopping_response_id = flight_price_response.get('ShoppingResponseID', {})
-            if isinstance(shopping_response_id, dict):
-                owner = shopping_response_id.get('Owner')
-                if owner:
-                    logger.info(f"Extracted airline code '{owner}' from multi-airline FlightPrice ShoppingResponseID.Owner")
-                    return owner
-
-                # Try to extract from ResponseID value (format: base-id-AIRLINE)
-                response_id_value = shopping_response_id.get('ResponseID', {}).get('value', '')
-                if '-' in response_id_value:
-                    airline_code = response_id_value.split('-')[-1]
-                    if len(airline_code) <= 3:  # Valid airline code length
-                        logger.info(f"Extracted airline code '{airline_code}' from multi-airline FlightPrice ResponseID")
-                        return airline_code
-
-            # Method 2: Extract from PricedFlightOffers
-            priced_offers = flight_price_response.get('PricedFlightOffers', {}).get('PricedFlightOffer', [])
-            if not isinstance(priced_offers, list):
-                priced_offers = [priced_offers] if priced_offers else []
-
-            if priced_offers:
-                first_offer = priced_offers[0]
-                offer_id = first_offer.get('OfferID', {})
-                owner = offer_id.get('Owner')
-                if owner:
-                    logger.info(f"Extracted airline code '{owner}' from multi-airline FlightPrice OfferID.Owner")
-                    return owner
-
-            logger.warning("Could not extract airline code from multi-airline flight price response")
-            return None
-
-        except Exception as e:
-            logger.error(f"Error extracting airline from multi-airline price response: {e}")
-            return None
 
     def _extract_airline_code_from_price_response(self, flight_price_response: Dict[str, Any]) -> Optional[str]:
         """
@@ -648,7 +600,7 @@ class FlightBookingService(FlightService):
         if len(country_code) != 2 or not country_code.isalpha():
             raise ValidationError("Valid country code is required (2-letter ISO format)")
     
-    def _build_booking_payload(
+    async def _build_booking_payload(
         self,
         flight_price_response: Dict[str, Any],
         passengers: List[Dict[str, Any]],
@@ -1153,19 +1105,13 @@ class FlightBookingService(FlightService):
             # FIXED: Enhance flight_price_response with extracted IDs if available
             # (enhanced_flight_price_response was already initialized at the beginning of the function)
 
-            # FIXED: Always try to extract ShoppingResponseID from the response structure
+            # Use navigator utility for ShoppingResponseID extraction
             if not shopping_response_id:
-                # Try to extract ShoppingResponseID from the nested response structure
-                if 'response' in enhanced_flight_price_response and 'raw_response' in enhanced_flight_price_response['response']:
-                    raw_response = enhanced_flight_price_response['response']['raw_response']
-                    if 'ShoppingResponseID' in raw_response:
-                        shopping_response_id = raw_response['ShoppingResponseID'].get('ResponseID', {}).get('value')
-                        logger.info(f"[DEBUG] Extracted ShoppingResponseID from raw_response: {shopping_response_id} (ReqID: {request_id})")
-                elif 'response' in enhanced_flight_price_response and 'data' in enhanced_flight_price_response['response']:
-                    data_response = enhanced_flight_price_response['response']['data']
-                    if 'ShoppingResponseID' in data_response:
-                        shopping_response_id = data_response['ShoppingResponseID'].get('ResponseID', {}).get('value')
-                        logger.info(f"[DEBUG] Extracted ShoppingResponseID from data: {shopping_response_id} (ReqID: {request_id})")
+                shopping_response_id = self.navigator.extract_id(
+                    enhanced_flight_price_response,
+                    'ShoppingResponseID',
+                    request_id
+                )
 
             # If we have extracted IDs from frontend or response, inject them into the response structure
             # to ensure build_ordercreate_rq can find them reliably
@@ -1212,7 +1158,7 @@ class FlightBookingService(FlightService):
             logger.info(f"[DEBUG] Enhanced flight price response top-level keys (ReqID: {request_id}): {list(enhanced_flight_price_response.keys())}")
             logger.info(f"[DEBUG] ShoppingResponseID in enhanced response (ReqID: {request_id}): {enhanced_flight_price_response.get('ShoppingResponseID')}")
             if 'PricedFlightOffers' in enhanced_flight_price_response:
-                priced_offers = enhanced_flight_price_response['PricedFlightOffers'].get('PricedFlightOffer', [])
+                priced_offers = self.navigator.get_priced_flight_offers(enhanced_flight_price_response)
                 if priced_offers and len(priced_offers) > 0:
                     logger.info(f"[DEBUG] First PricedFlightOffer OfferID (ReqID: {request_id}): {priced_offers[0].get('OfferID')}")
 
@@ -1357,13 +1303,37 @@ class FlightBookingService(FlightService):
             logger.info(f"[DEBUG] - selected_seats (converted to pricing ObjectKeys): {selected_seats}")
 
             # NEW: Check if enhanced OrderCreate builder should be used
-            if pricing_info and pricing_info.get('requires_pricing', False) and ancillary_pricing_response:
+            # First, detect if any items require additional pricing
+            from scripts.build_flightprice_ancillary_rq import detect_pricing_required
+
+            # Initialize ancillary_pricing_response (it may be None if no additional pricing is needed)
+            ancillary_pricing_response = None
+
+            pricing_info = detect_pricing_required(
+                servicelist_response=servicelist_response,
+                seatavailability_response=seatavailability_response,
+                selected_services=selected_services,
+                selected_seats=selected_seats
+            )
+
+            if pricing_info and pricing_info.get('requires_pricing', False):
                 logger.info(f"[DEBUG] ===== USING ENHANCED ORDERCREATE BUILDER (PricedInd=false) =====")
                 logger.info(f"[DEBUG] Pricing info: {pricing_info}")
-                
+
+                # NEW: Call ancillary pricing API when pricing is required
+                ancillary_pricing_response = await self._call_ancillary_pricing_api(
+                    flight_price_response=actual_flight_price_response,
+                    servicelist_response=servicelist_response,
+                    seatavailability_response=seatavailability_response,
+                    selected_services=selected_services,
+                    selected_seats=selected_seats,
+                    pricing_info=pricing_info,
+                    request_id=request_id
+                )
+
                 # Use enhanced OrderCreate builder for PricedInd=false scenario
                 from scripts.build_ordercreate_enhanced_rq import build_ordercreate_enhanced_request
-                
+
                 payload = build_ordercreate_enhanced_request(
                     flight_price_response=actual_flight_price_response,  # FIXED: Use actual response with segment key mapping
                     passengers_data=transformed_passengers,
@@ -1372,7 +1342,7 @@ class FlightBookingService(FlightService):
                     seatavailability_response=seatavailability_response,
                     selected_services=selected_services,
                     selected_seats=selected_seats,
-                    ancillary_pricing_response=ancillary_pricing_response
+                    ancillary_pricing_response=ancillary_pricing_response  # NEW: Pass actual pricing response
                 )
                 logger.info(f"[DEBUG] ===== ENHANCED ORDERCREATE BUILDER COMPLETED SUCCESSFULLY =====")
             else:
@@ -1405,12 +1375,12 @@ class FlightBookingService(FlightService):
             logger.error(f"Request builder traceback: {traceback.format_exc()}")
             logger.error(f"[DEBUG] ===== FALLING BACK TO MANUAL CONSTRUCTION =====")
             # Fallback to manual construction with extracted IDs
-            return self._build_fallback_payload(
+            return await self._build_fallback_payload(
                 flight_price_response, passengers, payment_info, contact_info, request_id,
                 offer_id, shopping_response_id
             )
     
-    def _build_fallback_payload(
+    async def _build_fallback_payload(
         self,
         flight_price_response: Dict[str, Any],
         passengers: List[Dict[str, Any]],
@@ -1444,209 +1414,26 @@ class FlightBookingService(FlightService):
         logger.info(f"[DEBUG] Fallback payload - Using extracted shopping_response_id: {extracted_shopping_response_id}")
         logger.info(f"[DEBUG] Fallback payload - Using extracted offer_id: {extracted_offer_id}")
 
-        # Only try to extract IDs from response if we don't already have them
+        # Use navigator utility for ShoppingResponseID extraction
         if not extracted_shopping_response_id:
-            # First try the deep frontend nested structure: data.raw_response.data.raw_response
-            if ('data' in flight_price_response and
-                'raw_response' in flight_price_response['data'] and
-                'data' in flight_price_response['data']['raw_response'] and
-                'raw_response' in flight_price_response['data']['raw_response']['data']):
-                raw_response = flight_price_response['data']['raw_response']['data']['raw_response']
-                logger.info(f"[DEBUG] Found data.raw_response.data.raw_response structure, keys: {list(raw_response.keys())}")
-
-                # Try direct ShoppingResponseID in deep raw_response
-                if 'ShoppingResponseID' in raw_response:
-                    shopping_response_id_node = raw_response['ShoppingResponseID']
-                    if isinstance(shopping_response_id_node, dict) and 'ResponseID' in shopping_response_id_node:
-                        extracted_shopping_response_id = shopping_response_id_node['ResponseID'].get('value')
-                    else:
-                        extracted_shopping_response_id = shopping_response_id_node
-                    logger.info(f"[DEBUG] Found ShoppingResponseID in data.raw_response.data.raw_response: {extracted_shopping_response_id}")
-
-            # Second try the frontend nested structure: data.raw_response
-            elif 'data' in flight_price_response and 'raw_response' in flight_price_response['data']:
-                raw_response = flight_price_response['data']['raw_response']
-                logger.info(f"[DEBUG] Found data.raw_response structure, keys: {list(raw_response.keys())}")
-
-                # Try direct ShoppingResponseID in raw_response
-                if 'ShoppingResponseID' in raw_response:
-                    shopping_response_id_node = raw_response['ShoppingResponseID']
-                    if isinstance(shopping_response_id_node, dict) and 'ResponseID' in shopping_response_id_node:
-                        extracted_shopping_response_id = shopping_response_id_node['ResponseID'].get('value')
-                    else:
-                        extracted_shopping_response_id = shopping_response_id_node
-                    logger.info(f"[DEBUG] Found ShoppingResponseID in data.raw_response: {extracted_shopping_response_id}")
+            extracted_shopping_response_id = self.navigator.extract_id(
+                flight_price_response,
+                'ShoppingResponseID',
+                request_id
+            )
         
-        # Third try: check if raw_response is at top level
-        if not extracted_shopping_response_id and 'raw_response' in flight_price_response:
-            raw_response = flight_price_response['raw_response']
-            logger.info(f"[DEBUG] Found top-level raw_response structure, keys: {list(raw_response.keys())}")
-
-            if 'ShoppingResponseID' in raw_response:
-                shopping_response_id_node = raw_response['ShoppingResponseID']
-                if isinstance(shopping_response_id_node, dict) and 'ResponseID' in shopping_response_id_node:
-                    extracted_shopping_response_id = shopping_response_id_node['ResponseID'].get('value')
-                else:
-                    extracted_shopping_response_id = shopping_response_id_node
-                logger.info(f"[DEBUG] Found ShoppingResponseID in raw_response: {extracted_shopping_response_id}")
-
-        # Fourth try: direct fields sent from frontend
-        if not extracted_shopping_response_id and 'ShoppingResponseID' in flight_price_response:
-            extracted_shopping_response_id = flight_price_response['ShoppingResponseID']
-            logger.info(f"[DEBUG] Found ShoppingResponseID in direct field: {extracted_shopping_response_id}")
-
-        # Fifth try: nested FlightPriceRS structure
-        if not extracted_shopping_response_id:
-            shopping_response_id_node = flight_price_response.get('FlightPriceRS', {}).get('ShoppingResponseID', {})
-            extracted_shopping_response_id = shopping_response_id_node.get('ResponseID', {}).get('value')
-            if extracted_shopping_response_id:
-                logger.info(f"[DEBUG] Found ShoppingResponseID in FlightPriceRS structure: {extracted_shopping_response_id}")
-        
-        # Extract OfferID if not provided - check multiple possible paths
+        # Use navigator utility for OfferID extraction
         if not extracted_offer_id:
-            # First try the deep frontend nested structure: data.raw_response.data.raw_response
-            if ('data' in flight_price_response and
-                'raw_response' in flight_price_response['data'] and
-                'data' in flight_price_response['data']['raw_response'] and
-                'raw_response' in flight_price_response['data']['raw_response']['data']):
-                raw_response = flight_price_response['data']['raw_response']['data']['raw_response']
-
-                # Try PricedFlightOffers in deep raw_response
-                priced_offers = raw_response.get('PricedFlightOffers', {}).get('PricedFlightOffer', [])
-                if priced_offers and isinstance(priced_offers, list) and len(priced_offers) > 0:
-                    offer_id_node = priced_offers[0].get('OfferID', {})
-                    if isinstance(offer_id_node, dict) and 'value' in offer_id_node:
-                        extracted_offer_id = offer_id_node['value']
-                    else:
-                        extracted_offer_id = offer_id_node
-                    logger.info(f"[DEBUG] Found OfferID in data.raw_response.data.raw_response.PricedFlightOffers: {extracted_offer_id}")
-
-            # Second try the frontend nested structure: data.raw_response
-            elif 'data' in flight_price_response and 'raw_response' in flight_price_response['data']:
-                raw_response = flight_price_response['data']['raw_response']
-
-                # Try PricedFlightOffers in raw_response
-                priced_offers = raw_response.get('PricedFlightOffers', {}).get('PricedFlightOffer', [])
-                if priced_offers and isinstance(priced_offers, list) and len(priced_offers) > 0:
-                    offer_id_node = priced_offers[0].get('OfferID', {})
-                    if isinstance(offer_id_node, dict) and 'value' in offer_id_node:
-                        extracted_offer_id = offer_id_node['value']
-                    else:
-                        extracted_offer_id = offer_id_node
-                    logger.info(f"[DEBUG] Found OfferID in data.raw_response.PricedFlightOffers: {extracted_offer_id}")
-
-            # Third try: check if raw_response is at top level
-            if not extracted_offer_id and 'raw_response' in flight_price_response:
-                raw_response = flight_price_response['raw_response']
-
-                priced_offers = raw_response.get('PricedFlightOffers', {}).get('PricedFlightOffer', [])
-                if priced_offers and isinstance(priced_offers, list) and len(priced_offers) > 0:
-                    offer_id_node = priced_offers[0].get('OfferID', {})
-                    if isinstance(offer_id_node, dict) and 'value' in offer_id_node:
-                        extracted_offer_id = offer_id_node['value']
-                    else:
-                        extracted_offer_id = offer_id_node
-                    logger.info(f"[DEBUG] Found OfferID in raw_response.PricedFlightOffers: {extracted_offer_id}")
-
-            # Fourth try: direct field sent from frontend
-            if not extracted_offer_id and 'OfferID' in flight_price_response:
-                extracted_offer_id = flight_price_response['OfferID']
-                logger.info(f"[DEBUG] Found OfferID in direct field: {extracted_offer_id}")
-
-            # Fifth try: nested PricedFlightOffers structure
-            if not extracted_offer_id:
-                priced_offers = flight_price_response.get('FlightPriceRS', {}).get('PricedFlightOffers', {}).get('PricedFlightOffer', [])
-                if priced_offers and isinstance(priced_offers, list) and len(priced_offers) > 0:
-                    extracted_offer_id = priced_offers[0].get('OfferID', {}).get('value')
-                    if extracted_offer_id:
-                        logger.info(f"[DEBUG] Found OfferID in PricedFlightOffers structure: {extracted_offer_id}")
+            extracted_offer_id = self.navigator.extract_offer_id_from_priced_offers(
+                flight_price_response,
+                request_id
+            )
         
-        # Extract OfferItemIDs from the raw flight price response using multiple methods
-        offer_item_ids = []
-
-        def extract_offer_item_ids_from_structure(data, path=""):
-            """Extract OfferItemIDs from a PricedFlightOffers structure."""
-            local_offer_item_ids = []
-            try:
-                priced_offers = data.get('PricedFlightOffers', {}).get('PricedFlightOffer', [])
-                if priced_offers and isinstance(priced_offers, list) and len(priced_offers) > 0:
-                    offer_prices = priced_offers[0].get('OfferPrice', [])
-                    if not isinstance(offer_prices, list):
-                        offer_prices = [offer_prices] if offer_prices else []
-
-                    for offer_price in offer_prices:
-                        offer_item_id = offer_price.get('OfferItemID')
-                        if offer_item_id:
-                            local_offer_item_ids.append(offer_item_id)
-
-                    if local_offer_item_ids:
-                        logger.info(f"[DEBUG] Found OfferItemIDs at {path}: {local_offer_item_ids}")
-            except Exception as e:
-                logger.warning(f"[DEBUG] Error extracting OfferItemIDs from {path}: {e}")
-
-            return local_offer_item_ids
-
-        # Method 1: Direct PricedFlightOffers at top level
-        offer_item_ids = extract_offer_item_ids_from_structure(flight_price_response, "top-level")
-
-        # Method 2: Try nested data.raw_response structure
-        if not offer_item_ids and 'data' in flight_price_response:
-            data_section = flight_price_response['data']
-            if 'raw_response' in data_section:
-                raw_response = data_section['raw_response']
-                offer_item_ids = extract_offer_item_ids_from_structure(raw_response, "data.raw_response")
-
-        # Method 3: Try FlightPriceRS structure (this is likely where it is based on OfferID success)
-        if not offer_item_ids:
-            # Try at top level
-            flight_price_rs = flight_price_response.get('FlightPriceRS', {})
-            if flight_price_rs:
-                offer_item_ids = extract_offer_item_ids_from_structure(flight_price_rs, "FlightPriceRS")
-
-            # Try in nested data.raw_response.FlightPriceRS
-            if not offer_item_ids and 'data' in flight_price_response:
-                data_section = flight_price_response['data']
-                if 'raw_response' in data_section:
-                    raw_response = data_section['raw_response']
-                    flight_price_rs = raw_response.get('FlightPriceRS', {})
-                    if flight_price_rs:
-                        offer_item_ids = extract_offer_item_ids_from_structure(flight_price_rs, "data.raw_response.FlightPriceRS")
-
-        # Method 4: Recursive search for any OfferPrice structure
-        if not offer_item_ids:
-            def find_offer_item_ids_recursive(obj, path=""):
-                local_ids = []
-                if isinstance(obj, dict):
-                    # Look for OfferPrice directly
-                    if 'OfferPrice' in obj:
-                        offer_prices = obj['OfferPrice']
-                        if not isinstance(offer_prices, list):
-                            offer_prices = [offer_prices] if offer_prices else []
-
-                        for offer_price in offer_prices:
-                            if isinstance(offer_price, dict) and 'OfferItemID' in offer_price:
-                                local_ids.append(offer_price['OfferItemID'])
-
-                        if local_ids:
-                            logger.info(f"[DEBUG] Found OfferItemIDs recursively at {path}.OfferPrice: {local_ids}")
-                            return local_ids
-
-                    # Recurse into nested objects
-                    for key, value in obj.items():
-                        result = find_offer_item_ids_recursive(value, f"{path}.{key}" if path else key)
-                        if result:
-                            return result
-                elif isinstance(obj, list):
-                    for i, item in enumerate(obj):
-                        result = find_offer_item_ids_recursive(item, f"{path}[{i}]")
-                        if result:
-                            return result
-
-                return []
-
-            offer_item_ids = find_offer_item_ids_recursive(flight_price_response)
-
-        logger.info(f"[DEBUG] Final extracted OfferItemIDs: {offer_item_ids}")
+        # Use navigator utility for OfferItemIDs extraction
+        offer_item_ids = self.navigator.extract_offer_item_ids(
+            flight_price_response,
+            request_id
+        )
 
         # Log final extracted values
         # logger.info(f"[DEBUG] Final extracted ShoppingResponseID: {extracted_shopping_response_id}")
@@ -2441,6 +2228,91 @@ class FlightBookingService(FlightService):
                 })
         
         return processed
+
+
+    async def _call_ancillary_pricing_api(
+        self,
+        flight_price_response: Dict[str, Any],
+        servicelist_response: Optional[Dict[str, Any]],
+        seatavailability_response: Optional[Dict[str, Any]],
+        selected_services: Optional[List[str]],
+        selected_seats: Optional[List[str]],
+        pricing_info: Dict[str, Any],
+        request_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Call the ancillary pricing API to get priced data for PricedInd=false items.
+
+        Args:
+            flight_price_response: Original FlightPrice response
+            servicelist_response: ServiceList response data
+            seatavailability_response: SeatAvailability response data
+            selected_services: List of selected service ObjectKeys
+            selected_seats: List of selected seat ObjectKeys
+            pricing_info: Pricing requirements information
+            request_id: Request ID for tracking
+
+        Returns:
+            Ancillary pricing response or None if failed
+        """
+        try:
+            logger.info(f"[DEBUG] Calling ancillary pricing API (ReqID: {request_id})")
+
+            # Build the request payload for the ancillary pricing API
+            pricing_payload = {
+                'flight_price_response': flight_price_response,
+                'servicelist_response': servicelist_response,
+                'seatavailability_response': seatavailability_response,
+                'selected_services': selected_services or [],
+                'selected_seats': selected_seats or [],
+                'selected_offer_index': 0
+            }
+
+            # Get auth token
+            token_manager = self._token_manager
+            bearer_token = token_manager.get_token()
+
+            # Get current app config
+            config = self.config if hasattr(self, 'config') else {}
+
+            # Create headers
+            headers = {
+                'Content-Type': 'application/json',
+                'Accept': '*/*',
+                'Authorization': bearer_token,
+                'OfficeId': config.get('VERTEIL_OFFICE_ID', ''),
+                'service': 'FlightPrice',
+                'User-Agent': 'PostmanRuntime/7.41',
+                'Cache-Control': 'no-cache',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Connection': 'keep-alive'
+            }
+
+            # Make API call to our own ancillary pricing endpoint
+            api_url = f"{config.get('API_BASE_URL', 'http://localhost:5000')}/api/verteil/pricing/price-ancillaries"
+
+            import aiohttp
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    api_url,
+                    headers=headers,
+                    json=pricing_payload,
+                    timeout=30
+                ) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        if result.get('status') == 'success':
+                            logger.info(f"[DEBUG] Ancillary pricing API call successful (ReqID: {request_id})")
+                            return result.get('data')
+                        else:
+                            logger.error(f"[DEBUG] Ancillary pricing API returned error: {result} (ReqID: {request_id})")
+                    else:
+                        logger.error(f"[DEBUG] Ancillary pricing API HTTP error: {response.status} (ReqID: {request_id})")
+
+        except Exception as e:
+            logger.error(f"[DEBUG] Exception calling ancillary pricing API: {e} (ReqID: {request_id})")
+
+        return None
 
 
 # Helper functions for backward compatibility

@@ -1,13 +1,13 @@
 {
-  "timestamp": "2025-09-27T12:26:09.351826",
+  "timestamp": "2025-10-17T21:16:26.202995",
   "service": "OrderCreate",
-  "request_id": "f8933c11-9abc-40b0-92f7-9a53e83ff659",
+  "request_id": "9cdf12fe-31e7-4236-b73d-d1de3c5796bf",
   "endpoint": "/entrygate/rest/request:orderCreate",
   "headers": {
     "Content-Type": "application/json",
     "Accept": "*/*",
-    "Authorization": "Bearer ***k416yncA",
-    "OfficeId": "***F301",
+    "Authorization": "Bearer ***JfR56jBg",
+    "OfficeId": "***3746",
     "service": "OrderCreate",
     "User-Agent": "PostmanRuntime/7.41",
     "Cache-Control": "no-cache",
@@ -43,7 +43,7 @@
             },
             "Age": {
               "BirthDate": {
-                "value": "2003-08-09"
+                "value": "2000-09-07"
               }
             },
             "Contacts": {
@@ -51,9 +51,9 @@
                 {
                   "AddressContact": {
                     "Street": [
-                      "190"
+                      "KIMATHI STREET"
                     ],
-                    "CityName": "LODWAR",
+                    "CityName": "NAIROBI",
                     "CountrySubDivisionCode": "",
                     "PostalCode": "30500",
                     "CountryCode": {
@@ -62,14 +62,14 @@
                   },
                   "EmailContact": {
                     "Address": {
-                      "value": "kevinamoni20@gmail.com"
+                      "value": "bkev4025@gmail.com"
                     }
                   },
                   "PhoneContact": {
                     "Application": "Home",
                     "Number": [
                       {
-                        "value": "0796861525",
+                        "value": "796861525",
                         "CountryCode": "+254"
                       }
                     ]
@@ -81,8 +81,8 @@
               "PassengerDocument": [
                 {
                   "Type": "PT",
-                  "ID": "Q032893N",
-                  "DateOfExpiration": "2037-07-05",
+                  "ID": "101238478",
+                  "DateOfExpiration": "2033-09-10",
                   "CountryOfIssuance": "KE"
                 }
               ]
@@ -92,25 +92,25 @@
       },
       "OrderItems": {
         "ShoppingResponse": {
-          "Owner": "KQ",
+          "Owner": "AF",
           "ResponseID": {
-            "value": "RQ295nCRfbrvzRjC8m6QKnLLJegueo3Nuh9xeqvacr0-KQ"
+            "value": "tz-s9tozhn8KCauIlsOhm4dhNa5LF7sNsGxATQtLyJo-AF"
           },
           "Offers": {
             "Offer": [
               {
                 "OfferID": {
-                  "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2",
-                  "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2",
-                  "Owner": "KQ",
+                  "ObjectKey": "ef49d126-b797-4712-89d1-26b797370001",
+                  "value": "ef49d126-b797-4712-89d1-26b797370001",
+                  "Owner": "AF",
                   "Channel": "NDC"
                 },
                 "OfferItems": {
                   "OfferItem": [
                     {
                       "OfferItemID": {
-                        "Owner": "KQ",
-                        "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-1-1",
+                        "Owner": "AF",
+                        "value": "d47274a9-3f9f-4a99-b274-a93f9fba9906",
                         "Channel": "NDC"
                       }
                     }
@@ -123,8 +123,8 @@
         "OfferItem": [
           {
             "OfferItemID": {
-              "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-1-1",
-              "Owner": "KQ",
+              "value": "d47274a9-3f9f-4a99-b274-a93f9fba9906",
+              "Owner": "AF",
               "Channel": "NDC"
             },
             "OfferItemType": {
@@ -132,13 +132,13 @@
                 {
                   "Price": {
                     "BaseAmount": {
-                      "value": 146365,
-                      "Code": "KES"
+                      "value": 7490.0,
+                      "Code": "INR"
                     },
                     "Taxes": {
                       "Total": {
-                        "value": 48980,
-                        "Code": "KES"
+                        "value": 4466.0,
+                        "Code": "INR"
                       }
                     }
                   },
@@ -148,113 +148,54 @@
                         {
                           "Departure": {
                             "AirportCode": {
-                              "value": "LHR"
+                              "value": "CDG"
                             },
-                            "Date": "2025-10-03",
-                            "Time": "19:45",
+                            "Date": "2025-10-23",
+                            "Time": "07:40",
                             "Terminal": {
-                              "Name": "4"
+                              "Name": "2G"
                             }
                           },
                           "Arrival": {
                             "AirportCode": {
-                              "value": "CDG"
+                              "value": "FRA"
                             },
-                            "Date": "2025-10-03",
-                            "Time": "22:00",
+                            "Date": "2025-10-23",
+                            "Time": "09:00",
                             "Terminal": {
-                              "Name": "2E"
+                              "Name": "2"
                             }
                           },
                           "ClassOfService": {
                             "Code": {
-                              "value": "U"
+                              "value": "N"
                             },
                             "MarketingName": {
-                              "value": "ECO",
+                              "value": "ECONOMY",
                               "CabinDesignator": "Y"
                             },
                             "refs": [
-                              "FG-58909065483531"
+                              "FG-SEG1"
                             ]
                           },
                           "MarketingCarrier": {
                             "AirlineID": {
-                              "value": "KQ"
+                              "value": "AF"
                             },
-                            "Name": "Kenya Airways",
                             "FlightNumber": {
-                              "value": "3079"
+                              "value": "1518"
                             }
                           },
                           "Equipment": {
                             "AircraftCode": {
-                              "value": "223"
+                              "value": "E70"
                             }
                           },
-                          "Details": {
-                            "FlightDuration": {
-                              "Value": "PT1H15M"
-                            }
-                          },
-                          "SegmentKey": "SEG5"
-                        },
-                        {
-                          "Departure": {
-                            "AirportCode": {
-                              "value": "CDG"
-                            },
-                            "Date": "2025-10-04",
-                            "Time": "10:45",
-                            "Terminal": {
-                              "Name": "2E"
-                            }
-                          },
-                          "Arrival": {
-                            "AirportCode": {
-                              "value": "NBO"
-                            },
-                            "Date": "2025-10-04",
-                            "Time": "20:10",
-                            "Terminal": {
-                              "Name": "1A"
-                            }
-                          },
-                          "ClassOfService": {
-                            "Code": {
-                              "value": "U"
-                            },
-                            "MarketingName": {
-                              "value": "ECO",
-                              "CabinDesignator": "Y"
-                            },
-                            "refs": [
-                              "FG-58909065483531"
-                            ]
-                          },
-                          "MarketingCarrier": {
-                            "AirlineID": {
-                              "value": "KQ"
-                            },
-                            "Name": "Kenya Airways",
-                            "FlightNumber": {
-                              "value": "113"
-                            }
-                          },
-                          "Equipment": {
-                            "AircraftCode": {
-                              "value": "788"
-                            }
-                          },
-                          "Details": {
-                            "FlightDuration": {
-                              "Value": "PT8H25M"
-                            }
-                          },
-                          "SegmentKey": "SEG6"
+                          "Details": null,
+                          "SegmentKey": "SEG1"
                         }
                       ],
-                      "OriginDestinationKey": "LHRNBO"
+                      "OriginDestinationKey": "OD1"
                     }
                   ],
                   "refs": [
@@ -265,23 +206,12 @@
                       {
                         "FareBasis": {
                           "FareBasisCode": {
-                            "Code": "ULSFWGB"
+                            "Code": "NYS5BALA"
                           },
-                          "RBD": "U"
+                          "RBD": "N"
                         },
                         "refs": [
-                          "SEG5"
-                        ]
-                      },
-                      {
-                        "FareBasis": {
-                          "FareBasisCode": {
-                            "Code": "ULSFWGB"
-                          },
-                          "RBD": "U"
-                        },
-                        "refs": [
-                          "SEG6"
+                          "SEG1"
                         ]
                       }
                     ]
@@ -292,11 +222,11 @@
           },
           {
             "OfferItemID": {
-              "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-2",
-              "Owner": "KQ",
+              "value": "cc550c32-83d8-4a4d-950c-3283d8ca0002",
+              "Owner": "AF",
               "refs": [
-                "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2",
-                "RQ295nCRfbrvzRjC8m6QKnLLJegueo3Nuh9xeqvacr0-KQ"
+                "ef49d126-b797-4712-89d1-26b797370001",
+                "tz-s9tozhn8KCauIlsOhm4dhNa5LF7sNsGxATQtLyJo-AF"
               ],
               "Channel": "NDC"
             },
@@ -305,12 +235,12 @@
                 {
                   "refs": [
                     "PAX1",
-                    "1-ServiceIdKQ-1"
+                    "1-ServiceIdAF-2"
                   ],
                   "Price": {
                     "SimpleCurrencyPrice": {
-                      "value": 26685,
-                      "Code": "KES"
+                      "value": 4102.0,
+                      "Code": "INR"
                     }
                   }
                 }
@@ -319,11 +249,11 @@
           },
           {
             "OfferItemID": {
-              "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-68",
-              "Owner": "KQ",
+              "value": "cc550c32-83d8-4a4d-950c-3283d8ca000f",
+              "Owner": "AF",
               "refs": [
-                "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2",
-                "RQ295nCRfbrvzRjC8m6QKnLLJegueo3Nuh9xeqvacr0-KQ"
+                "ef49d126-b797-4712-89d1-26b797370001",
+                "tz-s9tozhn8KCauIlsOhm4dhNa5LF7sNsGxATQtLyJo-AF"
               ],
               "Channel": "NDC"
             },
@@ -332,12 +262,12 @@
                 {
                   "refs": [
                     "PAX1",
-                    "1-ServiceIdKQ-11"
+                    "1-ServiceIdAF-15"
                   ],
                   "Price": {
                     "SimpleCurrencyPrice": {
-                      "value": 0,
-                      "Code": "KES"
+                      "value": 0.0,
+                      "Code": "INR"
                     }
                   }
                 }
@@ -346,11 +276,11 @@
           },
           {
             "OfferItemID": {
-              "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-206",
-              "Owner": "KQ",
+              "value": "cc550c32-83d8-4a4d-950c-3283d8ca0011",
+              "Owner": "AF",
               "refs": [
-                "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2",
-                "RQ295nCRfbrvzRjC8m6QKnLLJegueo3Nuh9xeqvacr0-KQ"
+                "ef49d126-b797-4712-89d1-26b797370001",
+                "tz-s9tozhn8KCauIlsOhm4dhNa5LF7sNsGxATQtLyJo-AF"
               ],
               "Channel": "NDC"
             },
@@ -359,12 +289,12 @@
                 {
                   "refs": [
                     "PAX1",
-                    "1-ServiceIdKQ-147"
+                    "1-ServiceIdAF-17"
                   ],
                   "Price": {
                     "SimpleCurrencyPrice": {
-                      "value": 0,
-                      "Code": "KES"
+                      "value": 0.0,
+                      "Code": "INR"
                     }
                   }
                 }
@@ -373,11 +303,10 @@
           },
           {
             "OfferItemID": {
-              "value": "PRICE4-SEG6",
-              "Owner": null,
+              "value": "e0ee9182-5616-47e1-ae91-825616070020",
               "refs": [
-                "PRICE",
-                "RQ295nCRfbrvzRjC8m6QKnLLJegueo3Nuh9xeqvacr0-KQ"
+                "ef49d126-b797-4712-89d1-26b797370001",
+                "tz-s9tozhn8KCauIlsOhm4dhNa5LF7sNsGxATQtLyJo-AF"
               ],
               "Channel": "NDC"
             },
@@ -386,17 +315,60 @@
                 {
                   "Price": {
                     "Total": {
-                      "value": 0,
-                      "Code": "KES"
+                      "value": 771.0,
+                      "Code": "INR"
                     }
                   },
-                  "Descriptions": {},
-                  "Location": {},
+                  "Descriptions": {
+                    "Description": [
+                      {
+                        "Text": {
+                          "value": "STANDARD SEAT SELECTION"
+                        }
+                      }
+                    ]
+                  },
+                  "Location": {
+                    "Column": "A",
+                    "Row": {
+                      "Number": {
+                        "value": "11"
+                      }
+                    },
+                    "Characteristics": {
+                      "Characteristic": [
+                        {
+                          "Code": "AM"
+                        },
+                        {
+                          "Code": "CH"
+                        },
+                        {
+                          "Code": "LS"
+                        },
+                        {
+                          "Code": "OW"
+                        },
+                        {
+                          "Code": "W"
+                        },
+                        {
+                          "Remarks": {
+                            "Remark": [
+                              {
+                                "value": "A"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
                   "SeatAssociation": [
                     {
                       "SegmentReferences": {
                         "value": [
-                          "SEG6"
+                          "SEG1"
                         ]
                       },
                       "TravelerReference": "PAX1"
@@ -412,14 +384,14 @@
         "FareList": {
           "FareGroup": [
             {
-              "ListKey": "FG-58909065483531",
+              "ListKey": "FG-SEG1",
               "Fare": {
                 "FareCode": {
                   "Code": "70J"
                 }
               },
               "FareBasisCode": {
-                "Code": "ULSFWGB"
+                "Code": "NYS5BALA"
               }
             }
           ]
@@ -427,45 +399,20 @@
         "ServiceList": {
           "Service": [
             {
-              "ObjectKey": "1-ServiceIdKQ-1",
+              "ObjectKey": "1-ServiceIdAF-2",
               "ServiceID": {
-                "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-2",
-                "value": "SRV1",
-                "Owner": "KQ"
+                "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca0002",
+                "value": "SRV2",
+                "Owner": "AF"
               },
               "Name": {
-                "value": "BAG:FIRST BAG"
+                "value": "BAG:LUGGAGE-FIRST ADDITIONAL BAG"
               },
               "Descriptions": {
                 "Description": [
                   {
                     "Text": {
-                      "value": "FIRST BAG"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "Chargeable"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "F"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "01"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "BG"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "B1"
+                      "value": "1 ABAG x 23 KG"
                     }
                   }
                 ]
@@ -473,8 +420,8 @@
               "Price": [
                 {
                   "Total": {
-                    "value": 26685,
-                    "Code": "KES"
+                    "value": 4102.0,
+                    "Code": "INR"
                   }
                 }
               ],
@@ -497,8 +444,7 @@
                       {
                         "SegmentReferences": {
                           "value": [
-                            "SEG5",
-                            "SEG6"
+                            "SEG1"
                           ]
                         }
                       }
@@ -506,33 +452,23 @@
                   }
                 }
               ],
-              "PricedInd": true
+              "PricedInd": false
             },
             {
-              "ObjectKey": "1-ServiceIdKQ-11",
+              "ObjectKey": "1-ServiceIdAF-15",
               "ServiceID": {
-                "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-68",
-                "value": "SRV11",
-                "Owner": "KQ"
+                "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca000f",
+                "value": "SRV17",
+                "Owner": "AF"
               },
               "Name": {
-                "value": "MEAL:VEGETARIAN INDIAN MEAL"
+                "value": "DISABILITY:WCHR - Wheelchair request - Stairs OK"
               },
               "Descriptions": {
                 "Description": [
                   {
                     "Text": {
-                      "value": "VEGETARIAN INDIAN MEAL"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "Free"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "MEAL"
+                      "value": "Wheelchair request - Stairs OK"
                     }
                   }
                 ]
@@ -540,14 +476,14 @@
               "Price": [
                 {
                   "Total": {
-                    "value": 0,
-                    "Code": "KES"
+                    "value": 0.0,
+                    "Code": "INR"
                   }
                 }
               ],
               "BookingInstructions": {
                 "SSRCode": [
-                  "AVML"
+                  "WCHR"
                 ],
                 "Method": "SSR"
               },
@@ -564,7 +500,7 @@
                       {
                         "SegmentReferences": {
                           "value": [
-                            "SEG5"
+                            "SEG1"
                           ]
                         }
                       }
@@ -572,33 +508,23 @@
                   }
                 }
               ],
-              "PricedInd": true
+              "PricedInd": false
             },
             {
-              "ObjectKey": "1-ServiceIdKQ-147",
+              "ObjectKey": "1-ServiceIdAF-17",
               "ServiceID": {
-                "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-206",
-                "value": "SRV149",
-                "Owner": "KQ"
+                "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca0011",
+                "value": "SRV19",
+                "Owner": "AF"
               },
               "Name": {
-                "value": "DISABILITY:WHEELCHAIR TO SEAT REQUEST"
+                "value": "DISABILITY:BLND - Visual impairment"
               },
               "Descriptions": {
                 "Description": [
                   {
                     "Text": {
-                      "value": "WHEELCHAIR TO SEAT REQUEST"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "Free"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "PAXINFO"
+                      "value": "Visual impairment"
                     }
                   }
                 ]
@@ -606,14 +532,14 @@
               "Price": [
                 {
                   "Total": {
-                    "value": 0,
-                    "Code": "KES"
+                    "value": 0.0,
+                    "Code": "INR"
                   }
                 }
               ],
               "BookingInstructions": {
                 "SSRCode": [
-                  "WCHC"
+                  "BLND"
                 ],
                 "Method": "SSR"
               },
@@ -630,7 +556,7 @@
                       {
                         "SegmentReferences": {
                           "value": [
-                            "SEG5"
+                            "SEG1"
                           ]
                         }
                       }
@@ -638,22 +564,31 @@
                   }
                 }
               ],
-              "PricedInd": true
+              "PricedInd": false
             },
             {
-              "ObjectKey": "PRICE4-SEG6",
+              "ObjectKey": "e0ee9182-5616-47e1-ae91-825616070020",
               "ServiceID": {
-                "value": "SERVICE-PRICE4-SEG6"
+                "value": "SERV_AFKL_SRV0_SEG1",
+                "Owner": "AF"
               },
               "Name": {
-                "value": "Seat PRICE4-SEG6"
+                "value": "SEAT"
               },
-              "Descriptions": {},
+              "Descriptions": {
+                "Description": [
+                  {
+                    "Text": {
+                      "value": "STANDARD SEAT SELECTION"
+                    }
+                  }
+                ]
+              },
               "Price": [
                 {
                   "Total": {
-                    "value": 0,
-                    "Code": "KES"
+                    "value": 771.0,
+                    "Code": "INR"
                   }
                 }
               ],
@@ -669,7 +604,7 @@
                       {
                         "SegmentReferences": {
                           "value": [
-                            "SEG6"
+                            "SEG1"
                           ]
                         }
                       }
@@ -677,12 +612,12 @@
                   },
                   "Offer": {
                     "OfferReferences": [
-                      "PRICE"
+                      "ef49d126-b797-4712-89d1-26b797370001"
                     ]
                   }
                 }
               ],
-              "PricedInd": true
+              "PricedInd": false
             }
           ]
         }
@@ -695,14 +630,14 @@
                 {
                   "any": {
                     "VdcAugPoint": {
-                      "Value": "TRApprovalDate=09/27/2025"
+                      "Value": "TRApprovalDate=10/17/2025"
                     }
                   }
                 },
                 {
                   "any": {
                     "VdcAugPoint": {
-                      "Value": "TRCreationDate=09/27/2025"
+                      "Value": "TRCreationDate=10/17/2025"
                     }
                   }
                 }
@@ -723,8 +658,8 @@
               }
             },
             "Amount": {
-              "Code": "KES",
-              "value": 222030
+              "Code": "INR",
+              "value": 16454
             }
           }
         ]

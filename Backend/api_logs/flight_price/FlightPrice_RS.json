@@ -1,7 +1,7 @@
 {
-  "timestamp": "2025-09-27T12:21:17.667098",
+  "timestamp": "2025-10-17T21:13:22.288606",
   "service": "FlightPrice",
-  "request_id": "ce454772-68e1-41b5-8f46-559dcaa43f2b",
+  "request_id": "7d0b7598-2c36-4d12-83cd-f5ab4e460724",
   "status_code": 200,
   "response_time_ms": null,
   "response": {
@@ -9,30 +9,19 @@
     "data": {
       "priced_offers": [
         {
-          "offer_id": "179",
-          "fare_family": "Economy Super Flex",
+          "offer_id": "0",
+          "fare_family": "Light",
           "flight_segments": [
             {
-              "departure_airport": "LHR",
-              "arrival_airport": "CDG",
-              "departure_datetime": "2025-10-03T19:45:00.000",
-              "arrival_datetime": "2025-10-03T22:00:00.000",
-              "airline_code": "AF",
-              "airline_name": "Air France",
-              "airline_logo_url": "/airlines/AF.svg",
-              "flight_number": "AF3079",
-              "duration": "1h 15m"
-            },
-            {
               "departure_airport": "CDG",
-              "arrival_airport": "NBO",
-              "departure_datetime": "2025-10-04T10:45:00.000",
-              "arrival_datetime": "2025-10-04T20:10:00.000",
-              "airline_code": "KQ",
-              "airline_name": "Kenya Airways",
-              "airline_logo_url": "/airlines/KQ.svg",
-              "flight_number": "KQ113",
-              "duration": "8h 25m"
+              "arrival_airport": "FRA",
+              "departure_datetime": "2025-10-23T07:40:00.000",
+              "arrival_datetime": "2025-10-23T09:00:00.000",
+              "airline_code": "A5",
+              "airline_name": "Airline A5",
+              "airline_logo_url": null,
+              "flight_number": "A51518",
+              "duration": "N/A"
             }
           ],
           "passengers": [
@@ -40,116 +29,100 @@
               "type": "ADT",
               "count": 1,
               "baggage": {
-                "carryOn": "1 piece",
-                "checked": "2 pieces"
+                "carryOn": "1 piece, up to 12.0 Kilogram",
+                "checked": "No baggage allowance"
               },
               "fare_rules": {
+                "Change Noshow": {
+                  "After Departure NO Show": {
+                    "od_pair": "CDG-FRA",
+                    "min_amount": 11956.0,
+                    "max_amount": 11956.0,
+                    "currency": "INR",
+                    "interpretation": "Change not allowed (after departure no show) [No-show]"
+                  }
+                },
                 "Cancel Noshow": {
                   "After Departure NO Show": {
-                    "od_pair": "LHR-NBO",
-                    "min_amount": 195345.0,
-                    "max_amount": 195345.0,
-                    "currency": "KES",
+                    "od_pair": "CDG-FRA",
+                    "min_amount": 11956.0,
+                    "max_amount": 11956.0,
+                    "currency": "INR",
                     "interpretation": "Non-refundable (after departure no show) [No-show]"
+                  }
+                },
+                "Cancel": {
+                  "Prior to Departure": {
+                    "od_pair": "CDG-FRA",
+                    "min_amount": 11956.0,
+                    "max_amount": 11956.0,
+                    "currency": "INR",
+                    "interpretation": "Non-refundable"
                   },
-                  "Before Departure No Show": {
-                    "od_pair": "LHR-NBO",
-                    "min_amount": 31240.0,
-                    "max_amount": 31240.0,
-                    "currency": "KES",
-                    "interpretation": "Refunable with penalty (partially refundable) [No-show]"
+                  "After Departure": {
+                    "od_pair": "CDG-FRA",
+                    "min_amount": 11956.0,
+                    "max_amount": 11956.0,
+                    "currency": "INR",
+                    "interpretation": "Non-refundable (after departure)"
                   }
                 },
                 "Change": {
                   "After Departure": {
-                    "od_pair": "LHR-NBO",
-                    "min_amount": 0.0,
-                    "max_amount": 0.0,
-                    "currency": "KES",
+                    "od_pair": "CDG-FRA",
+                    "min_amount": 11956.0,
+                    "max_amount": 11956.0,
+                    "currency": "INR",
                     "interpretation": "Change not allowed (after departure)"
                   },
                   "Prior to Departure": {
-                    "od_pair": "LHR-NBO",
-                    "min_amount": 0.0,
-                    "max_amount": 0.0,
-                    "currency": "KES",
-                    "interpretation": "Free change + difference in fare"
-                  }
-                },
-                "Cancel": {
-                  "After Departure": {
-                    "od_pair": "LHR-NBO",
-                    "min_amount": 195345.0,
-                    "max_amount": 195345.0,
-                    "currency": "KES",
-                    "interpretation": "Non-refundable (after departure)"
-                  },
-                  "Prior to Departure": {
-                    "od_pair": "LHR-NBO",
-                    "min_amount": 0.0,
-                    "max_amount": 0.0,
-                    "currency": "KES",
-                    "interpretation": "Fully refundable (without penalty)"
-                  }
-                },
-                "Change Noshow": {
-                  "After Departure NO Show": {
-                    "od_pair": "LHR-NBO",
-                    "min_amount": 31240.0,
-                    "max_amount": 31240.0,
-                    "currency": "KES",
-                    "interpretation": "Change not allowed (after departure no show) [No-show]"
-                  },
-                  "Before Departure No Show": {
-                    "od_pair": "LHR-NBO",
-                    "min_amount": 31240.0,
-                    "max_amount": 31240.0,
-                    "currency": "KES",
-                    "interpretation": "Change allowed with penalty + difference in fare [No-show]"
+                    "od_pair": "CDG-FRA",
+                    "min_amount": 11956.0,
+                    "max_amount": 11956.0,
+                    "currency": "INR",
+                    "interpretation": "Change not allowed"
                   }
                 }
               }
             }
           ],
           "total_price": {
-            "amount": 195345.0,
-            "currency": "KES"
+            "amount": 11581.0,
+            "currency": "INR"
           },
           "time_limits": {
-            "offer_expiration": "2025-09-27T09:51:16.000",
-            "payment_deadline": "2025-09-30T09:21:00.000"
+            "offer_expiration": "2025-10-17T18:42:31.888",
+            "payment_deadline": "2025-10-18T19:00:00.000"
           },
           "direction": "oneway",
-          "original_offer_id": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2"
+          "original_offer_id": "ef49d126-b797-4712-89d1-26b797370001"
         }
       ],
       "total_offers": 1,
       "transformation_status": "success",
       "metadata": {
-        "cache_key": "flight_price_response:ce454772-68e1-41b5-8f46-559dcaa43f2b",
-        "flight_price_cache_key": "flight_price_raw_ce454772-68e1-41b5-8f46-559dcaa43f2b_1758964876",
+        "cache_key": "flight_price_response:7d0b7598-2c36-4d12-83cd-f5ab4e460724",
+        "flight_price_cache_key": "flight_price_raw_7d0b7598-2c36-4d12-83cd-f5ab4e460724_1760724801",
         "cached": true,
-        "request_id": "ce454772-68e1-41b5-8f46-559dcaa43f2b",
-        "processed_cache_key": "flight_price:84d010b4adcf416b730d4e0168ab80ee"
+        "request_id": "7d0b7598-2c36-4d12-83cd-f5ab4e460724",
+        "processed_cache_key": "flight_price:f470232ce29c72f4d50f5821daa2763b"
       }
     },
-    "request_id": "ce454772-68e1-41b5-8f46-559dcaa43f2b",
+    "request_id": "7d0b7598-2c36-4d12-83cd-f5ab4e460724",
     "raw_response": {
-      "Document": {
-        "Name": "KQ"
-      },
+      "Success": {},
       "ShoppingResponseID": {
         "ResponseID": {
-          "value": "RQ295nCRfbrvzRjC8m6QKnLLJegueo3Nuh9xeqvacr0-KQ"
+          "value": "tz-s9tozhn8KCauIlsOhm4dhNa5LF7sNsGxATQtLyJo-AF"
         }
       },
       "PricedFlightOffers": {
         "PricedFlightOffer": [
           {
             "OfferID": {
-              "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2",
-              "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2",
-              "Owner": "KQ",
+              "ObjectKey": "ef49d126-b797-4712-89d1-26b797370001",
+              "value": "ef49d126-b797-4712-89d1-26b797370001",
+              "Owner": "AF",
               "Channel": "NDC"
             },
             "OfferPrice": [
@@ -167,116 +140,116 @@
                           {
                             "ClassOfService": {
                               "Code": {
-                                "value": "U"
+                                "value": "N"
                               },
                               "MarketingName": {
-                                "value": "ECO",
+                                "value": "ECONOMY",
                                 "CabinDesignator": "Y"
                               },
                               "refs": [
-                                "FG-58909065483531"
+                                "FG-SEG1"
                               ]
                             },
                             "BagDetailAssociation": {
                               "CheckedBagReferences": [
-                                "FBA1"
+                                "BA2_CHECKED_ADT"
                               ],
                               "CarryOnReferences": [
-                                "BAGGAGEALLOWANCE_CARRYON-1x12kg"
+                                "BA1_CARRY_ON_ADT"
                               ]
                             },
-                            "ref": "SEG5"
-                          },
-                          {
-                            "ClassOfService": {
-                              "Code": {
-                                "value": "U"
-                              },
-                              "MarketingName": {
-                                "value": "ECO",
-                                "CabinDesignator": "Y"
-                              },
-                              "refs": [
-                                "FG-58909065483531"
-                              ]
-                            },
-                            "BagDetailAssociation": {
-                              "CheckedBagReferences": [
-                                "FBA1"
-                              ],
-                              "CarryOnReferences": [
-                                "BAGGAGEALLOWANCE_CARRYON-1x12kg"
-                              ]
-                            },
-                            "ref": "SEG6"
+                            "ref": "SEG1"
                           }
                         ],
                         "OriginDestinationReferences": [
-                          "LHRNBO"
+                          "OD1"
                         ],
                         "FlightReferences": {
                           "value": [
-                            "FLT0"
+                            "PJ1"
                           ]
                         }
                       },
                       "PriceClass": {
-                        "PriceClassReference": "ECOSPFLXWW"
+                        "PriceClassReference": "PC1"
                       }
                     }
                   ],
                   "PriceDetail": {
                     "TotalAmount": {
                       "SimpleCurrencyPrice": {
-                        "value": 195345,
-                        "Code": "KES"
+                        "value": 11581.0,
+                        "Code": "INR"
                       }
                     },
                     "BaseAmount": {
-                      "value": 146365,
-                      "Code": "KES"
+                      "value": 7490.0,
+                      "Code": "INR"
                     },
+                    "Discount": [
+                      {
+                        "DiscountAmount": {
+                          "value": 375,
+                          "Code": "INR"
+                        },
+                        "DiscountPercent": 5,
+                        "discountOwner": "Magellan Travel Services (P) Ltd.",
+                        "discountCode": "Disc_rea",
+                        "discountName": "ReaDiscount",
+                        "preDiscountedAmount": {
+                          "value": 11956.0,
+                          "Code": "INR"
+                        }
+                      }
+                    ],
                     "Taxes": {
                       "Total": {
-                        "value": 48980,
-                        "Code": "KES"
+                        "value": 4466.0,
+                        "Code": "INR"
                       },
                       "Breakdown": {
                         "Tax": [
                           {
                             "Amount": {
-                              "value": 23555,
-                              "Code": "KES"
+                              "value": 154.0,
+                              "Code": "INR"
                             },
                             "TaxCode": "YR"
                           },
                           {
                             "Amount": {
-                              "value": 15705,
-                              "Code": "KES"
-                            },
-                            "TaxCode": "GB"
-                          },
-                          {
-                            "Amount": {
-                              "value": 4070,
-                              "Code": "KES"
-                            },
-                            "TaxCode": "UB"
-                          },
-                          {
-                            "Amount": {
-                              "value": 505,
-                              "Code": "KES"
+                              "value": 527.0,
+                              "Code": "INR"
                             },
                             "TaxCode": "FR"
                           },
                           {
                             "Amount": {
-                              "value": 5145,
-                              "Code": "KES"
+                              "value": 1339.0,
+                              "Code": "INR"
+                            },
+                            "TaxCode": "FR"
+                          },
+                          {
+                            "Amount": {
+                              "value": 759.0,
+                              "Code": "INR"
+                            },
+                            "TaxCode": "O4"
+                          },
+                          {
+                            "Amount": {
+                              "value": 1431.0,
+                              "Code": "INR"
                             },
                             "TaxCode": "QX"
+                          },
+                          {
+                            "Amount": {
+                              "value": 256,
+                              "Code": "INR"
+                            },
+                            "TaxCode": "T02"
                           }
                         ]
                       }
@@ -288,64 +261,37 @@
                     {
                       "FareBasis": {
                         "FareBasisCode": {
-                          "Code": "ULSFWGB"
+                          "Code": "NYS5BALA"
                         },
-                        "RBD": "U"
+                        "RBD": "N"
                       },
                       "FareRules": {
                         "Penalty": {
                           "refs": [
-                            "Penalty-FLAG18: Cancel-NoShow_MAX_195345_KES_MIN_195345_KES",
-                            "Penalty-FLAG10: Change_MAX_0_KES_MIN_0_KES",
-                            "Penalty-FLAG17: Cancel_MAX_195345_KES_MIN_195345_KES",
-                            "Penalty-FLAG4: Change_MAX_0_KES_MIN_0_KES",
-                            "Penalty-FLAG13: Change-NoShow_MAX_31240_KES_MIN_31240_KES",
-                            "Penalty-FLAG15: Cancel_MAX_0_KES_MIN_0_KES",
-                            "Penalty-FLAG16: Cancel-NoShow_MAX_31240_KES_MIN_31240_KES",
-                            "Penalty-FLAG7: Change-NoShow_MAX_31240_KES_MIN_31240_KES"
+                            "PEN_NoShow_NOSHOW_CHANGE_11956.00_false",
+                            "PEN_NoShow_NOSHOW_CANCELLATION_11956.00_false",
+                            "PEN_Cancellation_PDE_11956.00_NAV_N",
+                            "PEN_Change_ADE_11956.00_NAV_N",
+                            "PEN_Change_PDE_11956.00_NAV_N",
+                            "PEN_Cancellation_ADE_11956.00_NAV_N"
                           ]
                         }
                       },
                       "refs": [
-                        "SEG5"
-                      ]
-                    },
-                    {
-                      "FareBasis": {
-                        "FareBasisCode": {
-                          "Code": "ULSFWGB"
-                        },
-                        "RBD": "U"
-                      },
-                      "FareRules": {
-                        "Penalty": {
-                          "refs": [
-                            "Penalty-FLAG18: Cancel-NoShow_MAX_195345_KES_MIN_195345_KES",
-                            "Penalty-FLAG10: Change_MAX_0_KES_MIN_0_KES",
-                            "Penalty-FLAG17: Cancel_MAX_195345_KES_MIN_195345_KES",
-                            "Penalty-FLAG4: Change_MAX_0_KES_MIN_0_KES",
-                            "Penalty-FLAG13: Change-NoShow_MAX_31240_KES_MIN_31240_KES",
-                            "Penalty-FLAG15: Cancel_MAX_0_KES_MIN_0_KES",
-                            "Penalty-FLAG16: Cancel-NoShow_MAX_31240_KES_MIN_31240_KES",
-                            "Penalty-FLAG7: Change-NoShow_MAX_31240_KES_MIN_31240_KES"
-                          ]
-                        }
-                      },
-                      "refs": [
-                        "SEG6"
+                        "SEG1"
                       ]
                     }
                   ]
                 },
-                "OfferItemID": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-1-1"
+                "OfferItemID": "d47274a9-3f9f-4a99-b274-a93f9fba9906"
               }
             ],
             "TimeLimits": {
               "OfferExpiration": {
-                "DateTime": "2025-09-27T09:51:16.000"
+                "DateTime": "2025-10-17T18:42:31.888"
               },
               "Payment": {
-                "DateTime": "2025-09-30T09:21:00.000"
+                "DateTime": "2025-10-18T19:00:00.000"
               }
             }
           }
@@ -365,35 +311,76 @@
         "CarryOnAllowanceList": {
           "CarryOnAllowance": [
             {
-              "ListKey": "BAGGAGEALLOWANCE_CARRYON-1x12kg",
+              "ListKey": "BA1_CARRY_ON_ADT",
               "AllowanceDescription": {
-                "ApplicableParty": "Traveler"
+                "ApplicableParty": "Traveler",
+                "Descriptions": {
+                  "Description": [
+                    {
+                      "Text": {
+                        "value": "Height 13.8 IN"
+                      }
+                    },
+                    {
+                      "Text": {
+                        "value": "Width 9.9 IN"
+                      }
+                    },
+                    {
+                      "Text": {
+                        "value": "Length 21.7 IN"
+                      }
+                    },
+                    {
+                      "Text": {
+                        "value": "Total Linear 45.4 IN"
+                      }
+                    }
+                  ]
+                }
               },
               "PieceAllowance": [
                 {
                   "ApplicableParty": "Traveler",
-                  "TotalQuantity": 1,
-                  "PieceMeasurements": [
-                    {
-                      "Quantity": 1
-                    }
-                  ]
+                  "TotalQuantity": 1
                 }
-              ]
+              ],
+              "WeightAllowance": {
+                "ApplicableParty": "Traveler",
+                "MaximumWeight": [
+                  {
+                    "Value": 12.0,
+                    "UOM": "Kilogram"
+                  },
+                  {
+                    "Value": 26.0,
+                    "UOM": "Pound"
+                  }
+                ]
+              }
             }
           ]
         },
         "CheckedBagAllowanceList": {
           "CheckedBagAllowance": [
             {
-              "ListKey": "FBA1",
+              "ListKey": "BA2_CHECKED_ADT",
               "AllowanceDescription": {
-                "ApplicableParty": "Traveler"
+                "ApplicableParty": "Traveler",
+                "Descriptions": {
+                  "Description": [
+                    {
+                      "Text": {
+                        "value": "Baggage Not Applicable"
+                      }
+                    }
+                  ]
+                }
               },
               "PieceAllowance": [
                 {
                   "ApplicableParty": "Traveler",
-                  "TotalQuantity": 2
+                  "TotalQuantity": 0
                 }
               ]
             }
@@ -402,7 +389,7 @@
         "FareList": {
           "FareGroup": [
             {
-              "ListKey": "FG-58909065483531",
+              "ListKey": "FG-SEG1",
               "Fare": {
                 "FareCode": {
                   "Code": "70J"
@@ -418,7 +405,7 @@
                 }
               },
               "FareBasisCode": {
-                "Code": "ULSFWGB"
+                "Code": "NYS5BALA"
               }
             }
           ]
@@ -426,115 +413,52 @@
         "FlightSegmentList": {
           "FlightSegment": [
             {
-              "SegmentKey": "SEG5",
+              "SegmentKey": "SEG1",
               "Departure": {
                 "AirportCode": {
-                  "value": "LHR"
+                  "value": "CDG"
                 },
-                "Date": "2025-10-03T19:45:00.000",
-                "Time": "19:45",
+                "Date": "2025-10-23T07:40:00.000",
+                "Time": "07:40",
                 "Terminal": {
-                  "Name": "4"
+                  "Name": "2G"
                 }
               },
               "Arrival": {
                 "AirportCode": {
-                  "value": "CDG"
+                  "value": "FRA"
                 },
-                "Date": "2025-10-03T22:00:00.000",
-                "Time": "22:00",
+                "Date": "2025-10-23T09:00:00.000",
+                "Time": "09:00",
                 "Terminal": {
-                  "Name": "2E"
+                  "Name": "2"
                 }
               },
               "MarketingCarrier": {
-                "AirlineID": {
-                  "value": "KQ"
-                },
-                "Name": "Kenya Airways",
-                "FlightNumber": {
-                  "value": "3079"
-                }
-              },
-              "OperatingCarrier": {
                 "AirlineID": {
                   "value": "AF"
                 },
-                "Name": "Air France"
-              },
-              "Equipment": {
-                "AircraftCode": {
-                  "value": "223"
-                }
-              },
-              "ClassOfService": {
-                "Code": {
-                  "value": "U"
-                },
-                "refs": [
-                  "FG-58909065483531"
-                ]
-              },
-              "FlightDetail": {
-                "FlightDuration": {
-                  "Value": "PT1H15M"
-                }
-              }
-            },
-            {
-              "SegmentKey": "SEG6",
-              "Departure": {
-                "AirportCode": {
-                  "value": "CDG"
-                },
-                "Date": "2025-10-04T10:45:00.000",
-                "Time": "10:45",
-                "Terminal": {
-                  "Name": "2E"
-                }
-              },
-              "Arrival": {
-                "AirportCode": {
-                  "value": "NBO"
-                },
-                "Date": "2025-10-04T20:10:00.000",
-                "Time": "20:10",
-                "Terminal": {
-                  "Name": "1A"
-                }
-              },
-              "MarketingCarrier": {
-                "AirlineID": {
-                  "value": "KQ"
-                },
-                "Name": "Kenya Airways",
                 "FlightNumber": {
-                  "value": "113"
+                  "value": "1518"
                 }
               },
               "OperatingCarrier": {
                 "AirlineID": {
-                  "value": "KQ"
-                },
-                "Name": "Kenya Airways"
+                  "value": "A5"
+                }
               },
               "Equipment": {
                 "AircraftCode": {
-                  "value": "788"
+                  "value": "E70"
                 }
               },
               "ClassOfService": {
                 "Code": {
-                  "value": "U"
+                  "value": "N"
                 },
                 "refs": [
-                  "FG-58909065483531"
+                  "FG-SEG1"
                 ]
-              },
-              "FlightDetail": {
-                "FlightDuration": {
-                  "Value": "PT8H25M"
-                }
               }
             }
           ]
@@ -542,11 +466,10 @@
         "FlightList": {
           "Flight": [
             {
-              "FlightKey": "FLT0",
+              "FlightKey": "PJ1",
               "SegmentReferences": {
                 "value": [
-                  "SEG5",
-                  "SEG6"
+                  "SEG1"
                 ]
               }
             }
@@ -555,17 +478,17 @@
         "OriginDestinationList": {
           "OriginDestination": [
             {
-              "OriginDestinationKey": "LHRNBO",
+              "OriginDestinationKey": "OD1",
               "FlightReferences": {
                 "value": [
-                  "FLT0"
+                  "PJ1"
                 ]
               },
               "DepartureCode": {
-                "value": "LHR"
+                "value": "CDG"
               },
               "ArrivalCode": {
-                "value": "NBO"
+                "value": "FRA"
               }
             }
           ]
@@ -573,11 +496,11 @@
         "PenaltyList": {
           "Penalty": [
             {
-              "ObjectKey": "Penalty-FLAG18: Cancel-NoShow_MAX_195345_KES_MIN_195345_KES",
+              "ObjectKey": "PEN_NoShow_NOSHOW_CHANGE_11956.00_false",
               "Details": {
                 "Detail": [
                   {
-                    "Type": "Cancel-NoShow",
+                    "Type": "Change-Noshow",
                     "Application": {
                       "Code": "1"
                     },
@@ -585,28 +508,75 @@
                       "Amount": [
                         {
                           "CurrencyAmountValue": {
-                            "value": 195345,
-                            "Code": "KES"
+                            "value": 11956.0,
+                            "Code": "INR"
                           },
-                          "AmountApplication": "MAX",
+                          "AmountApplication": "MIN",
                           "ApplicableFeeRemarks": {
                             "Remark": [
                               {
-                                "value": "Not Allowed"
+                                "value": "false"
                               }
                             ]
                           }
                         },
                         {
                           "CurrencyAmountValue": {
-                            "value": 195345,
-                            "Code": "KES"
+                            "value": 11956.0,
+                            "Code": "INR"
+                          },
+                          "AmountApplication": "MAX",
+                          "ApplicableFeeRemarks": {
+                            "Remark": [
+                              {
+                                "value": "false"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "ChangeFeeInd": false,
+              "ChangeAllowedInd": false
+            },
+            {
+              "ObjectKey": "PEN_NoShow_NOSHOW_CANCELLATION_11956.00_false",
+              "Details": {
+                "Detail": [
+                  {
+                    "Type": "Cancel-Noshow",
+                    "Application": {
+                      "Code": "1"
+                    },
+                    "Amounts": {
+                      "Amount": [
+                        {
+                          "CurrencyAmountValue": {
+                            "value": 11956.0,
+                            "Code": "INR"
                           },
                           "AmountApplication": "MIN",
                           "ApplicableFeeRemarks": {
                             "Remark": [
                               {
-                                "value": "Not Allowed"
+                                "value": "false"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "CurrencyAmountValue": {
+                            "value": 11956.0,
+                            "Code": "INR"
+                          },
+                          "AmountApplication": "MAX",
+                          "ApplicableFeeRemarks": {
+                            "Remark": [
+                              {
+                                "value": "false"
                               }
                             ]
                           }
@@ -620,87 +590,40 @@
               "RefundableInd": false
             },
             {
-              "ObjectKey": "Penalty-FLAG10: Change_MAX_0_KES_MIN_0_KES",
-              "Details": {
-                "Detail": [
-                  {
-                    "Type": "Change",
-                    "Application": {
-                      "Code": "3"
-                    },
-                    "Amounts": {
-                      "Amount": [
-                        {
-                          "CurrencyAmountValue": {
-                            "value": 0,
-                            "Code": "KES"
-                          },
-                          "AmountApplication": "MAX",
-                          "ApplicableFeeRemarks": {
-                            "Remark": [
-                              {
-                                "value": "Allowed"
-                              }
-                            ]
-                          }
-                        },
-                        {
-                          "CurrencyAmountValue": {
-                            "value": 0,
-                            "Code": "KES"
-                          },
-                          "AmountApplication": "MIN",
-                          "ApplicableFeeRemarks": {
-                            "Remark": [
-                              {
-                                "value": "Allowed"
-                              }
-                            ]
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "ChangeFeeInd": false,
-              "ChangeAllowedInd": true
-            },
-            {
-              "ObjectKey": "Penalty-FLAG17: Cancel_MAX_195345_KES_MIN_195345_KES",
+              "ObjectKey": "PEN_Cancellation_PDE_11956.00_NAV_N",
               "Details": {
                 "Detail": [
                   {
                     "Type": "Cancel",
                     "Application": {
-                      "Code": "3"
+                      "Code": "2"
                     },
                     "Amounts": {
                       "Amount": [
                         {
                           "CurrencyAmountValue": {
-                            "value": 195345,
-                            "Code": "KES"
+                            "value": 11956.0,
+                            "Code": "INR"
                           },
-                          "AmountApplication": "MAX",
+                          "AmountApplication": "MIN",
                           "ApplicableFeeRemarks": {
                             "Remark": [
                               {
-                                "value": "Not Allowed"
+                                "value": "NAV"
                               }
                             ]
                           }
                         },
                         {
                           "CurrencyAmountValue": {
-                            "value": 195345,
-                            "Code": "KES"
+                            "value": 11956.0,
+                            "Code": "INR"
                           },
-                          "AmountApplication": "MIN",
+                          "AmountApplication": "MAX",
                           "ApplicableFeeRemarks": {
                             "Remark": [
                               {
-                                "value": "Not Allowed"
+                                "value": "NAV"
                               }
                             ]
                           }
@@ -714,7 +637,54 @@
               "RefundableInd": false
             },
             {
-              "ObjectKey": "Penalty-FLAG4: Change_MAX_0_KES_MIN_0_KES",
+              "ObjectKey": "PEN_Cancellation_ADE_11956.00_NAV_N",
+              "Details": {
+                "Detail": [
+                  {
+                    "Type": "Cancel",
+                    "Application": {
+                      "Code": "3"
+                    },
+                    "Amounts": {
+                      "Amount": [
+                        {
+                          "CurrencyAmountValue": {
+                            "value": 11956.0,
+                            "Code": "INR"
+                          },
+                          "AmountApplication": "MIN",
+                          "ApplicableFeeRemarks": {
+                            "Remark": [
+                              {
+                                "value": "NAV"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "CurrencyAmountValue": {
+                            "value": 11956.0,
+                            "Code": "INR"
+                          },
+                          "AmountApplication": "MAX",
+                          "ApplicableFeeRemarks": {
+                            "Remark": [
+                              {
+                                "value": "NAV"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "CancelFeeInd": false,
+              "RefundableInd": false
+            },
+            {
+              "ObjectKey": "PEN_Change_PDE_11956.00_NAV_N",
               "Details": {
                 "Detail": [
                   {
@@ -726,28 +696,28 @@
                       "Amount": [
                         {
                           "CurrencyAmountValue": {
-                            "value": 0,
-                            "Code": "KES"
+                            "value": 11956.0,
+                            "Code": "INR"
                           },
-                          "AmountApplication": "MAX",
+                          "AmountApplication": "MIN",
                           "ApplicableFeeRemarks": {
                             "Remark": [
                               {
-                                "value": "Allowed"
+                                "value": "NAV"
                               }
                             ]
                           }
                         },
                         {
                           "CurrencyAmountValue": {
-                            "value": 0,
-                            "Code": "KES"
+                            "value": 11956.0,
+                            "Code": "INR"
                           },
-                          "AmountApplication": "MIN",
+                          "AmountApplication": "MAX",
                           "ApplicableFeeRemarks": {
                             "Remark": [
                               {
-                                "value": "Allowed"
+                                "value": "NAV"
                               }
                             ]
                           }
@@ -758,43 +728,43 @@
                 ]
               },
               "ChangeFeeInd": false,
-              "ChangeAllowedInd": true
+              "ChangeAllowedInd": false
             },
             {
-              "ObjectKey": "Penalty-FLAG13: Change-NoShow_MAX_31240_KES_MIN_31240_KES",
+              "ObjectKey": "PEN_Change_ADE_11956.00_NAV_N",
               "Details": {
                 "Detail": [
                   {
-                    "Type": "Change-NoShow",
+                    "Type": "Change",
                     "Application": {
-                      "Code": "1"
+                      "Code": "3"
                     },
                     "Amounts": {
                       "Amount": [
                         {
                           "CurrencyAmountValue": {
-                            "value": 31240,
-                            "Code": "KES"
+                            "value": 11956.0,
+                            "Code": "INR"
                           },
-                          "AmountApplication": "MAX",
+                          "AmountApplication": "MIN",
                           "ApplicableFeeRemarks": {
                             "Remark": [
                               {
-                                "value": "Allowed"
+                                "value": "NAV"
                               }
                             ]
                           }
                         },
                         {
                           "CurrencyAmountValue": {
-                            "value": 31240,
-                            "Code": "KES"
+                            "value": 11956.0,
+                            "Code": "INR"
                           },
-                          "AmountApplication": "MIN",
+                          "AmountApplication": "MAX",
                           "ApplicableFeeRemarks": {
                             "Remark": [
                               {
-                                "value": "Allowed"
+                                "value": "NAV"
                               }
                             ]
                           }
@@ -804,208 +774,23 @@
                   }
                 ]
               },
-              "ChangeFeeInd": true,
-              "ChangeAllowedInd": true
-            },
-            {
-              "ObjectKey": "Penalty-FLAG15: Cancel_MAX_0_KES_MIN_0_KES",
-              "Details": {
-                "Detail": [
-                  {
-                    "Type": "Cancel",
-                    "Application": {
-                      "Code": "2"
-                    },
-                    "Amounts": {
-                      "Amount": [
-                        {
-                          "CurrencyAmountValue": {
-                            "value": 0,
-                            "Code": "KES"
-                          },
-                          "AmountApplication": "MAX",
-                          "ApplicableFeeRemarks": {
-                            "Remark": [
-                              {
-                                "value": "Allowed"
-                              }
-                            ]
-                          }
-                        },
-                        {
-                          "CurrencyAmountValue": {
-                            "value": 0,
-                            "Code": "KES"
-                          },
-                          "AmountApplication": "MIN",
-                          "ApplicableFeeRemarks": {
-                            "Remark": [
-                              {
-                                "value": "Allowed"
-                              }
-                            ]
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "CancelFeeInd": false,
-              "RefundableInd": true
-            },
-            {
-              "ObjectKey": "Penalty-FLAG16: Cancel-NoShow_MAX_31240_KES_MIN_31240_KES",
-              "Details": {
-                "Detail": [
-                  {
-                    "Type": "Cancel-NoShow",
-                    "Application": {
-                      "Code": "4"
-                    },
-                    "Amounts": {
-                      "Amount": [
-                        {
-                          "CurrencyAmountValue": {
-                            "value": 31240,
-                            "Code": "KES"
-                          },
-                          "AmountApplication": "MAX",
-                          "ApplicableFeeRemarks": {
-                            "Remark": [
-                              {
-                                "value": "Allowed"
-                              }
-                            ]
-                          }
-                        },
-                        {
-                          "CurrencyAmountValue": {
-                            "value": 31240,
-                            "Code": "KES"
-                          },
-                          "AmountApplication": "MIN",
-                          "ApplicableFeeRemarks": {
-                            "Remark": [
-                              {
-                                "value": "Allowed"
-                              }
-                            ]
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "CancelFeeInd": true,
-              "RefundableInd": true
-            },
-            {
-              "ObjectKey": "Penalty-FLAG7: Change-NoShow_MAX_31240_KES_MIN_31240_KES",
-              "Details": {
-                "Detail": [
-                  {
-                    "Type": "Change-NoShow",
-                    "Application": {
-                      "Code": "4"
-                    },
-                    "Amounts": {
-                      "Amount": [
-                        {
-                          "CurrencyAmountValue": {
-                            "value": 31240,
-                            "Code": "KES"
-                          },
-                          "AmountApplication": "MAX",
-                          "ApplicableFeeRemarks": {
-                            "Remark": [
-                              {
-                                "value": "Allowed"
-                              }
-                            ]
-                          }
-                        },
-                        {
-                          "CurrencyAmountValue": {
-                            "value": 31240,
-                            "Code": "KES"
-                          },
-                          "AmountApplication": "MIN",
-                          "ApplicableFeeRemarks": {
-                            "Remark": [
-                              {
-                                "value": "Allowed"
-                              }
-                            ]
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              "ChangeFeeInd": true,
-              "ChangeAllowedInd": true
+              "ChangeFeeInd": false,
+              "ChangeAllowedInd": false
             }
           ]
         },
         "PriceClassList": {
           "PriceClass": [
             {
-              "ObjectKey": "ECOSPFLXWW",
-              "Name": "Economy Super Flex",
-              "Descriptions": {
-                "Description": [
-                  {
-                    "Text": {
-                      "value": "BAGGAGEALLOWANCE_CARRYON-1 x 12 kg"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "BAGGAGEALLOWANCE_CHECKED-2 x 23 kg"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "CANCEL_BEFOREDEPARTURE-Ticket Refundable at a No fee"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "CHANGE_BEFOREDEPARTURE-Permitted, conditions apply"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "LOUNGEACCESS-Not included"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "PRIORITY_CHECKIN-Not included"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "PRIORITY_SECURITY-Not included"
-                    }
-                  },
-                  {
-                    "Text": {
-                      "value": "SEATSELECTION-Included"
-                    }
-                  }
-                ]
-              }
+              "ObjectKey": "PC1",
+              "Name": "Light"
             }
           ]
         }
       }
     },
-    "cache_key": "flight_price:84d010b4adcf416b730d4e0168ab80ee",
+    "cache_key": "flight_price:f470232ce29c72f4d50f5821daa2763b",
     "cached": true,
-    "flight_price_cache_key": "flight_price_raw_ce454772-68e1-41b5-8f46-559dcaa43f2b_1758964876"
+    "flight_price_cache_key": "flight_price_raw_7d0b7598-2c36-4d12-83cd-f5ab4e460724_1760724801"
   }
 }

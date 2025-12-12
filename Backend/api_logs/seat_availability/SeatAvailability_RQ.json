@@ -1,13 +1,13 @@
 {
-  "timestamp": "2025-09-27T12:24:15.964516",
+  "timestamp": "2025-10-17T21:13:32.634304",
   "service": "SeatAvailability",
-  "request_id": "919f44b0-b058-4b71-9fd1-3e1c5ed923ec",
+  "request_id": "c6eff0e6-7bb5-4c42-bac1-88ce3730966b",
   "endpoint": "/entrygate/rest/request:preSeatAvailability",
   "headers": {
     "Content-Type": "application/json",
     "Accept": "*/*",
-    "Authorization": "Bearer ***k416yncA",
-    "OfficeId": "***F301",
+    "Authorization": "Bearer ***JfR56jBg",
+    "OfficeId": "***3746",
     "service": "SeatAvailability",
     "User-Agent": "PostmanRuntime/7.41",
     "Cache-Control": "no-cache",
@@ -35,10 +35,7 @@
         {
           "FlightSegmentReference": [
             {
-              "ref": "SEG5"
-            },
-            {
-              "ref": "SEG6"
+              "ref": "SEG1"
             }
           ]
         }
@@ -47,14 +44,14 @@
         "Offer": [
           {
             "OfferID": {
-              "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2",
-              "Owner": "KQ",
+              "value": "ef49d126-b797-4712-89d1-26b797370001",
+              "Owner": "AF",
               "Channel": "NDC"
             },
             "OfferItemIDs": {
               "OfferItemID": [
                 {
-                  "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-1-1"
+                  "value": "d47274a9-3f9f-4a99-b274-a93f9fba9906"
                 }
               ]
             }
@@ -66,102 +63,55 @@
       "FlightSegmentList": {
         "FlightSegment": [
           {
-            "SegmentKey": "SEG5",
-            "Departure": {
-              "AirportCode": {
-                "value": "LHR"
-              },
-              "Date": "2025-10-03T19:45:00.000",
-              "Time": "19:45",
-              "Terminal": {
-                "Name": "4"
-              }
-            },
-            "Arrival": {
-              "AirportCode": {
-                "value": "CDG"
-              },
-              "Date": "2025-10-03T22:00:00.000",
-              "Time": "22:00",
-              "Terminal": {
-                "Name": "2E"
-              }
-            },
-            "MarketingCarrier": {
-              "AirlineID": {
-                "value": "KQ"
-              },
-              "Name": "Kenya Airways",
-              "FlightNumber": {
-                "value": "3079"
-              }
-            },
-            "Equipment": {
-              "AircraftCode": {
-                "value": "223"
-              }
-            },
-            "FlightDetail": {
-              "FlightDuration": {
-                "Value": "PT1H15M"
-              }
-            }
-          },
-          {
-            "SegmentKey": "SEG6",
+            "SegmentKey": "SEG1",
             "Departure": {
               "AirportCode": {
                 "value": "CDG"
               },
-              "Date": "2025-10-04T10:45:00.000",
-              "Time": "10:45",
+              "Date": "2025-10-23T07:40:00.000",
+              "Time": "07:40",
               "Terminal": {
-                "Name": "2E"
+                "Name": "2G"
               }
             },
             "Arrival": {
               "AirportCode": {
-                "value": "NBO"
+                "value": "FRA"
               },
-              "Date": "2025-10-04T20:10:00.000",
-              "Time": "20:10",
+              "Date": "2025-10-23T09:00:00.000",
+              "Time": "09:00",
               "Terminal": {
-                "Name": "1A"
+                "Name": "2"
               }
             },
             "MarketingCarrier": {
               "AirlineID": {
-                "value": "KQ"
+                "value": "AF"
               },
-              "Name": "Kenya Airways",
               "FlightNumber": {
-                "value": "113"
+                "value": "1518"
               }
             },
             "Equipment": {
               "AircraftCode": {
-                "value": "788"
+                "value": "E70"
               }
             },
-            "FlightDetail": {
-              "FlightDuration": {
-                "Value": "PT8H25M"
-              }
-            }
+            "FlightDetail": {}
           }
         ]
       },
       "FareList": {
         "FareGroup": [
           {
-            "ListKey": "FG-58909065483531",
+            "ListKey": "FG-SEG1",
             "Fare": {
               "FareCode": {
                 "Code": "70J"
               }
             },
             "FareBasisCode": {
-              "Code": "ULSFWGB"
+              "Code": "NYS5BALA"
             }
           }
         ]
@@ -169,7 +119,7 @@
     },
     "ShoppingResponseID": {
       "ResponseID": {
-        "value": "RQ295nCRfbrvzRjC8m6QKnLLJegueo3Nuh9xeqvacr0-KQ"
+        "value": "tz-s9tozhn8KCauIlsOhm4dhNa5LF7sNsGxATQtLyJo-AF"
       }
     }
   }

@@ -1,60 +1,37 @@
 {
-  "timestamp": "2025-09-27T12:24:19.908778",
+  "timestamp": "2025-10-17T21:13:36.363581",
   "service": "ServiceList",
-  "request_id": "e22ec96b-4554-45f6-9cb6-4ee4ce49349c",
+  "request_id": "1b3910b1-f588-4a79-9bda-4dfacfb66544",
   "status_code": 200,
-  "response_time_ms": 2953.655481338501,
+  "response_time_ms": 4842.503309249878,
   "response": {
     "OfferExpiration": {
-      "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2"
+      "ObjectKey": "ef49d126-b797-4712-89d1-26b797370001",
+      "DateTime": "2025-10-17T18:42:31.888",
+      "Time": "2025-10-18T00:12:31.888"
     },
     "ShoppingResponseID": {
       "ResponseID": {
-        "value": "RQ295nCRfbrvzRjC8m6QKnLLJegueo3Nuh9xeqvacr0-KQ"
+        "value": "tz-s9tozhn8KCauIlsOhm4dhNa5LF7sNsGxATQtLyJo-AF"
       }
     },
     "Services": {
       "Service": [
         {
-          "ObjectKey": "1-ServiceIdKQ-1",
+          "ObjectKey": "1-ServiceIdAF-2",
           "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-2",
-            "value": "SRV1",
-            "Owner": "KQ"
+            "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca0002",
+            "value": "SRV2",
+            "Owner": "AF"
           },
           "Name": {
-            "value": "BAG:FIRST BAG"
+            "value": "BAG:LUGGAGE-FIRST ADDITIONAL BAG"
           },
           "Descriptions": {
             "Description": [
               {
                 "Text": {
-                  "value": "FIRST BAG"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Chargeable"
-                }
-              },
-              {
-                "Text": {
-                  "value": "F"
-                }
-              },
-              {
-                "Text": {
-                  "value": "01"
-                }
-              },
-              {
-                "Text": {
-                  "value": "BG"
-                }
-              },
-              {
-                "Text": {
-                  "value": "B1"
+                  "value": "1 ABAG x 23 KG"
                 }
               }
             ]
@@ -62,8 +39,8 @@
           "Price": [
             {
               "Total": {
-                "value": 26685,
-                "Code": "KES"
+                "value": 4102.0,
+                "Code": "INR"
               }
             }
           ],
@@ -85,8 +62,7 @@
                   {
                     "SegmentReferences": {
                       "value": [
-                        "SEG5",
-                        "SEG6"
+                        "SEG1"
                       ]
                     }
                   }
@@ -94,48 +70,33 @@
               }
             }
           ],
-          "PricedInd": true
+          "PricedInd": false
         },
         {
-          "ObjectKey": "1-ServiceIdKQ-2",
+          "ObjectKey": "1-ServiceIdAF-12",
           "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-3",
-            "value": "SRV2",
-            "Owner": "KQ"
+            "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca000c",
+            "value": "SRV14-SAF",
+            "Owner": "AF"
           },
           "Name": {
-            "value": "BAG:SECOND ADDITIONAL BAG"
+            "value": "SUSTAINABLE AVIATION FUEL:SAF"
           },
           "Descriptions": {
             "Description": [
               {
                 "Text": {
-                  "value": "SECOND ADDITIONAL BAG"
+                  "value": "SUSTAINABLE_AVIATION_FUEL"
                 }
               },
               {
                 "Text": {
-                  "value": "Chargeable"
+                  "value": "SAFINVESTED_KG_20.00"
                 }
               },
               {
                 "Text": {
-                  "value": "F"
-                }
-              },
-              {
-                "Text": {
-                  "value": "01"
-                }
-              },
-              {
-                "Text": {
-                  "value": "BG"
-                }
-              },
-              {
-                "Text": {
-                  "value": "B2"
+                  "value": "CO2_KG_20.00"
                 }
               }
             ]
@@ -143,14 +104,16 @@
           "Price": [
             {
               "Total": {
-                "value": 26685,
-                "Code": "KES"
+                "value": 810.0,
+                "Code": "INR"
               }
             }
           ],
           "BookingInstructions": {
             "SSRCode": [
-              "BBAG"
+              "SUSTAINABLE_AVIATION_FUEL",
+              "SAFINVESTED_KG_20.00",
+              "CO2_KG_20.00"
             ],
             "Method": "SSR"
           },
@@ -166,8 +129,7 @@
                   {
                     "SegmentReferences": {
                       "value": [
-                        "SEG5",
-                        "SEG6"
+                        "SEG1"
                       ]
                     }
                   }
@@ -175,48 +137,33 @@
               }
             }
           ],
-          "PricedInd": true
+          "PricedInd": false
         },
         {
-          "ObjectKey": "1-ServiceIdKQ-3",
+          "ObjectKey": "1-ServiceIdAF-13",
           "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-4",
-            "value": "SRV3",
-            "Owner": "KQ"
+            "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca000d",
+            "value": "SRV15-SAF",
+            "Owner": "AF"
           },
           "Name": {
-            "value": "BAG:THIRD AND ABOVE ADDITIONAL BAG"
+            "value": "SUSTAINABLE AVIATION FUEL:SAF"
           },
           "Descriptions": {
             "Description": [
               {
                 "Text": {
-                  "value": "THIRD AND ABOVE ADDITIONAL BAG"
+                  "value": "SUSTAINABLE_AVIATION_FUEL"
                 }
               },
               {
                 "Text": {
-                  "value": "Chargeable"
+                  "value": "SAFINVESTED_KG_34.00"
                 }
               },
               {
                 "Text": {
-                  "value": "F"
-                }
-              },
-              {
-                "Text": {
-                  "value": "01"
-                }
-              },
-              {
-                "Text": {
-                  "value": "BG"
-                }
-              },
-              {
-                "Text": {
-                  "value": "B3"
+                  "value": "CO2_KG_34.00"
                 }
               }
             ]
@@ -224,14 +171,16 @@
           "Price": [
             {
               "Total": {
-                "value": 26685,
-                "Code": "KES"
+                "value": 1345.0,
+                "Code": "INR"
               }
             }
           ],
           "BookingInstructions": {
             "SSRCode": [
-              "CBAG"
+              "SUSTAINABLE_AVIATION_FUEL",
+              "SAFINVESTED_KG_34.00",
+              "CO2_KG_34.00"
             ],
             "Method": "SSR"
           },
@@ -247,8 +196,7 @@
                   {
                     "SegmentReferences": {
                       "value": [
-                        "SEG5",
-                        "SEG6"
+                        "SEG1"
                       ]
                     }
                   }
@@ -256,48 +204,33 @@
               }
             }
           ],
-          "PricedInd": true
+          "PricedInd": false
         },
         {
-          "ObjectKey": "1-ServiceIdKQ-5",
+          "ObjectKey": "1-ServiceIdAF-14",
           "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-13",
-            "value": "SRV5",
-            "Owner": "KQ"
+            "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca000e",
+            "value": "SRV16-SAF",
+            "Owner": "AF"
           },
           "Name": {
-            "value": "SPORTS:OTHER SPORTS EQUIPMENT"
+            "value": "SUSTAINABLE AVIATION FUEL:SAF"
           },
           "Descriptions": {
             "Description": [
               {
                 "Text": {
-                  "value": "OTHER SPORTS EQUIPMENT"
+                  "value": "SUSTAINABLE_AVIATION_FUEL"
                 }
               },
               {
                 "Text": {
-                  "value": "Chargeable"
+                  "value": "SAFINVESTED_KG_68.00"
                 }
               },
               {
                 "Text": {
-                  "value": "F"
-                }
-              },
-              {
-                "Text": {
-                  "value": "01"
-                }
-              },
-              {
-                "Text": {
-                  "value": "BG"
-                }
-              },
-              {
-                "Text": {
-                  "value": "SP"
+                  "value": "CO2_KG_68.00"
                 }
               }
             ]
@@ -305,14 +238,16 @@
           "Price": [
             {
               "Total": {
-                "value": 15620,
-                "Code": "KES"
+                "value": 2692.0,
+                "Code": "INR"
               }
             }
           ],
           "BookingInstructions": {
             "SSRCode": [
-              "SPEQ"
+              "SUSTAINABLE_AVIATION_FUEL",
+              "SAFINVESTED_KG_68.00",
+              "CO2_KG_68.00"
             ],
             "Method": "SSR"
           },
@@ -328,7 +263,7 @@
                   {
                     "SegmentReferences": {
                       "value": [
-                        "SEG6"
+                        "SEG1"
                       ]
                     }
                   }
@@ -336,58 +271,23 @@
               }
             }
           ],
-          "PricedInd": true
+          "PricedInd": false
         },
         {
-          "ObjectKey": "1-ServiceIdKQ-6",
+          "ObjectKey": "1-ServiceIdAF-15",
           "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-17",
-            "value": "SRV6",
-            "Owner": "KQ"
+            "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca000f",
+            "value": "SRV17",
+            "Owner": "AF"
           },
           "Name": {
-            "value": "SPORTS:FISHING EQUIPMENTUPTO50LB 23KG"
+            "value": "DISABILITY:WCHR - Wheelchair request - Stairs OK"
           },
           "Descriptions": {
             "Description": [
               {
                 "Text": {
-                  "value": "FISHING EQUIPMENTUPTO50LB 23KG"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Chargeable"
-                }
-              },
-              {
-                "Text": {
-                  "value": "F"
-                }
-              },
-              {
-                "Text": {
-                  "value": "01"
-                }
-              },
-              {
-                "Text": {
-                  "value": "BG"
-                }
-              },
-              {
-                "Text": {
-                  "value": "SP"
-                }
-              },
-              {
-                "Text": {
-                  "value": "FI"
-                }
-              },
-              {
-                "Text": {
-                  "value": "23"
+                  "value": "Wheelchair request - Stairs OK"
                 }
               }
             ]
@@ -395,2775 +295,8 @@
           "Price": [
             {
               "Total": {
-                "value": 14320,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "FSHE"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-8",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-21",
-            "value": "SRV8",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "OTHER:OXYGEN"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "OXYGEN"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Chargeable"
-                }
-              },
-              {
-                "Text": {
-                  "value": "F"
-                }
-              },
-              {
-                "Text": {
-                  "value": "01"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MD"
-                }
-              },
-              {
-                "Text": {
-                  "value": "OX"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 20045,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "OXYG"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-11",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-68",
-            "value": "SRV11",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN INDIAN MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN INDIAN MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "AVML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-12",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-69",
-            "value": "SRV12",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN INDIAN MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN INDIAN MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "AVML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-13",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-70",
-            "value": "SRV13",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:BABY MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "BABY MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "BBML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-14",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-71",
-            "value": "SRV14",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:BABY MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "BABY MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "BBML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-15",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-72",
-            "value": "SRV15",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:BLAND MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "BLAND MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "BLML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-16",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-73",
-            "value": "SRV16",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:BLAND MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "BLAND MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "BLML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-23",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-82",
-            "value": "SRV25",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:CHILD MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "CHILD MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "CHML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-24",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-83",
-            "value": "SRV26",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:CHILD MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "CHILD MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "CHML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-27",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-86",
-            "value": "SRV29",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:DIABETIC MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "DIABETIC MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "DBML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-28",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-87",
-            "value": "SRV30",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:DIABETIC MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "DIABETIC MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "DBML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-47",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-106",
-            "value": "SRV49",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:FRUIT PLATTER"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "FRUIT PLATTER"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "FPML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-48",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-107",
-            "value": "SRV50",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:FRUIT PLATTER"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "FRUIT PLATTER"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "FPML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-55",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-114",
-            "value": "SRV57",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:FREQUENT TRAVELLER INFORMATION"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "FREQUENT TRAVELLER INFORMATION"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "FQTX"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "FQTV"
-            ],
-            "OSIText": [
-              "%FQTCARD%"
-            ],
-            "Method": "SSR",
-            "Text": [
-              "FQTCARD",
-              "%FQTOWN%%FQTNBR%",
-              "FQTOWN",
-              "[A-Z0-9]{2}",
-              "FQTNBR",
-              "[\\sA-Z0-9]{1,25}"
-            ]
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-56",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-115",
-            "value": "SRV58",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:FREQUENT TRAVELLER INFORMATION"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "FREQUENT TRAVELLER INFORMATION"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "FQTX"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "FQTV"
-            ],
-            "OSIText": [
-              "%FQTCARD%"
-            ],
-            "Method": "SSR",
-            "Text": [
-              "FQTCARD",
-              "%FQTOWN%%FQTNBR%",
-              "FQTOWN",
-              "[A-Z0-9]{2}",
-              "FQTNBR",
-              "[\\sA-Z0-9]{1,25}"
-            ]
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-61",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-120",
-            "value": "SRV63",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:GLUTEN INTOLERENT MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "GLUTEN INTOLERENT MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "GFML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-62",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-121",
-            "value": "SRV64",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:GLUTEN INTOLERENT MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "GLUTEN INTOLERENT MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "GFML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-67",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-126",
-            "value": "SRV69",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:HINDU NON-VEGETARIAN MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "HINDU NON-VEGETARIAN MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "HNML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-68",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-127",
-            "value": "SRV70",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:HINDU NON-VEGETARIAN MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "HINDU NON-VEGETARIAN MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "HNML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-73",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-132",
-            "value": "SRV75",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:KOSHER MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "KOSHER MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "KSML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-74",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-133",
-            "value": "SRV76",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:KOSHER MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "KOSHER MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "KSML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-79",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-138",
-            "value": "SRV81",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:LOW FAT MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "LOW FAT MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "LFML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-80",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-139",
-            "value": "SRV82",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:LOW FAT MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "LOW FAT MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "LFML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-81",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-140",
-            "value": "SRV83",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:LOW SALT MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "LOW SALT MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "LSML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-82",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-141",
-            "value": "SRV84",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:LOW SALT MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "LOW SALT MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "LSML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-87",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-146",
-            "value": "SRV89",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:MUSLIM MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "MUSLIM MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "MOML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-88",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-147",
-            "value": "SRV90",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:MUSLIM MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "MUSLIM MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "MOML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-91",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-150",
-            "value": "SRV93",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:LOW LACTOSE MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "LOW LACTOSE MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "NLML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-92",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-151",
-            "value": "SRV94",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:LOW LACTOSE MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "LOW LACTOSE MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "NLML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-115",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-174",
-            "value": "SRV117",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:SEAFOOD MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "SEAFOOD MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "SFML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-116",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-175",
-            "value": "SRV118",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:SEAFOOD MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "SEAFOOD MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "SFML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-135",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-194",
-            "value": "SRV137",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN VEGAN MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN VEGAN MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "VGML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-136",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-195",
-            "value": "SRV138",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN VEGAN MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN VEGAN MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "VGML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-137",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-196",
-            "value": "SRV139",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN JAIN MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN JAIN MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "VJML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-138",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-197",
-            "value": "SRV140",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN JAIN MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN JAIN MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "VJML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-139",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-198",
-            "value": "SRV141",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN LACTO-OVO MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN LACTO-OVO MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "VLML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-140",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-199",
-            "value": "SRV142",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN LACTO-OVO MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN LACTO-OVO MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "VLML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-141",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-200",
-            "value": "SRV143",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN ORIENTAL MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN ORIENTAL MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "VOML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-142",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-201",
-            "value": "SRV144",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "MEAL:VEGETARIAN ORIENTAL MEAL"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "VEGETARIAN ORIENTAL MEAL"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "MEAL"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "VOML"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-147",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-206",
-            "value": "SRV149",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "DISABILITY:WHEELCHAIR TO SEAT REQUEST"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "WHEELCHAIR TO SEAT REQUEST"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "PAXINFO"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "WCHC"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG5"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-148",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-207",
-            "value": "SRV150",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "DISABILITY:WHEELCHAIR TO SEAT REQUEST"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "WHEELCHAIR TO SEAT REQUEST"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "PAXINFO"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "WCHC"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-149",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-208",
-            "value": "SRV151",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "DISABILITY:WHEELCHAIR TO AIRCRAFT DOOR REQUEST"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "WHEELCHAIR TO AIRCRAFT DOOR REQUEST"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "PAXINFO"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
+                "value": 0.0,
+                "Code": "INR"
               }
             }
           ],
@@ -3185,7 +318,7 @@
                   {
                     "SegmentReferences": {
                       "value": [
-                        "SEG5"
+                        "SEG1"
                       ]
                     }
                   }
@@ -3193,33 +326,23 @@
               }
             }
           ],
-          "PricedInd": true
+          "PricedInd": false
         },
         {
-          "ObjectKey": "1-ServiceIdKQ-150",
+          "ObjectKey": "1-ServiceIdAF-16",
           "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-209",
-            "value": "SRV152",
-            "Owner": "KQ"
+            "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca0010",
+            "value": "SRV18",
+            "Owner": "AF"
           },
           "Name": {
-            "value": "DISABILITY:WHEELCHAIR TO AIRCRAFT DOOR REQUEST"
+            "value": "DISABILITY:WCHS - Wheelchair request - No Stairs"
           },
           "Descriptions": {
             "Description": [
               {
                 "Text": {
-                  "value": "WHEELCHAIR TO AIRCRAFT DOOR REQUEST"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "PAXINFO"
+                  "value": "Wheelchair request - No Stairs"
                 }
               }
             ]
@@ -3227,73 +350,8 @@
           "Price": [
             {
               "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "WCHR"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-151",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-210",
-            "value": "SRV153",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "DISABILITY:WHEELCHAIR UP/DOWN STAIRS REQUEST"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "WHEELCHAIR UP/DOWN STAIRS REQUEST"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "PAXINFO"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
+                "value": 0.0,
+                "Code": "INR"
               }
             }
           ],
@@ -3315,7 +373,7 @@
                   {
                     "SegmentReferences": {
                       "value": [
-                        "SEG5"
+                        "SEG1"
                       ]
                     }
                   }
@@ -3323,33 +381,23 @@
               }
             }
           ],
-          "PricedInd": true
+          "PricedInd": false
         },
         {
-          "ObjectKey": "1-ServiceIdKQ-152",
+          "ObjectKey": "1-ServiceIdAF-17",
           "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-211",
-            "value": "SRV154",
-            "Owner": "KQ"
+            "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca0011",
+            "value": "SRV19",
+            "Owner": "AF"
           },
           "Name": {
-            "value": "DISABILITY:WHEELCHAIR UP/DOWN STAIRS REQUEST"
+            "value": "DISABILITY:BLND - Visual impairment"
           },
           "Descriptions": {
             "Description": [
               {
                 "Text": {
-                  "value": "WHEELCHAIR UP/DOWN STAIRS REQUEST"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "PAXINFO"
+                  "value": "Visual impairment"
                 }
               }
             ]
@@ -3357,14 +405,14 @@
           "Price": [
             {
               "Total": {
-                "value": 0,
-                "Code": "KES"
+                "value": 0.0,
+                "Code": "INR"
               }
             }
           ],
           "BookingInstructions": {
             "SSRCode": [
-              "WCHS"
+              "BLND"
             ],
             "Method": "SSR"
           },
@@ -3380,7 +428,7 @@
                   {
                     "SegmentReferences": {
                       "value": [
-                        "SEG6"
+                        "SEG1"
                       ]
                     }
                   }
@@ -3388,33 +436,23 @@
               }
             }
           ],
-          "PricedInd": true
+          "PricedInd": false
         },
         {
-          "ObjectKey": "1-ServiceIdKQ-157",
+          "ObjectKey": "1-ServiceIdAF-18",
           "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-216",
-            "value": "SRV159",
-            "Owner": "KQ"
+            "ObjectKey": "cc550c32-83d8-4a4d-950c-3283d8ca0012",
+            "value": "SRV20",
+            "Owner": "AF"
           },
           "Name": {
-            "value": "DISABILITY:WHEELCHAIR ON BOARD REQUEST"
+            "value": "DISABILITY:DEAF - Hearing impairment"
           },
           "Descriptions": {
             "Description": [
               {
                 "Text": {
-                  "value": "WHEELCHAIR ON BOARD REQUEST"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "PAXINFO"
+                  "value": "Hearing impairment"
                 }
               }
             ]
@@ -3422,14 +460,14 @@
           "Price": [
             {
               "Total": {
-                "value": 0,
-                "Code": "KES"
+                "value": 0.0,
+                "Code": "INR"
               }
             }
           ],
           "BookingInstructions": {
             "SSRCode": [
-              "WCOB"
+              "DEAF"
             ],
             "Method": "SSR"
           },
@@ -3445,7 +483,7 @@
                   {
                     "SegmentReferences": {
                       "value": [
-                        "SEG5"
+                        "SEG1"
                       ]
                     }
                   }
@@ -3453,72 +491,7 @@
               }
             }
           ],
-          "PricedInd": true
-        },
-        {
-          "ObjectKey": "1-ServiceIdKQ-158",
-          "ServiceID": {
-            "ObjectKey": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-217",
-            "value": "SRV160",
-            "Owner": "KQ"
-          },
-          "Name": {
-            "value": "DISABILITY:WHEELCHAIR ON BOARD REQUEST"
-          },
-          "Descriptions": {
-            "Description": [
-              {
-                "Text": {
-                  "value": "WHEELCHAIR ON BOARD REQUEST"
-                }
-              },
-              {
-                "Text": {
-                  "value": "Free"
-                }
-              },
-              {
-                "Text": {
-                  "value": "PAXINFO"
-                }
-              }
-            ]
-          },
-          "Price": [
-            {
-              "Total": {
-                "value": 0,
-                "Code": "KES"
-              }
-            }
-          ],
-          "BookingInstructions": {
-            "SSRCode": [
-              "WCOB"
-            ],
-            "Method": "SSR"
-          },
-          "Associations": [
-            {
-              "Traveler": {
-                "TravelerReferences": [
-                  "PAX1"
-                ]
-              },
-              "Flight": {
-                "originDestinationReferencesOrSegmentReferences": [
-                  {
-                    "SegmentReferences": {
-                      "value": [
-                        "SEG6"
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ],
-          "PricedInd": true
+          "PricedInd": false
         }
       ]
     },
@@ -3536,72 +509,38 @@
       "FlightSegmentList": {
         "FlightSegment": [
           {
-            "SegmentKey": "SEG5",
+            "SegmentKey": "SEG1",
             "Departure": {
               "AirportCode": {
-                "value": "LHR"
+                "value": "CDG"
               },
-              "Date": "2025-10-03T19:45:00.000",
-              "Time": "19:45",
+              "Date": "2025-10-23T00:00:00.000",
+              "Time": "07:40",
               "Terminal": {
-                "Name": "4"
+                "Name": "2G"
               }
             },
             "Arrival": {
               "AirportCode": {
-                "value": "CDG"
+                "value": "FRA"
               },
-              "Date": "2025-10-03T22:00:00.000",
-              "Time": "22:00",
+              "Date": "2025-10-23T00:00:00.000",
+              "Time": "09:00",
               "Terminal": {
-                "Name": "2E"
+                "Name": "2"
               }
             },
             "MarketingCarrier": {
               "AirlineID": {
-                "value": "KQ"
+                "value": "AF"
               },
-              "Name": "KENYA AIRWAYS",
               "FlightNumber": {
-                "value": "3079"
+                "value": "1518"
               }
             },
             "OperatingCarrier": {
               "AirlineID": {
-                "value": "AF"
-              },
-              "Name": "AIR FRANCE"
-            }
-          },
-          {
-            "SegmentKey": "SEG6",
-            "Departure": {
-              "AirportCode": {
-                "value": "CDG"
-              },
-              "Date": "2025-10-04T10:45:00.000",
-              "Time": "10:45",
-              "Terminal": {
-                "Name": "2E"
-              }
-            },
-            "Arrival": {
-              "AirportCode": {
-                "value": "NBO"
-              },
-              "Date": "2025-10-04T20:10:00.000",
-              "Time": "20:10",
-              "Terminal": {
-                "Name": "1A"
-              }
-            },
-            "MarketingCarrier": {
-              "AirlineID": {
-                "value": "KQ"
-              },
-              "Name": "KENYA AIRWAYS",
-              "FlightNumber": {
-                "value": "113"
+                "value": "A5"
               }
             }
           }
@@ -3610,11 +549,10 @@
       "FlightList": {
         "Flight": [
           {
-            "FlightKey": "Flight-1",
+            "FlightKey": "PJ1",
             "SegmentReferences": {
               "value": [
-                "SEG5",
-                "SEG6"
+                "SEG1"
               ]
             }
           }
@@ -3623,17 +561,17 @@
       "OriginDestinationList": {
         "OriginDestination": [
           {
-            "OriginDestinationKey": "JRN1",
+            "OriginDestinationKey": "OD1",
             "FlightReferences": {
               "value": [
-                "Flight-1"
+                "PJ1"
               ]
             },
             "DepartureCode": {
-              "value": "LHR"
+              "value": "CDG"
             },
             "ArrivalCode": {
-              "value": "NBO"
+              "value": "FRA"
             }
           }
         ]

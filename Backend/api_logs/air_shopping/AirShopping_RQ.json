@@ -1,13 +1,13 @@
 {
-  "timestamp": "2025-09-27T12:20:17.929580",
+  "timestamp": "2025-10-17T21:12:28.463698",
   "service": "AirShopping",
-  "request_id": "c49f8f02-c17a-4e5d-b8ff-e33f2dd5eb80",
+  "request_id": "6f0a3a92-f9c7-4264-bf6a-29b70c1614a4",
   "endpoint": "/entrygate/rest/request:airShopping",
   "headers": {
     "Content-Type": "application/json",
     "Accept": "*/*",
-    "Authorization": "Bearer ***k416yncA",
-    "OfficeId": "***F301",
+    "Authorization": "Bearer ***JfR56jBg",
+    "OfficeId": "***3746",
     "service": "AirShopping",
     "User-Agent": "PostmanRuntime/7.41",
     "Cache-Control": "no-cache",
@@ -73,13 +73,13 @@
             "OriginDestinationKey": "OD1",
             "Departure": {
               "AirportCode": {
-                "value": "LHR"
+                "value": "CDG"
               },
-              "Date": "2025-10-03"
+              "Date": "2025-10-23"
             },
             "Arrival": {
               "AirportCode": {
-                "value": "NBO"
+                "value": "FRA"
               }
             }
           }

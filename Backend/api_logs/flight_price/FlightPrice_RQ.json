@@ -1,13 +1,13 @@
 {
-  "timestamp": "2025-09-27T12:21:15.058222",
+  "timestamp": "2025-10-17T21:13:12.666373",
   "service": "FlightPrice",
-  "request_id": "ce454772-68e1-41b5-8f46-559dcaa43f2b",
+  "request_id": "7d0b7598-2c36-4d12-83cd-f5ab4e460724",
   "endpoint": "/entrygate/rest/request:flightPrice",
   "headers": {
     "Content-Type": "application/json",
     "Accept": "*/*",
-    "Authorization": "Bearer ***k416yncA",
-    "OfficeId": "***F301",
+    "Authorization": "Bearer ***JfR56jBg",
+    "OfficeId": "***3746",
     "service": "FlightPrice",
     "User-Agent": "PostmanRuntime/7.41",
     "Cache-Control": "no-cache",
@@ -19,16 +19,16 @@
     "DataLists": {
       "FareGroup": [
         {
-          "ListKey": "KQ-FG-145369758825304",
+          "ListKey": "AF-FG-NYS5BALA-70J",
           "FareBasisCode": {
-            "Code": "ULSFWGB"
+            "Code": "NYS5BALA"
           }
         }
       ],
       "AnonymousTravelerList": {
         "AnonymousTraveler": [
           {
-            "ObjectKey": "KQ-PAX1",
+            "ObjectKey": "AF-PAX1",
             "PTC": {
               "value": "ADT"
             }
@@ -41,90 +41,41 @@
         {
           "Flight": [
             {
-              "SegmentKey": "KQ-SEG5",
+              "SegmentKey": "AF-SEG1",
               "Departure": {
                 "AirportCode": {
-                  "value": "LHR"
+                  "value": "CDG"
                 },
-                "Date": "2025-10-03T19:45:00.000",
-                "Time": "19:45",
+                "Date": "2025-10-23T00:00:00.000",
+                "Time": "07:40",
                 "Terminal": {
-                  "Name": "4"
+                  "Name": "2G"
                 }
               },
               "Arrival": {
                 "AirportCode": {
-                  "value": "CDG"
+                  "value": "FRA"
                 },
-                "Date": "2025-10-03T22:00:00.000",
-                "Time": "22:00",
+                "Date": "2025-10-23T00:00:00.000",
+                "Time": "09:00",
                 "Terminal": {
-                  "Name": "2E"
+                  "Name": "2"
                 }
               },
               "MarketingCarrier": {
-                "AirlineID": {
-                  "value": "KQ"
-                },
-                "Name": "Kenya Airways",
-                "FlightNumber": {
-                  "value": "3079"
-                }
-              },
-              "OperatingCarrier": {
                 "AirlineID": {
                   "value": "AF"
                 },
-                "Name": "Air France"
-              },
-              "FlightDetail": {
-                "FlightDuration": {
-                  "Value": "PT1H15M"
-                }
-              }
-            },
-            {
-              "SegmentKey": "KQ-SEG6",
-              "Departure": {
-                "AirportCode": {
-                  "value": "CDG"
-                },
-                "Date": "2025-10-04T10:45:00.000",
-                "Time": "10:45",
-                "Terminal": {
-                  "Name": "2E"
-                }
-              },
-              "Arrival": {
-                "AirportCode": {
-                  "value": "NBO"
-                },
-                "Date": "2025-10-04T20:10:00.000",
-                "Time": "20:10",
-                "Terminal": {
-                  "Name": "1A"
-                }
-              },
-              "MarketingCarrier": {
-                "AirlineID": {
-                  "value": "KQ"
-                },
-                "Name": "Kenya Airways",
                 "FlightNumber": {
-                  "value": "113"
+                  "value": "1518"
                 }
               },
               "OperatingCarrier": {
                 "AirlineID": {
-                  "value": "KQ"
-                },
-                "Name": "Kenya Airways"
-              },
-              "FlightDetail": {
-                "FlightDuration": {
-                  "Value": "PT8H25M"
+                  "value": "A5"
                 }
-              }
+              },
+              "FlightDetail": {}
             }
           ]
         }
@@ -133,16 +84,16 @@
         "Offer": [
           {
             "OfferID": {
-              "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2",
-              "Owner": "KQ",
+              "value": "ef49d126-b797-4712-89d1-26b797370001",
+              "Owner": "AF",
               "Channel": "NDC"
             },
             "OfferItemIDs": {
               "OfferItemID": [
                 {
-                  "value": "1GHKQZ_M5E20LQLNRI0VVVFEK1KGZWUKNS2-1",
+                  "value": "d47274a9-3f9f-4a99-b274-a93f9fba9906",
                   "refs": [
-                    "KQ-PAX1"
+                    "AF-PAX1"
                   ]
                 }
               ]
@@ -150,6 +101,9 @@
             "refs": [
               {
                 "Ref": "VDC-AIRLINE-SRID"
+              },
+              {
+                "Ref": "VDC-PR-zTywGrIpB3yHCE2sDZGm"
               }
             ]
           }
@@ -157,9 +111,9 @@
       }
     },
     "ShoppingResponseID": {
-      "Owner": "KQ",
+      "Owner": "AF",
       "ResponseID": {
-        "value": "RQ295nCRfbrvzRjC8m6QKnLLJegueo3Nuh9xeqvacr0-KQ"
+        "value": "tz-s9tozhn8KCauIlsOhm4dhNa5LF7sNsGxATQtLyJo-AF"
       }
     },
     "Travelers": {
@@ -188,7 +142,20 @@
                       {
                         "any": {
                           "type": "java.util.HashMap",
-                          "value": "eyJLTCI6ImdWZnZIRnZ5ZmtIS0owelhiNWE4IiwiUVIiOiIxRzVRUlpfSlY1QU0xWTJHSUZQQzdDWklSMjJHSEs1QzhLRiIsIkVZIjoiRlE2V1JKRERUNTVCMTlKS1BCM1FTQjlGRTEiLCJBRiI6Ilh3MVN1OFdMQ1NUbk5BTEgwNXNRIiwiS1EiOiIxR0hLUVpfSktaUktIR1M1MEVBWTAxMzRUR0hUQjA2VlVKQiIsIlRLIjoiMGYxOTZkZWYtZWI4Ni00NWNjLWFkMGUtZmY3Yjg4M2IzNTY1In0="
+                          "value": "eyJRUiI6IjFIMlFSWl9EOEc5MEVQMkhFRVJZWVYzN1lUSUxFMVU2TFUyIiwiS0wiOiI3MEZoNklLTTNMd2RYRWJNdWZnRCIsIkFGIjoibkhEbW9vdGV2cG1kV2dIengyZnQiLCJMSEciOiJYRUFDOEM4OTItNThFOS00NjRELUFFQUUiLCJHRiI6IjgzMjU0OTM3LWE3MzgtNDY4Ni05N2M5LTEyNjk4ZmFmZWNhMDo4MzI1NDkzNy1hNzM4LTQ2ODYtOTdjOS0xMjY5OGZhZmVjYTAiLCJFVCI6IkZTMjVDNUtDWTAyQjBWSSJ9"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "MetadataKey": "VDC-PR-zTywGrIpB3yHCE2sDZGm",
+                  "AugmentationPoint": {
+                    "AugPoint": [
+                      {
+                        "any": {
+                          "@type": "com.verteil.pricemanager.data.PriceRuleAugPoint",
+                          "value": "tO3oqLaKU6bHOMSPHe3m9PGJSs6bko/QCB/Me/hs7dFrKXiXfDvOChA37ZbI7tfZrAzY91SOAAqpS4FNUjLkWsUU1BwdZsGmi/6F2AsMbI0FwoGUUPCwHsk+MVoIWDlTiu3/gsp56IXsfpN/B7kZbgiujLAahBqXE4s2TFBBeEXbezxK9sGXNCQBg/wW5se1AilkEtH4OR/SpoId+yjiwmBf8V8dHkc7Hm9pwkBCarmJ7zIr8xt5+UkQC5jneaxjJedNTQmMW8tIdPfwCLHMXOJFDsZbXjEKA36Ujkw6Wcg1f+W4w7LD1fn2+xIIylJMLr1hn9i5kcffaxam0H4V+3Cw0thRwnf1S23+NE/yjNTFiEILZIPclgQEDo+kiBvsc/YTMnRiX4cUbqzbxM3V"
                         }
                       }
                     ]

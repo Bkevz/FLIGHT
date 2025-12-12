@@ -1,16 +1,16 @@
 {
-  "timestamp": "2025-09-27T12:26:11.806427",
+  "timestamp": "2025-10-17T21:16:30.043212",
   "service": "OrderCreate",
-  "request_id": "f8933c11-9abc-40b0-92f7-9a53e83ff659",
+  "request_id": "9cdf12fe-31e7-4236-b73d-d1de3c5796bf",
   "status_code": 200,
   "response_time_ms": null,
   "response": {
     "status": "success",
     "data": {
       "error": {
-        "code": "VALIDATION_FAILURE",
-        "message": "FAILED_PRECONDITION: Payment authorization failed - Agent FOP Validation Failure - CASH is not allowed",
-        "timestamp": "2025-09-27T09:26:11.460820Z",
+        "code": "AIRLINE_ERROR",
+        "message": "Unable to process - system error",
+        "timestamp": "2025-10-17T18:16:29.805055Z",
         "requestId": "unknown"
       }
     },
@@ -18,14 +18,14 @@
       "Errors": {
         "Error": [
           {
-            "value": "FAILED_PRECONDITION: Payment authorization failed - Agent FOP Validation Failure - CASH is not allowed",
-            "ShortText": "FAILED_PRECONDITION: Payment authorization failed - Agent FOP Validation Failure - CASH is not allowed",
-            "Code": "VALIDATION_FAILURE",
-            "Reason": "PAYMENT_ERROR"
+            "value": "Unable to process - system error",
+            "ShortText": "Offer item not found",
+            "Code": "AIRLINE_ERROR",
+            "Reason": "UNKNOWN"
           }
         ]
       }
     },
-    "request_id": "f8933c11-9abc-40b0-92f7-9a53e83ff659"
+    "request_id": "9cdf12fe-31e7-4236-b73d-d1de3c5796bf"
   }
 }
